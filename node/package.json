@@ -1,5 +1,5 @@
 {
-  "name": "spark-house-control",
+  "name": "spark-neopixel-control",
   "version": "0.0.1",
   "private": true,
   "scripts": {

@@ -3,9 +3,14 @@
 #include "application.h"
 #include "neopixel/neopixel.h"
 
+//the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
-#define PIXEL_COUNT 150
+//the number of pixels you are controlling
+#define PIXEL_COUNT 600
+//the neopixel chip type
 #define PIXEL_TYPE WS2812B
+
+//particle params
 #define MAX_COLOR 255
 #define NUM_PARTICLES 1
 #define FPS 210
@@ -18,7 +23,23 @@ char parameters[64];
 
 void setCoordColor(Coord3D coord, uint32_t color);
 
-String loopRun = "stop";
+//program and action names
+#define STOP "stop"
+#define SHUTDOWN "shutdown"
+#define RAINBOW "rainbow"
+#define ALTERNATE "alternate"
+#define BLOCKS "blocks"
+#define FADECOLOR "fadeColor"
+#define PARTICLES "particles"
+#define ALLOFF "allOff"
+#define SETALL "setAll"
+#define LOOPALTERNATE "loopAlternate"
+#define LOOPBLOCKS "loopBlocks"
+#define LATCHPIXEL "latch"
+#define SETPIXEL "setPixel"
+
+
+String loopRun = STOP;
 String *loopArgs = new String[20];
 
 void setup() 
@@ -26,10 +47,14 @@ void setup()
   Serial.begin(9600);
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  //register the run command as an API endpoint
   Spark.function("run", run);
+  //register the action variable as a GET parameter
   Spark.variable("action", &action, STRING);
+  //retister the parameters variable as a GET parameter
   Spark.variable("parameters", &parameters, STRING);
 
+  //particles init
   emitter.respawnOnOtherSide = true;
   emitter.threed = false;
   emitter.numParticles = NUM_PARTICLES;
@@ -38,15 +63,20 @@ void setup()
 
 void loop() 
 {
-    if(loopRun.equals("stop"))
+    if(loopRun.equals(STOP))
     {
         delay(1000);
     }
-    else if(loopRun.equals("rainbow"))
+    if(loopRun.equals(SHUTDOWN))
+    { //stop all programs and set all pixels to off
+        loopRun = STOP;
+        setAll(0,0,0);
+    }
+    else if(loopRun.equals(RAINBOW))
     {
         rainbow(20);        
     }
-    else if(loopRun.equals("alternate"))
+    else if(loopRun.equals(ALTERNATE))
     {
         int r1 = stringToInt(loopArgs[0]);
         int g1 = stringToInt(loopArgs[1]);
@@ -61,7 +91,7 @@ void loop()
         staticAlternate(r2, g2, b2, r1, g1, b1);
         delay(d);
     }
-    else if(loopRun.equals("blocks"))
+    else if(loopRun.equals(BLOCKS))
     {
         int r1 = stringToInt(loopArgs[0]);
         int g1 = stringToInt(loopArgs[1]);
@@ -77,7 +107,7 @@ void loop()
         buildBlocks(r2, g2, b2, r1, g1, b1, blockSize);
         delay(d);
     }
-    else if(loopRun.equals("fadeColor"))
+    else if(loopRun.equals(FADECOLOR))
     {
         int r1 = stringToInt(loopArgs[0]);
         int g1 = stringToInt(loopArgs[1]);
@@ -93,13 +123,9 @@ void loop()
         fadeColor(r2, g2, b2, r1, g1, b1, d, duration);
         delay(d);
     }
-    else if(loopRun.equals("particles"))
+    else if(loopRun.equals(PARTICLES))
     {
         particles(); 
-    }
-    else if(loopRun.equals("pumpkin"))
-    {
-        pumpkin();
     }
 }
 
@@ -109,27 +135,38 @@ int allOff()
     return 1;
 }
 
+/*
+    This function handles the API requests to /run.  The params are a 
+    comma separated list.  
+    params format is <command>,<param0>,<param1>,...,<paramN>
+    where <command> is the action to be run and <paramN> are the parameters that an individual
+    action needs.
+    
+    Actions can be divided into two categories: one where the loop() function is used to animate pixel
+    values and one where pixel values are set a single time.
+    Looped programs can be run using the loopRun variable.  If loopRun is set to STOP the loop will 
+    run with no program selected.
+*/
 int run(String params)
 {
-    //params format is <command>,<param0>,<paramN>
     String* args = stringSplit(params, ',');
     String command = args[0];
     strcpy(parameters, params.c_str());
     strcpy(action, command.c_str());
-    loopRun = "stop";
-    if(command.equals("allOff"))
+    loopRun = SHUTDOWN;
+    if(command.equals(ALLOFF))
     {
         return allOff();
         return 1;
     }
-    else if(command.equals("setAll"))
+    else if(command.equals(SETALL))
     {
         int r = stringToInt(args[1]);
         int g = stringToInt(args[2]);
         int b = stringToInt(args[3]);
         return setAll(r, g, b);
     }
-    else if(command.equals("alternate"))
+    else if(command.equals(ALTERNATE))
     {
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
@@ -139,9 +176,9 @@ int run(String params)
         int b2 = stringToInt(args[6]);
         return staticAlternate(r1, g1, b1, r2, g2, b2);
     }
-    else if(command.equals("loopAlternate"))
+    else if(command.equals(LOOPALTERNATE))
     {
-        loopRun = "alternate";
+        loopRun = ALTERNATE;
         loopArgs[0] = args[1]; //r1
         loopArgs[1] = args[2]; //g1
         loopArgs[2] = args[3]; //b1
@@ -151,9 +188,9 @@ int run(String params)
         loopArgs[6] = args[7]; //delay
         return 1;
     }
-    else if(command.equals("loopBlocks"))
+    else if(command.equals(LOOPBLOCKS))
     {
-        loopRun = "blocks";
+        loopRun = BLOCKS;
         loopArgs[0] = args[1]; //r1
         loopArgs[1] = args[2]; //g1
         loopArgs[2] = args[3]; //b1
@@ -164,7 +201,7 @@ int run(String params)
         loopArgs[7] = args[8]; //block size
         return 1;
     }
-    else if(command.equals("blocks"))
+    else if(command.equals(BLOCKS))
     {
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
@@ -175,10 +212,10 @@ int run(String params)
         int blockSize = stringToInt(args[7]);
         buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
     }
-    else if(command.equals("fadeColor"))
+    else if(command.equals(FADECOLOR))
     {
         //possible commands: stop, rainbow, alternate
-        loopRun = "fadeColor";
+        loopRun = FADECOLOR;
         loopArgs[0] = args[1]; //r1
         loopArgs[1] = args[2]; //g1
         loopArgs[2] = args[3]; //b1
@@ -189,14 +226,14 @@ int run(String params)
         loopArgs[7] = args[8]; //duration
         return 1;
     }
-    else if(command.equals("rainbow"))
+    else if(command.equals(RAINBOW))
     {
-        loopRun = "rainbow";
+        loopRun = RAINBOW;
         return 1;
     }
-    else if(command.equals("particles"))
+    else if(command.equals(PARTICLES))
     {
-        loopRun = "particles";
+        loopRun = PARTICLES;
         return 1;
     }
     else if(command.equals("latchPixel"))
@@ -209,7 +246,7 @@ int run(String params)
         strip.show();
         return 1;
     }
-    else if(command.equals("setPixel"))
+    else if(command.equals(SETPIXEL))
     {
         int pixel = stringToInt(args[0]);
         int r1 = stringToInt(args[1]);
@@ -218,19 +255,19 @@ int run(String params)
         strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
         return 1;
     }
-    else if(command.equals("latch"))
+    else if(command.equals(LATCHPIXEL))
     {
         strip.show();
         return 1;
     }
-    else if(command.equals("stop"))
+    else if(command.equals(STOP))
     {
-        loopRun = "stop";
+        loopRun = STOP;
         return 1;
     }
-    else if(command.equals("pumpkin"))
+    else if(command.equals(SHUTDOWN))
     {
-        loopRun = "pumpkin";
+        loopRun = SHUTDOWN;
         return 1;
     }
     else 
@@ -261,54 +298,6 @@ int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
         }
     }
     strip.show();
-    return 1;
-}
-
-int pumpkin()
-{               
-    //set the purple block
-    for(int i=strip.numPixels() - 20; i<strip.numPixels(); i++) {
-        strip.setPixelColor(i, strip.Color(100, 0, 255));
-    }
-    strip.show();
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(128, 128, 128));
-    }
-    strip.show();
-    delay(100);
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(0, 0, 0));
-    }
-    strip.show();
-    delay(100);
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(128, 128, 128));
-    }
-    strip.show();
-    delay(100);
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(0, 0, 0));
-    }
-    strip.show();
-    delay(100);
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(128, 128, 128));
-    }
-    strip.show();
-    delay(100);
-    
-    for(int i=0; i<strip.numPixels() - 20; i++) {
-        strip.setPixelColor(i, strip.Color(0, 0, 0));
-    }
-    strip.show();
-    delay(random(10000));
-    
-    
     return 1;
 }
 
