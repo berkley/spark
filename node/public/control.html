@@ -1,0 +1,279 @@
+<html>
+<head>
+	<title>El Poder Casa 2000</title>
+	<!-- <link rel="shortcut icon" href="favicon.ico" type="image/x-icon"> -->
+	<link rel="apple-touch-icon" href="./freddy.png" />
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="spectrum.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="spectrum.css" type="text/css"/>
+	<meta name="viewport" content="width=250" />
+	<script>
+    $( document ).ready(function() {
+        // console.log( "document loaded" );
+        $('#colorSelector1').hide();
+		$('#colorSelector2').hide();
+		$('#delayDiv').hide();
+		$('#durationDiv').hide();
+		$('#blockSizeDiv').hide();
+		$('#spinner').hide();
+    });
+ 
+    $( window ).load(function() {
+        // console.log( "window loaded" );
+    });
+    </script>
+	<style>
+		body 
+		{
+			background-color: grey;
+		}
+    </style>
+</head>
+<body style="max-width: 200px; margin: 0 auto; float: none">
+	<br/>
+	<img src="freddy.png"/>
+	<h3>El Poder Casa 2000</h3>
+	Core:
+	<select id="coreIdSelect" name="core">
+		<option value="53ff70065067544818350687">Colussus - lower house</option>
+		<option value="54ff6c066667515143491267">Giggle - upper house (eventually)</option>
+		<option value="all">All</option>
+	</select><br/>
+	Program:
+	<select id="actionSelect" name="action">
+		<option value="allOff">All Pixels Off</option>
+		<option value="stop">Stop Program</option>
+		<option value="setAll">Single Color</option>
+		<option value="alternate">Alternate Colors</option>
+		<option value="animateAlternate">Animate Alternate Colors</option>
+		<option value="rainbow">Rainbow</option>
+		<option value="blocks">Blocks</option>
+		<option value="loopBlocks">Animate Blocks</option>
+		<option value="fadeColor">Fade Between 2 Colors</option>
+		<option value="particles">Particles</option>
+	</select><br/>
+
+	<span id="colorSelector1">
+		Red1: <br/>
+		<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
+		<br/>
+		Green1: <br/>
+		<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
+		<br/>
+		Blue1: <br/>
+		<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
+		<br/>
+		<input id='colorpicker1' />
+		<br/>
+	</span>
+
+
+	<span id="colorSelector2">
+		Red2: <br/>
+		<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
+		<br/>
+		Green2: <br/>
+		<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
+		<br/>
+		Blue2: <br/>
+		<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
+		<br/>
+		<input id='colorpicker2' />
+	</span>
+
+	<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
+	<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
+	<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
+	<button id="goButton">Light It Up</button>
+
+	<div id="status"></div>
+	<div id="result"></div>
+	<img style="width:30px;" id="spinner" width="100" src="spinner.gif"></div>
+
+	<script>
+		var createColorPicker = function(id, color, rid, gid, bid) {
+			$(id).spectrum({
+			color: color,
+			preferredFormat: "rgb",
+		    move: function(tinycolor) { },
+		    show: function(tinycolor) { },
+		    hide: function(tinycolor) { },
+		    beforeShow: function(tinycolor) { },
+		    change: function(color) {
+		    	$(rid).val(color.toRgb().r);
+		    	$(gid).val(color.toRgb().g);
+		    	$(bid).val(color.toRgb().b);
+		    }
+			});
+		};
+
+		createColorPicker("#colorpicker1", "F00", "#r1", "#g1", "#b1");
+		createColorPicker("#colorpicker2", "F00", "#r2", "#g2", "#b2");
+
+		var button = document.querySelector("#goButton");
+		var select = document.querySelector("select");
+
+		var calcColor = function(r, g, b) {
+			var rstr = r.toString(16);
+			var gstr = g.toString(16);
+			var bstr = b.toString(16);
+			if(rstr == '0') {rstr = '00'}
+			if(gstr == '0') {gstr = '00'}
+			if(bstr == '0') {bstr = '00'}
+			var col = "#" + rstr + gstr + bstr;
+			// alert('col: ' + col);
+			return col;
+		};
+
+		document.getElementById("r1").addEventListener("change", function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		document.getElementById("g1").addEventListener("change", function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		document.getElementById("b1").addEventListener("change", function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		document.getElementById("r2").addEventListener("change", function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		document.getElementById("g2").addEventListener("change", function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		document.getElementById("b2").addEventListener("change", function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		document.getElementById("actionSelect").addEventListener("change", function(ev) {
+			if(ev.target.value == 'stop')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'allOff')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'setAll')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'alternate')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'animateAlternate')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'rainbow')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'loopBlocks')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').show();
+			}
+			else if(ev.target.value == 'blocks')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').show();
+			}
+			else if(ev.target.value == 'fadeColor')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				$('#durationDiv').show();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'particles')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+
+		});
+	 
+	    button.addEventListener("click", function(ev) {
+	    	$('#spinner').show();
+	    	$('#status').html("");
+	    	$('#result').html("");
+		    $.get("/house/run/action", 
+		    	{action:$('#actionSelect').val(), coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val()}, 
+		    	function(data) {
+		      if(!data.return_value >= 1) {
+		      	$('#status').html("<h3>Request Succeeded</h3>");
+		      } else {
+		      	$('#status').html("<h3>Request Failed</h3>");
+		      }
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+	    }, false);
+	</script>
+
+</body>
+</html>
