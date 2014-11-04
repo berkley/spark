@@ -1,7 +1,6 @@
-#include "particles/particles.h"
-
 #include "application.h"
 #include "neopixel/neopixel.h"
+#include "particles/particles.h"
 
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
