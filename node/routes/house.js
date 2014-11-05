@@ -24,7 +24,7 @@ exports.action = function(req, res) {
 	else if(action == "stop")
 	{
 		var url = buildUrl("run", coreId);
-		var data = "stop,";
+		var data = "shutdown,";
 		request.post(url, function(err, response, body) {
 			res.send(body);
 		}).form(buildFormData(data));

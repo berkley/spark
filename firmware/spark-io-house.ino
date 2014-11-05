@@ -34,8 +34,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETALL "setAll"
 #define LOOPALTERNATE "loopAlternate"
 #define LOOPBLOCKS "loopBlocks"
-#define LATCHPIXEL "latch"
+#define LATCHPIXEL "latchPixel"
 #define SETPIXEL "setPixel"
+#define LATCH "latch"
 
 
 String loopRun = STOP;
@@ -66,7 +67,7 @@ void loop()
     {
         delay(1000);
     }
-    if(loopRun.equals(SHUTDOWN))
+    else if(loopRun.equals(SHUTDOWN))
     { //stop all programs and set all pixels to off
         loopRun = STOP;
         setAll(0,0,0);
@@ -152,11 +153,10 @@ int run(String params)
     String command = args[0];
     strcpy(parameters, params.c_str());
     strcpy(action, command.c_str());
-    loopRun = SHUTDOWN;
+    
     if(command.equals(ALLOFF))
     {
         return allOff();
-        return 1;
     }
     else if(command.equals(SETALL))
     {
@@ -235,7 +235,7 @@ int run(String params)
         loopRun = PARTICLES;
         return 1;
     }
-    else if(command.equals("latchPixel"))
+    else if(command.equals(LATCHPIXEL))
     {
         int pixel = stringToInt(args[0]);
         int r1 = stringToInt(args[1]);
@@ -254,7 +254,7 @@ int run(String params)
         strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
         return 1;
     }
-    else if(command.equals(LATCHPIXEL))
+    else if(command.equals(LATCH))
     {
         strip.show();
         return 1;
