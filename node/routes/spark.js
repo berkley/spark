@@ -57,10 +57,10 @@ exports.action = function(req, res) {
 		data = "particles,";
 	}
 
-	runPost(data, action, coreId);
+	runPost(data, action, coreId, res);
 };
 
-var runPost = function(data, action, coreId) {
+var runPost = function(data, action, coreId, res) {
 	console.log("action: " + action);
 	console.log("coreId: " + coreId);
 	console.log("data: " + data);
@@ -68,13 +68,17 @@ var runPost = function(data, action, coreId) {
 	if(coreId == "all")
 	{
 		var cores = config.get("cores");
-		for(int i=0; i<cores.length; i++)
+		var resData = [];
+		for(var i=0; i<cores.length; i++)
 		{
 			var url = buildUrl("run", cores[i].id);
 			request.post(url, function(err, response, body) {
+				// resData.push(body);
 				res.send(body);
 			}).form(buildFormData(data));
 		}
+		console.log("resData: ", resData);
+		
 	}
 	else
 	{
