@@ -1,0 +1,16 @@
+{
+    "access_token": "24edb556548761530ad4ecde7e4223ebc662b9fb",
+    "port": 3000,
+    "cores": [
+        {
+            "name": "Outside",
+            "id": "53ff70065067544818350687",
+            "description": "Outside of the house"
+        },
+        {
+            "name": "Mantel",
+            "id": "54ff6c066667515143491267",
+            "description": "Inside above the fireplace"
+        }
+    ]
+}

@@ -1,12 +1,20 @@
 var request = require('request');
+var nconf = require('nconf');
+var config;
 
 var sparkUrl = "https://api.spark.io/v1/devices";
+var access_token = "24edb556548761530ad4ecde7e4223ebc662b9fb";
 
-exports.index = function(req, res) {
-	res.redirect("control.html");
+exports.setConfig = function(conf) {
+	config = conf;
 };
 
-var access_token = "";
+exports.index = function(req, res) {
+	var cores = {"cores":config.get("cores")};
+	console.log(cores);
+	res.render('index', cores);
+	
+};
 
 exports.action = function(req, res) {
 	var action = req.query.action;
