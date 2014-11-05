@@ -6,15 +6,17 @@ This is the control firmware for the spark core device(s).  You'll need to use t
 This file provides a simple POST route to control the neopixels attached to the device.  You'll need to set the number of pixels and the neopixel chip type (ex: WS2812) at the top of the firmware file.  
 
 The node app communicates with the spark core via the spark API.  The API calls are a POST of the form 
-`	
+```	
 	https://api.spark.io/v1/devices/<deviceId>/run
 	formData:  { access_token: '<accessToken>',
-  	                   params: '<action>,param1,param2,...,paramN' }
+	                   params: '<action>,param1,param2,...,paramN' }
+```
 
 This request is handled by the run() function in the firmware.  The Params are parsed and the given action is executed.
 
 The current list of actions is in the #define block near the top of spark-io-house.ino.  Different actions take different parameters (or none at all).  You can find the parameter list in the if/then statement within run() for the action you want to use.  Here are some examples:
 
+```
 description: blocks of color alternating on the strip
 action: "blocks"
 params: 
@@ -46,3 +48,4 @@ POST: https://api.spark.io/v1/devices/<deviceId>/run
 		formData:  { access_token: '<accessToken>',
   					       params: 'fadeColor,255,0,0,0,0,255,50,5000'}
 NOTES: this POST fades from red to blue, stepping the color every 50ms with a total duration of 5 seconds
+```
