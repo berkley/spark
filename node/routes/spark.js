@@ -18,86 +18,66 @@ exports.action = function(req, res) {
 
 	console.log("action: " + action);
 	console.log("coreId: " + coreId);
+
+	var url = null;
+	var data = null;
+
 	if(action == "allOff")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "setAll,0,0,0";
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "setAll,0,0,0";
 	}
 	else if(action == "stop")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "shutdown,";
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "shutdown,";
 	}
 	else if(action == "setAll")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "setAll," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "setAll," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1;
 	}
 	else if(action == "alternate")
 	{
-		var url = buildUrl("run", coreId);	
-	    var data = "alternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);	
+	    data = "alternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2;
 	}
 	else if(action == "animateAlternate")
 	{
-		var url = buildUrl("run", coreId);	
-	    var data = "loopAlternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);	
+	    data = "loopAlternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
 	}
 	else if(action == "rainbow")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "rainbow,";
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "rainbow,";
 	}
 	else if(action == "loopBlocks")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "loopBlocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.blockSize;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "loopBlocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.blockSize;
 	}
 	else if(action == "fadeColor")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "fadeColor," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.duration;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "fadeColor," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.duration;
 	}
 	else if(action == "blocks")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "blocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.blockSize;
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "blocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.blockSize;
 	}
 	else if(action == "particles")
 	{
-		var url = buildUrl("run", coreId);
-		var data = "particles,";
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));
+		url = buildUrl("run", coreId);
+		data = "particles,";
 	}
+
+	request.post(url, function(err, response, body) {
+		console.log("\n\npost callback:", err, body);
+		res.send(body);
+	}).form(buildFormData(data));
+
 };
 
 var buildFormData = function(params) {
