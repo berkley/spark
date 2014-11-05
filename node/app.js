@@ -6,13 +6,13 @@ var nconf = require('nconf');
 var fs = require('fs');
 
 var app = express();
-spark.setConfig(nconf);
 
 nconf.argv()
      .env()
      .file({file: 'config.json'});
 
-// all environments
+spark.setConfig(nconf);
+
 app.set('port', nconf.get("port") || process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'ejs');

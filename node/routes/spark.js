@@ -2,9 +2,6 @@ var request = require('request');
 var nconf = require('nconf');
 var config;
 
-var sparkUrl = "https://api.spark.io/v1/devices";
-var access_token = "24edb556548761530ad4ecde7e4223ebc662b9fb";
-
 exports.setConfig = function(conf) {
 	config = conf;
 };
@@ -13,12 +10,12 @@ exports.index = function(req, res) {
 	var cores = {"cores":config.get("cores")};
 	console.log(cores);
 	res.render('index', cores);
-	
 };
 
 exports.action = function(req, res) {
 	var action = req.query.action;
 	var coreId = req.query.coreId;
+
 	console.log("action: " + action);
 	console.log("coreId: " + coreId);
 	if(action == "allOff")
@@ -104,12 +101,14 @@ exports.action = function(req, res) {
 };
 
 var buildFormData = function(params) {
+	var access_token = config.get("access_token");
 	var formData = {"access_token":access_token ,"params":params};
 	console.log("formData: ", formData);
 	return formData;
 };
 
 var buildUrl = function(action, coreId) {
+	var sparkUrl = config.get("spark_url");
 	var url = sparkUrl + "/" + coreId + "/" + action;
 	console.log("url: ", url);
 	return url;
