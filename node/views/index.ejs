@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>El Poder Casa 2000</title>
+	<title>El Casa Poder 2000</title>
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="apple-touch-icon" href="./freddy.png" />
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
@@ -10,7 +10,6 @@
 	<meta name="viewport" content="width=250" />
 	<script>
     $( document ).ready(function() {
-        // console.log( "document loaded" );
         $('#colorSelector1').hide();
 		$('#colorSelector2').hide();
 		$('#delayDiv').hide();
@@ -20,20 +19,22 @@
     });
  
     $( window ).load(function() {
-        // console.log( "window loaded" );
     });
     </script>
 	<style>
 		body 
 		{
 			background-color: grey;
+			max-width: 200px;
+			margin: 0 auto;
+			float: none;
 		}
     </style>
 </head>
-<body style="max-width: 200px; margin: 0 auto; float: none">
+<body>
 	<br/>
 	<img src="freddy.png"/>
-	<h3>El Poder Casa 2000</h3>
+	<h3>El Casa Poder 2000</h3>
 	Core:
 	<select id="coreIdSelect" name="core">
 		<% for(var i=0; i<cores.length; i++) {%>
@@ -265,11 +266,7 @@
 		    $.get("/house/run/action", 
 		    	{action:$('#actionSelect').val(), coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val()}, 
 		    	function(data) {
-		      if(!data.return_value >= 1) {
-		      	$('#status').html("<h3>Request Succeeded</h3>");
-		      } else {
-		      	$('#status').html("<h3>Request Failed</h3>");
-		      }
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
 			  $('#result').html( data );
 			  $('#spinner').hide();
 			});
