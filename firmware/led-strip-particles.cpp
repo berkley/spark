@@ -76,7 +76,7 @@ Particle ParticleEmitter::updateParticle(uint16_t i) {
     }
 
     float maxHighVelocity = maxVelocity * GOLDEN_RATIO * 10.0; 
-    float extra = 0.33;
+    float extra = 0.45;
     
     if (respawnOnOtherSide && p->velocity.x < maxHighVelocity && p->velocity.y < maxHighVelocity) {        
         if (p->coord.x < 0.0-extra) {

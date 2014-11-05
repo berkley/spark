@@ -11,7 +11,7 @@
 
 //particle params
 #define MAX_COLOR 200
-#define NUM_PARTICLES 20
+#define NUM_PARTICLES 12
 #define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
 
