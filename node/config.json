@@ -1,5 +1,5 @@
 {
-    "access_token": "24edb556548761530ad4ecde7e4223ebc662b9fb",
+    "access_token": "your_access_token_here",
     "port": 3000,
     "spark_url":"https://api.spark.io/v1/devices",
     "cores": [
