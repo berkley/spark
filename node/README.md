@@ -4,11 +4,21 @@ This server provides access to one or more spark core processors via the spark.i
 
 You'll need to configure your access_token in house.js and your device id(s) in control.html
 
+Installation
+============
+```
+npm install
+```
+
 Startup
 =======
+```
 npm start
+```
 
 In a browser
 ============
+```
 http://localhost:3000
+```
 
