@@ -6,7 +6,7 @@ exports.index = function(req, res) {
 	res.redirect("control.html");
 };
 
-var access_token = "2863796eb27c702fa85eea98cef4720c2b7b4ca1";
+var access_token = "";
 
 exports.action = function(req, res) {
 	var action = req.query.action;
