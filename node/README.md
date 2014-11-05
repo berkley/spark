@@ -1,6 +1,4 @@
-This server provides access to one or more spark core processors via the spark.io API
-
-* Port: 3000
+This server provides access to WS2811/12 neopixel LED strips connected to one or more spark core processors via the spark.io API
 
 You'll need to change the config.json file to match your core ids and your access_token.  You can also pass the access_token via the command line if you don't want to put it in a text file.  
 
@@ -40,7 +38,7 @@ or
 node app.js --access_token 1234567890
 ```
 
-In a browser
+Web interface
 ============
 ```
 http://localhost:3000
