@@ -1,0 +1,17 @@
+{
+    "access_token": "your_access_token_here",
+    "port": 3000,
+    "spark_url":"https://api.spark.io/v1/devices",
+    "cores": [
+        {
+            "name": "Outside",
+            "id": "53ff70065067544818350687",
+            "description": "Outside of the house"
+        },
+        {
+            "name": "Mantel",
+            "id": "54ff6c066667515143491267",
+            "description": "Inside above the fireplace"
+        }
+    ]
+}

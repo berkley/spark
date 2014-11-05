@@ -1,7 +1,11 @@
 spark
 =====
-Repository for spark.io and related code.
+Spark.io and Node.js controlled neopixels
 
-The gist of this project is that the spark core (http://spark.io) firmware (see the firmware dir) to control neopixels runs on one or more devices and the node server controls them via the spark API.  You'll need to flash each of your spark cores with the firmware, then run the node server.  The control.html page is mobile friendly so you can control your lighting from your phone.
+Overview
+========
+Control neopixel LED strips connected to one or more Spark Core (http://spark.io) processors with a web interface.  You can use this to control various parts of your house lighting, an art project or whatever else you want to program.
+
+You'll need to flash each of your cores with the firmware, then run the node.js server on a computer with access to the internet.  
 
 See the README in each subdirectory for a more detailed description of its contents.

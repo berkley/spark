@@ -14,7 +14,9 @@ The node app communicates with the spark core via the spark API.  The API calls 
 
 This request is handled by the run() function in the firmware.  The Params are parsed and the given action is executed.
 
-The current list of actions is in the #define block near the top of spark-io-house.ino.  Different actions take different parameters (or none at all).  You can find the parameter list in the if/then statement within run() for the action you want to use.  Here are some examples:
+The current list of actions is in the #define block near the top of spark-io-house.ino.  Different actions take different parameters (or none at all).  You can find the parameter list in the if/then statement within run() for the action you want to use.  You can add additional actions by adding code to the run() and/or loop() functions.  
+
+Here are some example actions:
 
 ```
 description: blocks of color alternating on the strip
