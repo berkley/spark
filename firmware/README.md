@@ -1,6 +1,8 @@
 firmware
 ========
 
+Special Note: You will need to import the neopixel library from the spark IDE for this to work.  You will also need to comment out the #include "particles/particles.h" line and the body of the particles() function.  We're working on the particles code and will release the particles library when it's working.
+
 This is the control firmware for the spark core device(s).  You'll need to use the spark web IDE (http://spark.io) to flash each of your devices with this firmware before using the node server.
 
 This file provides a simple POST route to control the neopixels attached to the device.  You'll need to set the number of pixels and the neopixel chip type (ex: WS2812) at the top of the firmware file.  
