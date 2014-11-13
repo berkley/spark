@@ -10,7 +10,7 @@
 #define PIXEL_TYPE WS2812B
 
 //particle params
-#define MAX_COLOR 200
+#define MAX_COLOR 255
 #define NUM_PARTICLES 12
 #define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
