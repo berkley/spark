@@ -1,0 +1,12 @@
+{
+    "access_token": "PUT YOUR ACCESS TOKEN HERE",
+    "port": 3000,
+    "spark_url":"https://api.spark.io/v1/devices",
+    "cores": [
+        {
+            "name": "NAME YOUR DEVICE HERE",
+            "id": "PUT THE DEVICE ID HERE",
+            "description": "This is my Spark MCU."
+        }
+    ]
+}
