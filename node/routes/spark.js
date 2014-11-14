@@ -16,61 +16,45 @@ exports.index = function(req, res) {
 exports.action = function(req, res) {
 	var action = req.query.action;
 	var coreId = req.query.coreId;
-
-	console.log("action: " + action);
-	console.log("coreId: " + coreId);
-
-	var url = null;
-	var data = null;
-
+	var data = "";
 	if(action == "allOff")
 	{
-		url = buildUrl("run", coreId);
 		data = "setAll,0,0,0";
 	}
 	else if(action == "stop")
 	{
-		url = buildUrl("run", coreId);
 		data = "shutdown,";
 	}
 	else if(action == "setAll")
 	{
-		url = buildUrl("run", coreId);
 		data = "setAll," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1;
 	}
 	else if(action == "alternate")
 	{
-		url = buildUrl("run", coreId);	
 	    data = "alternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2;
 	}
 	else if(action == "animateAlternate")
 	{
-		url = buildUrl("run", coreId);	
 	    data = "loopAlternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
 	}
 	else if(action == "rainbow")
 	{
-		url = buildUrl("run", coreId);
 		data = "rainbow,";
 	}
 	else if(action == "loopBlocks")
 	{
-		url = buildUrl("run", coreId);
 		data = "loopBlocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.blockSize;
 	}
 	else if(action == "fadeColor")
 	{
-		url = buildUrl("run", coreId);
 		data = "fadeColor," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay + "," + req.query.duration;
 	}
 	else if(action == "blocks")
 	{
-		url = buildUrl("run", coreId);
 		data = "blocks," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.blockSize;
 	}
 	else if(action == "particles")
 	{
-		url = buildUrl("run", coreId);
 		data = "particles,";
 	}
 	else if(action == "endrun")
@@ -78,10 +62,7 @@ exports.action = function(req, res) {
 		data = "endrun," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
 	}
 
-	request.post(url, function(err, response, body) {
-		console.log("\n\npost callback:", err, body);
-		res.send(body);
-	}).form(buildFormData(data));
+	runPost(data, action, coreId, res);
 };
 
 var runPost = function(data, action, coreId, res) {
@@ -116,6 +97,7 @@ var runPost = function(data, action, coreId, res) {
 			res.send(body);
 		}).form(buildFormData(data));	
 	}
+	
 };
 
 var buildFormData = function(params) {
