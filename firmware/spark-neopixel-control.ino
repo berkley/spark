@@ -37,7 +37,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LATCHPIXEL "latchPixel"
 #define SETPIXEL "setPixel"
 #define LATCH "latch"
-
+#define ENDRUN "endrun"
 
 String loopRun = PARTICLES;
 String *loopArgs = new String[20];
@@ -71,7 +71,7 @@ void loop()
     else if(loopRun.equals(SHUTDOWN))
     { //stop all programs and set all pixels to off
         loopRun = STOP;
-        setAll(0,0,0);
+        allOff();
     }
     else if(loopRun.equals(RAINBOW))
     {
@@ -128,6 +128,17 @@ void loop()
     {
         particles(); 
     }
+    else if(loopRun.equals(ENDRUN))
+    {
+        int r1 = stringToInt(loopArgs[0]);
+        int g1 = stringToInt(loopArgs[1]);
+        int b1 = stringToInt(loopArgs[2]);
+        int r2 = stringToInt(loopArgs[3]);
+        int g2 = stringToInt(loopArgs[4]);
+        int b2 = stringToInt(loopArgs[5]);
+        int d = stringToInt(loopArgs[6]);
+        endRun(r1, g1, b1, r2, g2, b2, d);
+    }
 }
 
 int allOff()
@@ -157,7 +168,7 @@ int run(String params)
     
     if(command.equals(ALLOFF))
     {
-        return allOff();
+        loopRun = SHUTDOWN;
     }
     else if(command.equals(SETALL))
     {
@@ -271,9 +282,34 @@ int run(String params)
         loopRun = SHUTDOWN;
         return 1;
     }
+    else if(command.equals(ENDRUN))
+    {
+        loopRun = ENDRUN;
+        loopArgs[0] = args[1]; //r1
+        loopArgs[1] = args[2]; //g1
+        loopArgs[2] = args[3]; //b1
+        loopArgs[3] = args[4]; //r2
+        loopArgs[4] = args[5]; //g2
+        loopArgs[5] = args[6]; //b2
+        loopArgs[6] = args[7]; //delay
+        return 1;
+    }
     else 
     { //command not found
         return 0;
+    }
+}
+
+int endRun(uint8_t r1, uint8_t g1, uint8_t b1, 
+    uint8_t r2, uint8_t g2, uint8_t b2,
+    uint8_t d)
+{
+    for(int i=0; i<strip.numPixels(); i++)
+    {
+        strip.setPixelColor(i, strip.Color(r1, g1, b1));
+        strip.setPixelColor(strip.numPixels() - i, strip.Color(r2, g2, b2));
+        strip.show();
+        delay(d);
     }
 }
 

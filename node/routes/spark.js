@@ -1,5 +1,6 @@
 var request = require('request');
 var nconf = require('nconf');
+var async = require('async');
 var config;
 
 exports.setConfig = function(conf) {
@@ -72,12 +73,49 @@ exports.action = function(req, res) {
 		url = buildUrl("run", coreId);
 		data = "particles,";
 	}
+	else if(action == "endrun")
+	{
+		data = "endrun," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
+	}
 
 	request.post(url, function(err, response, body) {
 		console.log("\n\npost callback:", err, body);
 		res.send(body);
 	}).form(buildFormData(data));
+};
 
+var runPost = function(data, action, coreId, res) {
+	console.log("action: " + action);
+	console.log("coreId: " + coreId);
+	console.log("data: " + data);
+
+	if(coreId == "all")
+	{
+		var cores = config.get("cores");
+		var resData = [];
+		async.each(cores, function(core, callback){
+			var url = buildUrl("run", core.id);
+			request.post(url, function(err, response, body) {
+				resData.push(body);
+				callback();
+				// res.send(body);
+			}).form(buildFormData(data));
+		}, function(err){
+			if(err){
+				console.log("Error making API call to core ", core);	
+			} else {
+				console.log("resData: ", resData);
+				res.send(resData);
+			}
+		});
+	}
+	else
+	{
+		var url = buildUrl("run", coreId);
+		request.post(url, function(err, response, body) {
+			res.send(body);
+		}).form(buildFormData(data));	
+	}
 };
 
 var buildFormData = function(params) {
