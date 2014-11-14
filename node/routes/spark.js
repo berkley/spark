@@ -57,6 +57,10 @@ exports.action = function(req, res) {
 	{
 		data = "particles,";
 	}
+	else if(action == "endrun")
+	{
+		data = "endrun," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
+	}
 
 	runPost(data, action, coreId, res);
 };
