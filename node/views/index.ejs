@@ -54,6 +54,7 @@
 		<option value="loopBlocks">Animate Blocks</option>
 		<option value="fadeColor">Fade Between 2 Colors</option>
 		<option value="particles">Particles</option>
+		<option value="endrun">End Run</option>
 	</select><br/>
 
 	<span id="colorSelector1">
@@ -254,6 +255,14 @@
 				$('#colorSelector1').hide();
 				$('#colorSelector2').hide();
 				$('#delayDiv').hide();
+				$('#durationDiv').hide();
+				$('#blockSizeDiv').hide();
+			}
+			else if(ev.target.value == 'endrun')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
 				$('#durationDiv').hide();
 				$('#blockSizeDiv').hide();
 			}
