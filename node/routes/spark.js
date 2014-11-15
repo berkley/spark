@@ -55,7 +55,7 @@ exports.action = function(req, res) {
 	}
 	else if(action == "particles")
 	{
-		data = "particles,";
+		data = "particles," + req.query.numParticles + "," + req.query.maxVelocity;
 	}
 	else if(action == "endrun")
 	{
