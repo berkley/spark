@@ -1,6 +1,6 @@
 #include "application.h"
 #include "neopixel/neopixel.h"
-#include "particles/particles.h"
+#include "led-strip-particles.h"
 
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
@@ -11,12 +11,12 @@
 
 //particle params
 #define MAX_COLOR 255
-#define NUM_PARTICLES 1
-#define FPS 210
+#define NUM_PARTICLES 12
+#define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT * 2, MAX_COLOR);
+ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR);
 char action[64];
 char parameters[64];
 
@@ -39,12 +39,12 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LATCH "latch"
 #define ENDRUN "endrun"
 
-String loopRun = STOP;
+String loopRun = PARTICLES;
 String *loopArgs = new String[20];
 
 void setup() 
 {
-  Serial.begin(9600);
+//   Serial.begin(9600);
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   //register the run command as an API endpoint
@@ -55,10 +55,11 @@ void setup()
   Spark.variable("parameters", &parameters, STRING);
 
   //particles init
-  emitter.respawnOnOtherSide = true;
-  emitter.threed = false;
-  emitter.numParticles = NUM_PARTICLES;
-  emitter.maxVelocity = 0.015;
+   emitter.respawnOnOtherSide = false;
+   emitter.threed = true;
+   emitter.flicker = false;
+   emitter.numParticles = NUM_PARTICLES;
+   emitter.maxVelocity = 1.0 / FPS;  // TODO: use an intuitive unit
 }
 
 void loop() 
@@ -221,6 +222,7 @@ int run(String params)
         int b2 = stringToInt(args[6]);
         int blockSize = stringToInt(args[7]);
         buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
+        return 1;
     }
     else if(command.equals(FADECOLOR))
     {
@@ -462,7 +464,7 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
 
 void particles() {
     unsigned long frameStartMillis = millis();
-    emitter.stripPosition = random(100) / 100.0;
+    emitter.stripPosition = 0.5; //random(100) / 100.0;
 
     // Draw each particle
     for (int i=0; i < emitter.numParticles; i++) {
@@ -470,55 +472,54 @@ void particles() {
         // Update this particle's position
         Particle prt = emitter.updateParticle(i);
 
-        uint8_t tailLength =abs(prt.velocity.x * 8);
+        float zScale = (1.0 - prt.coord.z);
+        uint8_t tailLength = 1 + abs(prt.velocity.x * 15) * zScale;
         int16_t startSlot = emitter.numPixels * prt.coord.x;
         int16_t currentSlot = startSlot;
         int16_t oldSlot = currentSlot;
 
         // Draw the particle and its tail
         // High velocity particles have longer tails
-        for (int z=0; z < tailLength; z++) {
+        for (int ii=0; ii < tailLength; ii++) {
 
-            // Taper the tail fade  
-            float colorScale = ((tailLength - (z * 0.25)) / tailLength);
+            // Taper the tail fade
+            float colorScale = ((tailLength - (ii * GOLDEN_RATIO)) / tailLength);
 
-            if (z == 0 && prt.dimmed) {
+            if (ii == 0 && prt.dimmed) {
             // Flicker the first particle
                 colorScale *= (random(50) / 100) + 0.05;
             }      
 
-            if (colorScale < 0.05) {
-                colorScale = 0.05;
+            if (emitter.threed) {
+                colorScale *= zScale;
             }
 
-            if (emitter.threed) {
-                colorScale = (1.0 - prt.coord.z);
+            if (colorScale < 0.05) {
+                colorScale = 0.0;
             }
 
             // Draw particle
-            setCoordColor(prt.coord, 
-                strip.Color(prt.redColor * colorScale, 
-                    prt.greenColor * colorScale, 
-                    prt.blueColor * colorScale));
+            strip.setPixelColor(currentSlot, 
+                                strip.Color(prt.redColor * colorScale, 
+                                            prt.greenColor * colorScale, 
+                                            prt.blueColor * colorScale));
 
             oldSlot = currentSlot;
-            currentSlot = startSlot + ((z+1) * (prt.velocity.x > 0 ? -1 : 1));
+            currentSlot = startSlot + ((ii+1) * (prt.velocity.x > 0 ? -1 : 1));
         }
 
         //Terminate the tail
-        strip.setPixelColor(oldSlot, strip.Color(0,0,0));
+        strip.setPixelColor(oldSlot, strip.Color(0, 0, 0));
     }
 
     uint16_t frameElapsedMillis = millis() - frameStartMillis;
-    uint16_t frameDelayMillis = 0;
+    uint16_t frameDelayMillis = (MILLIS_PER_FRAME - frameElapsedMillis);
 
-    if (MILLIS_PER_FRAME > frameElapsedMillis) {
-        frameDelayMillis = MILLIS_PER_FRAME - frameElapsedMillis;
+    if (frameDelayMillis > 0.0) {
+        Serial.println(frameDelayMillis);
+        delay(frameDelayMillis);
+        strip.show();
     }
-
-    Serial.println(frameDelayMillis);
-    delay(frameDelayMillis);
-    strip.show();
 }
 
 void setCoordColor(Coord3D coord, uint32_t color) {
