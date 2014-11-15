@@ -10,12 +10,7 @@
 	<meta name="viewport" content="width=250" />
 	<script>
     $( document ).ready(function() {
-        $('#colorSelector1').hide();
-		$('#colorSelector2').hide();
-		$('#delayDiv').hide();
-		$('#durationDiv').hide();
-		$('#blockSizeDiv').hide();
-		$('#spinner').hide();
+        hideAll();
     });
  
     $( window ).load(function() {
@@ -88,7 +83,10 @@
 	<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
 	<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
 	<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
+	<div id="numParticlesDiv">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
+	<div id="maxVelocityDiv">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="30"/></div>
 	<button id="goButton">Light It Up</button>
+	<br/>
 
 	<div id="status"></div>
 	<div id="result"></div>
@@ -177,69 +175,56 @@
 			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
 		});
 
+		var hideAll = function() {
+			$('#colorSelector1').hide();
+			$('#colorSelector2').hide();
+			$('#delayDiv').hide();
+			$('#durationDiv').hide();
+			$('#blockSizeDiv').hide();
+			$('#numParticlesDiv').hide();
+			$('#maxVelocityDiv').hide();
+
+			$('#spinner').hide();
+		};
+
 		document.getElementById("actionSelect").addEventListener("change", function(ev) {
+			hideAll();
 			if(ev.target.value == 'stop')
 			{
-				$('#colorSelector1').hide();
-				$('#colorSelector2').hide();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
+
 			}
 			else if(ev.target.value == 'allOff')
 			{
-				$('#colorSelector1').hide();
-				$('#colorSelector2').hide();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'setAll')
 			{
 				$('#colorSelector1').show();
-				$('#colorSelector2').hide();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'alternate')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'animateAlternate')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'rainbow')
 			{
-				$('#colorSelector1').hide();
-				$('#colorSelector2').hide();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'loopBlocks')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
-				$('#durationDiv').hide();
 				$('#blockSizeDiv').show();
 			}
 			else if(ev.target.value == 'blocks')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
 				$('#blockSizeDiv').show();
 			}
 			else if(ev.target.value == 'fadeColor')
@@ -248,33 +233,27 @@
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
 				$('#durationDiv').show();
-				$('#blockSizeDiv').hide();
 			}
 			else if(ev.target.value == 'particles')
 			{
-				$('#colorSelector1').hide();
-				$('#colorSelector2').hide();
-				$('#delayDiv').hide();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
+				// $('#numParticlesDiv').show();
+				// $('#maxVelocityDiv').show();
 			}
 			else if(ev.target.value == 'endrun')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
-				$('#durationDiv').hide();
-				$('#blockSizeDiv').hide();
 			}
 
 		});
-	 
+
 	    button.addEventListener("click", function(ev) {
 	    	$('#spinner').show();
 	    	$('#status').html("");
 	    	$('#result').html("");
 		    $.get("/house/run/action", 
-		    	{action:$('#actionSelect').val(), coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val()}, 
+		    	{action:$('#actionSelect').val(), coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val()}, 
 		    	function(data) {
 		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
 			  $('#result').html( data );

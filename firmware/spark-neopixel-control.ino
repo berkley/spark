@@ -25,6 +25,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 //program and action names
 #define STOP "stop"
 #define SHUTDOWN "shutdown"
+#define PRESTOP "prestop"
 #define RAINBOW "rainbow"
 #define ALTERNATE "alternate"
 #define BLOCKS "blocks"
@@ -39,7 +40,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LATCH "latch"
 #define ENDRUN "endrun"
 
-String loopRun = PARTICLES;
+String loopRun = STOP;
 String *loopArgs = new String[20];
 
 void setup() 
@@ -70,6 +71,11 @@ void loop()
     }
     else if(loopRun.equals(SHUTDOWN))
     { //stop all programs and set all pixels to off
+        loopRun = PRESTOP;
+        delay(1000); //give a program time to stop
+    }
+    else if(loopRun.equals(PRESTOP))
+    {
         loopRun = STOP;
         allOff();
     }
@@ -293,6 +299,14 @@ int run(String params)
         loopArgs[5] = args[6]; //b2
         loopArgs[6] = args[7]; //delay
         return 1;
+    }
+    else if(command.equals("particles"))
+    {
+        int np = stringToInt(args[1]);
+        int mv = stringToInt(args[2]);
+        // emitter.numParticles = np;
+        // emitter.maxVelocity = mv / FPS;
+        loopRun = PARTICLES;
     }
     else 
     { //command not found
