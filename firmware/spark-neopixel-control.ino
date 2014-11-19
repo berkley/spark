@@ -5,7 +5,7 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 600
+#define PIXEL_COUNT 150
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
@@ -16,7 +16,7 @@
 #define MILLIS_PER_FRAME (1000 / FPS)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR / 2.0);
+ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR);
 char action[64];
 char parameters[64];
 
@@ -54,13 +54,6 @@ void setup()
   Spark.variable("action", &action, STRING);
   //retister the parameters variable as a GET parameter
   Spark.variable("parameters", &parameters, STRING);
-
-  //particles init
-   emitter.respawnOnOtherSide = false;
-   emitter.threed = false;
-   emitter.flicker = false;
-   emitter.numParticles = NUM_PARTICLES;
-   emitter.maxVelocity = 0.15 / FPS;    //1.0 / FPS;  // TODO: use an intuitive unit
 }
 
 void loop() 
@@ -249,11 +242,6 @@ int run(String params)
         loopRun = RAINBOW;
         return 1;
     }
-    else if(command.equals(PARTICLES))
-    {
-        loopRun = PARTICLES;
-        return 1;
-    }
     else if(command.equals(LATCHPIXEL))
     {
         int pixel = stringToInt(args[0]);
@@ -300,13 +288,22 @@ int run(String params)
         loopArgs[6] = args[7]; //delay
         return 1;
     }
-    else if(command.equals("particles"))
+    else if(command.equals(PARTICLES))
     {
         int np = stringToInt(args[1]);
         int mv = stringToInt(args[2]);
-        // emitter.numParticles = np;
-        // emitter.maxVelocity = mv / FPS;
+        bool respawn = stringToBool(args[3]);
+        bool threed = stringToBool(args[4]);
+        bool flicker = stringToBool(args[5]);
+        
+        emitter.respawnOnOtherSide = respawn;
+        emitter.threed = threed;
+        emitter.flicker = flicker;
+        emitter.numParticles = np;
+        float mvf = mv / 10.0;
+        emitter.maxVelocity = mvf / FPS;
         loopRun = PARTICLES;
+        return 1;
     }
     else 
     { //command not found
@@ -414,6 +411,13 @@ uint32_t Wheel(byte WheelPos) {
      WheelPos -= 170;
      return strip.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
  }
+}
+
+bool stringToBool(String s)
+{
+    if(s.equals("true") || s.equals("TRUE"))
+        return true;
+    return false;
 }
 
 int stringToInt(String s)
