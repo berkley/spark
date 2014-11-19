@@ -13,6 +13,22 @@ exports.index = function(req, res) {
 	res.render('index', cores);
 };
 
+exports.params = function(req, res) {
+	var coreId = req.params.coreId;
+	console.log("getting params for coreId: " + coreId);
+	var url = buildParamUrl(coreId);
+	request.get(url, function(err, response, body) {
+		if(err)
+		{
+			res.send(500, err);
+		}
+		else
+		{
+			res.send(200, body);
+		}
+	});
+};
+
 exports.action = function(req, res) {
 	var action = req.query.action;
 	var coreId = req.query.coreId;
@@ -33,7 +49,7 @@ exports.action = function(req, res) {
 	{
 	    data = "alternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2;
 	}
-	else if(action == "animateAlternate")
+	else if(action == "loopAlternate")
 	{
 	    data = "loopAlternate," + req.query.r1 + "," + req.query.g1 + "," + req.query.b1 + "," + req.query.r2 + "," + req.query.g2 + "," + req.query.b2 + "," + req.query.delay;
 	}
@@ -111,5 +127,12 @@ var buildUrl = function(action, coreId) {
 	var sparkUrl = config.get("spark_url");
 	var url = sparkUrl + "/" + coreId + "/" + action;
 	console.log("url: ", url);
+	return url;
+};
+
+var buildParamUrl = function(coreId) {
+	var sparkUrl = config.get("spark_url");
+	var url = sparkUrl + "/" + coreId + "/parameters?access_token=" + config.get("access_token");
+	console.log("paramUrl: ", url);
 	return url;
 };
