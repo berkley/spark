@@ -11,6 +11,7 @@
 	<script>
     $( document ).ready(function() {
         hideAll();
+        setCurrentState();
     });
  
     $( window ).load(function() {
@@ -30,6 +31,7 @@
 	<br/>
 	<img src="freddy.png"/>
 	<h3>El Casa Poder 2000</h3>
+	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
 	Core:
 	<select id="coreIdSelect" name="core">
 		<% for(var i=0; i<cores.length; i++) {%>
@@ -43,7 +45,7 @@
 		<option value="stop">Stop Program</option>
 		<option value="setAll">Single Color</option>
 		<option value="alternate">Alternate Colors</option>
-		<option value="animateAlternate">Animate Alternate Colors</option>
+		<option value="loopAlternate">Animate Alternate Colors</option>
 		<option value="rainbow">Rainbow</option>
 		<option value="blocks">Blocks</option>
 		<option value="loopBlocks">Animate Blocks</option>
@@ -98,6 +100,8 @@
 	<img style="width:30px;" id="spinner" width="100" src="spinner.gif"></div>
 
 	<script>
+		var paramState = null;
+
 		var createColorPicker = function(id, color, rid, gid, bid) {
 			$(id).spectrum({
 			color: color,
@@ -133,7 +137,7 @@
 			return col;
 		};
 
-		document.getElementById("r1").addEventListener("change", function(ev){
+		$("#r1").change(function(ev){
 			var rint = parseInt($('#r1').val());
 			var gint = parseInt($('#g1').val());
 			var bint = parseInt($('#b1').val());
@@ -141,7 +145,7 @@
 			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
 		});
 
-		document.getElementById("g1").addEventListener("change", function(ev){
+		$("#g1").change(function(ev){
 			var rint = parseInt($('#r1').val());
 			var gint = parseInt($('#g1').val());
 			var bint = parseInt($('#b1').val());
@@ -149,7 +153,7 @@
 			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
 		});
 
-		document.getElementById("b1").addEventListener("change", function(ev){
+		$("#b1").change(function(ev){
 			var rint = parseInt($('#r1').val());
 			var gint = parseInt($('#g1').val());
 			var bint = parseInt($('#b1').val());
@@ -157,7 +161,7 @@
 			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
 		});
 
-		document.getElementById("r2").addEventListener("change", function(ev){
+		$("#r2").change(function(ev){
 			var rint = parseInt($('#r2').val());
 			var gint = parseInt($('#g2').val());
 			var bint = parseInt($('#b2').val());
@@ -165,7 +169,7 @@
 			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
 		});
 
-		document.getElementById("g2").addEventListener("change", function(ev){
+		$("#g2").change(function(ev){
 			var rint = parseInt($('#r2').val());
 			var gint = parseInt($('#g2').val());
 			var bint = parseInt($('#b2').val());
@@ -173,7 +177,7 @@
 			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
 		});
 
-		document.getElementById("b2").addEventListener("change", function(ev){
+		$("#b2").change(function(ev){
 			var rint = parseInt($('#r2').val());
 			var gint = parseInt($('#g2').val());
 			var bint = parseInt($('#b2').val());
@@ -196,6 +200,38 @@
 			$('#spinner').hide();
 		};
 
+		var setCurrentState = function() {
+			//get the current param list from the core
+			//populate the controls with the state data
+			var coreId = $('#coreIdSelect').val();
+			if(coreId == "all")
+			{
+				coreId = $('#defaultCoreId').val();
+			}
+
+			$.get("/house/params/" + coreId, function(data) {
+				var paramStr = jQuery.parseJSON(data).result;
+				var params = paramStr.split(',');
+				console.log("params: ", params);
+				paramState = params;
+
+				document.getElementById("actionSelect").value = params[0];
+				var event = jQuery.Event("change");
+				$('#actionSelect').trigger("change");
+			});
+		};
+
+		var getParamsFromCore = function() {
+			$('#spinner').show();
+			$.get("/house/run/action", 
+		    	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
+		    	function(data) {
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+		};
+
 		var runQuery = function(verb) {
 	    	$('#spinner').show();
 	    	$('#status').html("");
@@ -209,8 +245,9 @@
 			});
 	    };
 
-		document.getElementById("actionSelect").addEventListener("change", function(ev) {
+		$('#actionSelect').change(function(ev) {
 			hideAll();
+			console.log("event: " + ev.target.value);
 			if(ev.target.value == 'stop')
 			{
 
@@ -221,17 +258,48 @@
 			else if(ev.target.value == 'setAll')
 			{
 				$('#colorSelector1').show();
+				if(paramState[0] == 'setAll')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r1').trigger('change');
+				}
 			}
 			else if(ev.target.value == 'alternate')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
+				if(paramState[0] == 'alternate')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
 			}
-			else if(ev.target.value == 'animateAlternate')
+			else if(ev.target.value == 'loopAlternate')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
+				if(paramState[0] == 'loopAlternate')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+
+				}
 			}
 			else if(ev.target.value == 'rainbow')
 			{
@@ -242,12 +310,37 @@
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
 				$('#blockSizeDiv').show();
+				if(paramState[0] == 'loopBlocks')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#blockSize').val(paramState[8]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
 			}
 			else if(ev.target.value == 'blocks')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#blockSizeDiv').show();
+				if(paramState[0] == 'blocks')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#blockSize').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
 			}
 			else if(ev.target.value == 'fadeColor')
 			{
@@ -255,6 +348,20 @@
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
 				$('#durationDiv').show();
+
+				if(paramState[0] == 'fadeColor')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#duration').val(paramState[8]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
 			}
 			else if(ev.target.value == 'particles')
 			{
@@ -263,12 +370,33 @@
 				$('#threedDiv').show();
 				$('#respawnDiv').show();
 				$('#flickerDiv').show();
+				if(paramState[0] == 'particles')
+				{
+					$('#numParticles').val(paramState[1]);
+					$('#maxVelocity').val(paramState[2]);
+					$('#respawn').prop('checked', $.parseJSON(paramState[3]));
+					$('#threed').prop('checked', $.parseJSON(paramState[4]));
+					$('#flicker').prop('checked', $.parseJSON(paramState[5]));
+				}
 			}
 			else if(ev.target.value == 'endrun')
 			{
 				$('#colorSelector1').show();
 				$('#colorSelector2').show();
 				$('#delayDiv').show();
+
+				if(paramState[0] == 'endrun')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
 			}
 
 		});

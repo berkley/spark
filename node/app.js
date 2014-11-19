@@ -26,6 +26,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', spark.index);
 app.get('/house/run/action', spark.action);
+app.get('/house/params/:coreId', spark.params); //get the current param state for the given coreId;
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
