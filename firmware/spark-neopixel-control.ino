@@ -57,7 +57,7 @@ void setup()
 
   //particles init
    emitter.respawnOnOtherSide = false;
-   emitter.threed = true;
+   emitter.threed = false;
    emitter.flicker = false;
    emitter.numParticles = NUM_PARTICLES;
    emitter.maxVelocity = 0.15 / FPS;    //1.0 / FPS;  // TODO: use an intuitive unit
