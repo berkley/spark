@@ -200,6 +200,10 @@
 			$('#spinner').hide();
 		};
 
+		$("#coreIdSelect").change(function(ev) {
+			setCurrentState();
+		});
+
 		var setCurrentState = function() {
 			//get the current param list from the core
 			//populate the controls with the state data
