@@ -62,7 +62,7 @@ Particle ParticleEmitter::updateParticle(uint16_t i) {
         p->dimmed = (random(3) == 0 ? 1 : 0);
     }
 
-    float zScale = (1.0 - (p->coord.z * 0.9));
+    float zScale = (threed ? (1.0 - (p->coord.z * 0.9)) : 1.0);
     p->coord.x += (maxVelocity * p->velocity.x) * zScale;
     p->coord.y += (maxVelocity * p->velocity.y) * zScale;
 
