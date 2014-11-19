@@ -16,7 +16,7 @@
 #define MILLIS_PER_FRAME (1000 / FPS)
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR);
+ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR / 2.0);
 char action[64];
 char parameters[64];
 
@@ -60,7 +60,7 @@ void setup()
    emitter.threed = true;
    emitter.flicker = false;
    emitter.numParticles = NUM_PARTICLES;
-   emitter.maxVelocity = 1.0 / FPS;  // TODO: use an intuitive unit
+   emitter.maxVelocity = 0.15 / FPS;    //1.0 / FPS;  // TODO: use an intuitive unit
 }
 
 void loop() 
@@ -486,8 +486,8 @@ void particles() {
         // Update this particle's position
         Particle prt = emitter.updateParticle(i);
 
-        float zScale = (1.0 - prt.coord.z);
-        uint8_t tailLength = 1 + abs(prt.velocity.x * 15) * zScale;
+        float zScale = (emitter.threed ? (1.0 - prt.coord.z) : 1.0);
+        double tailLength = (1.0 + abs(prt.velocity.x * 15) * zScale);
         int16_t startSlot = emitter.numPixels * prt.coord.x;
         int16_t currentSlot = startSlot;
         int16_t oldSlot = currentSlot;
