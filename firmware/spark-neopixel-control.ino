@@ -5,7 +5,8 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 150
+#define PIXEL_COUNT 467 //giggle
+//#define PIXEL_COUNT 150 //colossus
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
