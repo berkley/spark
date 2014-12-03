@@ -55,23 +55,19 @@
 	</select><br/>
 
 	<div id="colorSelectorDiv">
-		<div id="colorSelector" style="border: 2px solid; width:200px">
+		<div id="colorSelector1" style="border: 2px solid; width:200px">
+			<div id="colorSelectorLabel">Color 1</div>
 			<div id="redSlider" style="margin:10px auto; background:red; width:180px;">
-				<input type="range"  min="0" max="255" name="r1" id="r1" value="0" style="width:170px"/>
+				<input type="range"  min="0" max="255" id="r1" value="0" style="width:170px"/>
 			</div>
 			<div id="greenSlider" style="margin:10px auto; background:green; width:180px">
-				<input type="range"  min="0" max="255" name="g1" id="g1" value="0" style="width:170px"/>
+				<input type="range"  min="0" max="255" id="g1" value="0" style="width:170px"/>
 			</div>
 			<div id="blueSlider" style="margin:10px auto; background:blue; width:180px">
-				<input type="range"  min="0" max="255" name="b1" id="b1" value="0" style="width:170px"/>
+				<input type="range"  min="0" max="255" id="b1" value="0" style="width:170px"/>
 			</div>
-			<input id='colorpicker' />
+			<input id='colorpicker1' />
 			<br/>
-
-			<script>
-				createColorPicker("#colorpicker", "F00", "#r1", "#g1", "#b1");
-				alert('xxx');
-			</script>
 		</div>
 
 	</div>
@@ -98,10 +94,49 @@
 
 	<script>
 		var paramState = null;
+		var idSerial = 1;
 
 		$("#addColorButton").click(function(ev) {
-			$("#colorSelector").clone().appendTo("#colorSelectorDiv");
+			createColorWidget(++idSerial);
 		});
+
+		var createColorWidget = function(id) {
+			var $htmlStr = $("#colorSelector1").clone();
+			$htmlStr.attr("id", "colorSelector" + id);
+			$htmlStr.find("#colorSelectorLabel").html("Color " + id);
+			$htmlStr.find("#r1").attr("id", "r" + id);
+			$htmlStr.find("#g1").attr("id", "g" + id);
+			$htmlStr.find("#b1").attr("id", "b" + id);
+			$htmlStr.find(".sp-replacer").remove();
+			$htmlStr.find("#colorpicker1").attr("id", "colorpicker" + id);
+			$htmlStr.appendTo("#colorSelectorDiv");
+
+			$("#r" + id).change(function(ev){
+				var rint = parseInt($('#r' + id).val());
+				var gint = parseInt($('#g' + id).val());
+				var bint = parseInt($('#b' + id).val());
+				var col = calcColor(rint, gint, bint);
+				createColorPicker("#colorpicker" + id, col, "#r" + id, "#g" + id, "#b" + id);
+			});
+
+			$("#g" + id).change(function(ev){
+				var rint = parseInt($('#r' + id).val());
+				var gint = parseInt($('#g' + id).val());
+				var bint = parseInt($('#b' + id).val());
+				var col = calcColor(rint, gint, bint);
+				createColorPicker("#colorpicker" + id, col, "#r" + id, "#g" + id, "#b" + id);
+			});
+
+			$("#b" + id).change(function(ev){
+				var rint = parseInt($('#r' + id).val());
+				var gint = parseInt($('#g' + id).val());
+				var bint = parseInt($('#b' + id).val());
+				var col = calcColor(rint, gint, bint);
+				createColorPicker("#colorpicker" + id, col, "#r" + id, "#g" + id, "#b" + id);
+			});
+
+			createColorPicker("#colorpicker" + id, "000", "#r" + id, "#g" + id, "#b" + id);
+		};
 
 		var createColorPicker = function(id, color, rid, gid, bid) {
 			$(id).spectrum({
@@ -119,8 +154,8 @@
 			});
 		};
 
-		createColorPicker("#colorpicker1", "F00", "#r1", "#g1", "#b1");
-		createColorPicker("#colorpicker2", "F00", "#r2", "#g2", "#b2");
+		// createColorPicker("#colorpicker1", "F00", "#r1", "#g1", "#b1");
+		// createColorPicker("#colorpicker2", "F00", "#r2", "#g2", "#b2");
 
 		var button = document.querySelector("#goButton");
 		var stopButton = document.querySelector("#stopButton");
@@ -160,30 +195,6 @@
 			var bint = parseInt($('#b1').val());
 			var col = calcColor(rint, gint, bint);
 			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
-		});
-
-		$("#r2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
-		});
-
-		$("#g2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
-		});
-
-		$("#b2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
 		});
 
 		var hideAll = function() {
