@@ -54,33 +54,30 @@
 		<option value="endrun">End Run</option>
 	</select><br/>
 
-	<span id="colorSelector1">
-		Red1: <br/>
-		<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
-		<br/>
-		Green1: <br/>
-		<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
-		<br/>
-		Blue1: <br/>
-		<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
-		<br/>
-		<input id='colorpicker1' />
-		<br/>
-	</span>
+	<div id="colorSelectorDiv">
+		<div id="colorSelector" style="border: 2px solid; width:200px">
+			<div id="redSlider" style="margin:10px auto; background:red; width:180px;">
+				<input type="range"  min="0" max="255" name="r1" id="r1" value="0" style="width:170px"/>
+			</div>
+			<div id="greenSlider" style="margin:10px auto; background:green; width:180px">
+				<input type="range"  min="0" max="255" name="g1" id="g1" value="0" style="width:170px"/>
+			</div>
+			<div id="blueSlider" style="margin:10px auto; background:blue; width:180px">
+				<input type="range"  min="0" max="255" name="b1" id="b1" value="0" style="width:170px"/>
+			</div>
+			<input id='colorpicker' />
+			<br/>
 
+			<script>
+				createColorPicker("#colorpicker", "F00", "#r1", "#g1", "#b1");
+				alert('xxx');
+			</script>
+		</div>
 
-	<span id="colorSelector2">
-		Red2: <br/>
-		<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
-		<br/>
-		Green2: <br/>
-		<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
-		<br/>
-		Blue2: <br/>
-		<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
-		<br/>
-		<input id='colorpicker2' />
-	</span>
+	</div>
+	<div>
+	<button id="addColorButton">Add Color</button>
+	</div>
 
 	<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
 	<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
@@ -101,6 +98,10 @@
 
 	<script>
 		var paramState = null;
+
+		$("#addColorButton").click(function(ev) {
+			$("#colorSelector").clone().appendTo("#colorSelectorDiv");
+		});
 
 		var createColorPicker = function(id, color, rid, gid, bid) {
 			$(id).spectrum({
