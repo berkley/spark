@@ -5,7 +5,8 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 150
+#define PIXEL_COUNT 467 //giggle
+//#define PIXEL_COUNT 150 //colossus
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
@@ -39,6 +40,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETPIXEL "setPixel"
 #define LATCH "latch"
 #define ENDRUN "endrun"
+#define DUALCOLORPULSE "dualcolorpulse"
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
@@ -75,6 +77,33 @@ void loop()
     else if(loopRun.equals(RAINBOW))
     {
         rainbow(20);        
+    }
+    else if(loopRun.equals(DUALCOLORPULSE))
+    {
+        int r1 = stringToInt(loopArgs[0]);
+        int g1 = stringToInt(loopArgs[1]);
+        int b1 = stringToInt(loopArgs[2]);
+        int r2 = stringToInt(loopArgs[3]);
+        int g2 = stringToInt(loopArgs[4]);
+        int b2 = stringToInt(loopArgs[5]);
+        int d = stringToInt(loopArgs[6]);
+        r1 = 255;
+        g1 = 0;
+        b1 = 0;
+        r2 = 0;
+        g2 = 0;
+        b2 = 255;
+        d = 50;
+        dualColorPulse(r1, g1, b1, r2, g2, b2, d, 50, 10);
+        delay(10000);
+        // r1 = 0;
+        // g1 = 0;
+        // b1 = 255;
+        // r2 = 255;
+        // g2 = 0;
+        // b2 = 0;
+        // d = 50;
+        // dualColorPulse(r1, g1, b1, r2, g2, b2, d, 10, 10);
     }
     else if(loopRun.equals(ALTERNATE))
     {
@@ -237,6 +266,19 @@ int run(String params)
         loopArgs[7] = args[8]; //duration
         return 1;
     }
+    else if(command.equals(DUALCOLORPULSE))
+    {
+        //possible commands: stop, rainbow, alternate
+        loopRun = DUALCOLORPULSE;
+        loopArgs[0] = args[1]; //r1
+        loopArgs[1] = args[2]; //g1
+        loopArgs[2] = args[3]; //b1
+        loopArgs[3] = args[4]; //r2
+        loopArgs[4] = args[5]; //g2
+        loopArgs[5] = args[6]; //b2
+        loopArgs[6] = args[7]; //delay
+        return 1;
+    }
     else if(command.equals(RAINBOW))
     {
         loopRun = RAINBOW;
@@ -391,11 +433,47 @@ int rainbow(int d) {
   for(j=0; j<256; j++) {
     for(i=0; i<strip.numPixels(); i++) {
       strip.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-  }
-  strip.show();
-  delay(d);
+    }
+    strip.show();
+    delay(d);
+    }
+    return 1;
 }
-return 1;
+
+//TODO: finish this
+int dualColorPulse(uint8_t r1, uint8_t g1, uint8_t b1, uint8_t r2, uint8_t g2, uint8_t b2, int del, int steps, int blockSize)
+{
+    int16_t redDiff = r2 - r1;
+    int16_t greenDiff = g2 - g1;
+    int16_t blueDiff = b2 - b1;
+
+    int16_t redValue, greenValue, blueValue;
+
+    bool inBlock = true;
+    
+    for(int i=0; i<strip.numPixels(); i+=steps * 2) {
+        for (int16_t j = steps; j >= 0; j--) {
+            redValue = r1 + (redDiff * j / steps);
+            greenValue = g1 + (greenDiff * j / steps);
+            blueValue = b1 + (blueDiff * j / steps);
+
+            strip.setPixelColor(i + j, strip.Color(redValue, greenValue, blueValue));
+            
+        }
+        for (int16_t j = steps * 2; j >= steps / 2; j--) {
+            redValue = r1 - (redDiff * j / steps);
+            greenValue = g1 - (greenDiff * j / steps);
+            blueValue = b1 - (blueDiff * j / steps);
+
+            strip.setPixelColor(i + j, strip.Color(redValue, greenValue, blueValue));
+            
+        }
+        strip.show();
+    }
+    
+    // delay(del);
+   
+    return 1;
 }
 
 // Input a value 0 to MAX_COLOR to get a color value.
