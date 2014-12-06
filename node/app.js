@@ -31,3 +31,40 @@ app.get('/house/params/:coreId', spark.params); //get the current param state fo
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+
+//websockets
+
+var pixel = 0;
+
+var WebSocketServer = require('ws').Server
+  , wss = new WebSocketServer({ port: 3001 });
+console.log("WebSocketServer created on port 3001");
+
+wss.on('connection', function connection(ws) {
+  console.log("connection made");
+  ws.on('message', function incoming(message) {
+    console.log('received: %s', message);
+  });
+
+ //  ws.send('{pixel:0, r:255, g:255, b:255}', function ack(error){
+	// if(error) {
+	// 	console.log("error sending something " + error);
+	// }
+ //  });
+
+  setInterval(function() {
+  		var data = pixel + ',' + parseInt(Math.random() * 255) + ',' + 
+			              parseInt(Math.random() * 255) + ',' + 
+			              parseInt(Math.random() * 255);
+		console.log("sending ws data ", data);
+		pixel++;
+		if(pixel > 4)
+			pixel = 0;
+		ws.send(data, function ack(error){
+			if(error) {
+				console.log("error sending something else " + error);
+			}
+		});	
+	}, 50);
+
+});
