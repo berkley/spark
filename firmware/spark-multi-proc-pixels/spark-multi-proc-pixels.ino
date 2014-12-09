@@ -4,6 +4,7 @@
 
 WebSocketClient client;
 char server[] = "10.0.1.74";
+// char server[] = "192.168.1.145";
 
 #define PIXEL_PIN D2
 #define PIXEL_COUNT 5
@@ -13,15 +14,45 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 String* strArr = new String[20];
 
+String getCoreID()
+{
+  String coreIdentifier = "";
+  char id[12];
+  memcpy(id, (char *)ID1, 12);
+  char hex_digit;
+  for (int i = 0; i < 12; ++i)
+  {
+    hex_digit = 48 + (id[i] >> 4);
+    if (57 < hex_digit)
+     hex_digit += 39;
+     coreIdentifier = coreIdentifier + hex_digit;
+    hex_digit = 48 + (id[i] & 0xf);
+   if (57 < hex_digit)
+     hex_digit += 39;
+   coreIdentifier = coreIdentifier + hex_digit;
+ }
+ return coreIdentifier;
+}
+
 void onMessage(WebSocketClient client, char* message) {
     Serial.print("Received: ");
     Serial.println(message);
     
     String* vals = stringSplit(message, ',');
-    // if(sizeof(vals) < 4)
-    // { //invalid data
-    //     return;
-    // }
+    if(vals[0].toInt() == -99) //so lame...but it works
+    {
+        String s1 = "{\"coreid\":\"";
+        String s2 = getCoreID();
+        String s3 = "\"}";
+        s1.concat(s2);
+        s1.concat(s3);
+        char* str = new char[s1.length() + 1];
+        strcpy(str, s1.c_str());
+        Serial.println(s1);
+        client.send(str);
+        return;
+    }
+    
     Serial.print("Setting pixel ");
     Serial.println(vals[0]);
     Serial.print("r: ");
@@ -30,10 +61,8 @@ void onMessage(WebSocketClient client, char* message) {
     Serial.println(vals[2]);
     Serial.print("b: ");
     Serial.println(vals[3]);
-    strip.setPixelColor(stringToInt(vals[0]), strip.Color(stringToInt(vals[1]), stringToInt(vals[2]), stringToInt(vals[3])));
-    // strip.setPixelColor(1, strip.Color(random(255), random(255), random(255)));
+    strip.setPixelColor(vals[0].toInt(), strip.Color(vals[1].toInt(), vals[2].toInt(), vals[3].toInt()));
     strip.show();    
-    // free(vals);
 }
 
 void onError(WebSocketClient client, char* message) {
@@ -62,32 +91,12 @@ void setup()
     client.onError(onError);
     client.onClose(onClose);
     client.onOpen(onOpen);
-    client.send("Hello World!");
     strip.setPixelColor(0, strip.Color(255, 0, 0));
     strip.show();
 }
 
 void loop() {
     client.monitor();
-    // strip.setPixelColor(2, strip.Color(0, random(255), 0));
-    // strip.show();
-    // delay(1000);
-}
-
-bool stringToBool(String s)
-{
-    if(s.equals("true") || s.equals("TRUE"))
-        return true;
-    return false;
-}
-
-int stringToInt(String s)
-{
-    char* str = new char[s.length() + 1];
-    strcpy(str, s.c_str());
-    int out = atoi(str);
-    free(str);
-    return out;
 }
 
 String* stringSplit(String s, char delim)
@@ -111,22 +120,3 @@ String* stringSplit(String s, char delim)
     strArr[arrcnt] = token;
     return strArr;
 }
-
-/*
-class WebSocketClient {
-public:
-  typedef void (*OnMessage)(WebSocketClient client, char* message);
-  typedef void (*OnOpen)(WebSocketClient client);
-  typedef void (*OnClose)(WebSocketClient client, int code, char* message);
-  typedef void (*OnError)(WebSocketClient client, char* message);
-  void connect(const char hostname[], int port = 80, const char protocol[] = NULL, const char path[] = "/");
-  bool connected();
-  void disconnect();
-  void monitor();
-  void onOpen(OnOpen function);
-  void onClose(OnClose function);
-  void onMessage(OnMessage function);
-  void onError(OnError function);
-  bool send(char* message);
-private:
-*/
