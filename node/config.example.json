@@ -4,9 +4,16 @@
     "spark_url":"https://api.spark.io/v1/devices",
     "cores": [
         {
-            "name": "NAME YOUR DEVICE HERE",
+            "name": "Core1",
+            "id": "PUT THE DEVICE ID HERE",
+            "description": "This is my Spark MCU."
+        },
+        {
+            "name": "Core2",
             "id": "PUT THE DEVICE ID HERE",
             "description": "This is my Spark MCU."
         }
-    ]
+    ],
+    "screen":[{"name":"Core1", "vPixelStart":0, "vPixelEnd":4, "pixelStart":0, "pixelEnd":4},
+              {"name":"Core2", "vPixelStart":5, "vPixelEnd":9, "pixelStart":0, "pixelEnd":4}]
 }
