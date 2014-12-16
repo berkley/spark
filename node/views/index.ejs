@@ -52,6 +52,7 @@
 		<option value="fadeColor">Fade Between 2 Colors</option>
 		<option value="particles">Particles</option>
 		<option value="endrun">End Run</option>
+		<option value="snow">Snow</option>
 	</select><br/>
 
 	<span id="colorSelector1">
@@ -401,6 +402,12 @@
 					$('#r1').trigger('change');
 					$('#r2').trigger('change');
 				}
+			}
+			else if(ev.target.value == 'snow')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
 			}
 
 		});

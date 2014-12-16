@@ -5,8 +5,8 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 467 //giggle
-//#define PIXEL_COUNT 150 //colossus
+// #define PIXEL_COUNT 467 //giggle
+#define PIXEL_COUNT 150 //colossus
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
@@ -40,9 +40,11 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETPIXEL "setPixel"
 #define LATCH "latch"
 #define ENDRUN "endrun"
+#define SNOW "snow"
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
+String *strArr = new String[20];
 
 void setup() 
 {
@@ -138,6 +140,10 @@ void loop()
         int b2 = stringToInt(loopArgs[5]);
         int d = stringToInt(loopArgs[6]);
         endRun(r1, g1, b1, r2, g2, b2, d);
+    }
+    else if(loopRun.equals(SNOW))
+    {
+        snow();
     }
 }
 
@@ -289,6 +295,11 @@ int run(String params)
         loopArgs[6] = args[7]; //delay
         return 1;
     }
+    else if(command.equals(SNOW))
+    {
+        loopRun = SNOW;
+        return 1;
+    }
     else if(command.equals(PARTICLES))
     {
         int np = stringToInt(args[1]);
@@ -309,6 +320,26 @@ int run(String params)
     else 
     { //command not found
         return 0;
+    }
+}
+
+int snow()
+{
+    for(int i=0; i<strip.numPixels() / 15; i++)
+    { //pick the random pixels
+        uint8_t pix = random(strip.numPixels());
+        strip.setPixelColor(pix, strip.Color(0, 0, 0));
+        strip.show();
+        delay(random(50));
+    }
+    
+    for(int i=0; i<strip.numPixels() / 15; i++)
+    { //pick the random pixels
+        uint8_t pix = random(strip.numPixels());
+        uint8_t brightness = random(255);
+        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .30)); //poor mans white balance
+        strip.show();
+        delay(random(50));
     }
 }
 
@@ -432,7 +463,6 @@ int stringToInt(String s)
 
 String* stringSplit(String s, char delim)
 {
-    String* strArr = new String[20];
     int arrcnt = 0;
     String token = "";
     for(uint8_t i=0; i<s.length(); i++)
