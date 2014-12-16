@@ -12,26 +12,32 @@ var WebSocketServer = require('ws').Server
 console.log("WebSocketServer created on port 3001");
 
 wss.on('connection', function connection(ws) {
-  console.log("connection made");
+  console.log("connection made...");
 
-  ws.on('message', function incoming(message) {
-    console.log('message received: ', message);
+  ws.on('message', function(message) {
     var coreid = JSON.parse(message).coreid;
+    console.log("message from core ", coreid);
     sockets[coreid] = ws;
+    console.log("connections: ", Object.keys(sockets));
   });
 
-  ws.send("-99,0,0,0");
+  ws.send("ident,0,0,0");
 });
 
 var count = 0;
+var on = true;
 
 setInterval(function() {	
-  console.log("connections: ", Object.keys(sockets));
+  // console.log("connections: ", Object.keys(sockets));
   screen.setConfig(config);
-	screen.setVPixel(sockets, count, parseInt(Math.random() * 255), parseInt(Math.random() * 255), parseInt(Math.random() * 255));
+  if(on)
+	 screen.setVPixel(sockets, count, 255, 0, 0);
+  else
+    screen.setVPixel(sockets, count, 0, 255, 0);
 	count++;
 	if(count == 10)
   {
 		count = 0;
+    on = !on;
   }
 }, 100);

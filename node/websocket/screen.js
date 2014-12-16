@@ -6,7 +6,7 @@ exports.setConfig = function(conf) {
 };
 
 exports.setVPixel = function(sockets, vPixel, red, green, blue) {	
-	console.log("setting vPixel " + vPixel + " to rgb: " + red + "," + green + "," + blue);
+	// console.log("setting vPixel " + vPixel + " to rgb: " + red + "," + green + "," + blue);
 	if(sockets.length < 1)
 		return;
 	var coreId = getCoreForPixel(vPixel);
@@ -16,7 +16,7 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 		if(socket)
 		{
 			var data = getSocketData(coreId, vPixel, red, green, blue);
-			console.log("data: ", data);
+			// console.log("data: ", data);
 			socket.send(data, function(err){
 				if(err)
 				{
@@ -35,12 +35,8 @@ var getSocketData = function(coreId, vPixel, red, green, blue) {
 	{
 		if(screen[i].name == name)
 		{
-			console.log("creating socket data for core: " + screen[i].name);
 			var vPixelStart = screen[i].vPixelStart;
 			var data = (vPixel - vPixelStart) + "," + red + "," + green + "," + blue;
-			console.log("vPixelStart: " + vPixelStart);
-			console.log("vPixel: " + vPixel);
-			console.log("scren data " + data);
 			return data;
 		}
 	}
