@@ -40,10 +40,11 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETPIXEL "setPixel"
 #define LATCH "latch"
 #define ENDRUN "endrun"
-#define SPARKLE "sparkle"
+#define SNOW "snow"
 
-String loopRun = SPARKLE;
+String loopRun = STOP;
 String *loopArgs = new String[20];
+String *strArr = new String[20];
 
 void setup() 
 {
@@ -140,9 +141,9 @@ void loop()
         int d = stringToInt(loopArgs[6]);
         endRun(r1, g1, b1, r2, g2, b2, d);
     }
-    else if(loopRun.equals(SPARKLE))
+    else if(loopRun.equals(SNOW))
     {
-        sparkle();
+        snow();
     }
 }
 
@@ -294,9 +295,9 @@ int run(String params)
         loopArgs[6] = args[7]; //delay
         return 1;
     }
-    else if(command.equals(SPARKLE))
+    else if(command.equals(SNOW))
     {
-        loopRun = SPARKLE;
+        loopRun = SNOW;
         return 1;
     }
     else if(command.equals(PARTICLES))
@@ -322,7 +323,7 @@ int run(String params)
     }
 }
 
-int sparkle()
+int snow()
 {
     for(int i=0; i<strip.numPixels() / 15; i++)
     { //pick the random pixels
@@ -335,8 +336,8 @@ int sparkle()
     for(int i=0; i<strip.numPixels() / 15; i++)
     { //pick the random pixels
         uint8_t pix = random(strip.numPixels());
-        uint8_t brightness = random(200);
-        strip.setPixelColor(pix, strip.Color(brightness + 25, brightness + 25, brightness));
+        uint8_t brightness = random(255);
+        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .30)); //poor mans white balance
         strip.show();
         delay(random(50));
     }
@@ -462,7 +463,6 @@ int stringToInt(String s)
 
 String* stringSplit(String s, char delim)
 {
-    String* strArr = new String[20];
     int arrcnt = 0;
     String token = "";
     for(uint8_t i=0; i<s.length(); i++)
