@@ -3,9 +3,10 @@
 #include "application.h"
 
 WebSocketClient client;
-char server[] = "10.0.1.74";
-// char server[] = "192.168.1.145";
-
+// char server[] = "10.0.1.6"; //dino
+char server[] = "10.0.1.22"; //syncline
+// char server[] = "192.168.1.145"; //albina press wifi
+#define WS_PORT 3001
 #define PIXEL_PIN D2
 #define PIXEL_COUNT 5
 #define PIXEL_TYPE WS2812B
@@ -76,8 +77,9 @@ void onOpen(WebSocketClient client) {
 
 void onClose(WebSocketClient client, int code, char* message) {
     Serial.println("Connection closed");
-    Serial.println("reopening connection on port 3001");
-    client.connect(server, 3001);
+    Serial.print("reopening connection on port");
+    Serial.println(WS_PORT)
+    client.connect(server, WS_PORT);
 }
 
 void setup() 
@@ -86,7 +88,7 @@ void setup()
     Serial.println("Setup complete");
     strip.begin();
     strip.show();
-    client.connect(server, 3001);
+    client.connect(server, WS_PORT);
     client.onMessage(onMessage);
     client.onError(onError);
     client.onClose(onClose);

@@ -21,14 +21,14 @@ wss.on('connection', function connection(ws) {
     console.log("connections: ", Object.keys(sockets));
   });
 
-  ws.send("ident,0,0,0");
+  ws.send("-99,0,0,0");
 });
 
 var count = 0;
 var on = true;
 
 setInterval(function() {	
-  // console.log("connections: ", Object.keys(sockets));
+ // console.log("connections: ", Object.keys(sockets));
   screen.setConfig(config);
   if(on)
 	 screen.setVPixel(sockets, count, 255, 0, 0);
