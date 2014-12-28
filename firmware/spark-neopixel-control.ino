@@ -5,8 +5,9 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-// #define PIXEL_COUNT 467 //giggle
-#define PIXEL_COUNT 150 //colossus
+#define PIXEL_COUNT 467 //giggle
+// #define PIXEL_COUNT 150 //colossus
+
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
@@ -40,10 +41,11 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETPIXEL "setPixel"
 #define LATCH "latch"
 #define ENDRUN "endrun"
-#define SPARKLE "sparkle"
+#define SNOW "snow"
 
-String loopRun = SPARKLE;
+String loopRun = STOP;
 String *loopArgs = new String[20];
+String *strArr = new String[20];
 
 void setup() 
 {
@@ -104,10 +106,8 @@ void loop()
         int d = stringToInt(loopArgs[6]);
         int blockSize = stringToInt(loopArgs[7]);
         
-        buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
-        delay(d);
-        buildBlocks(r2, g2, b2, r1, g1, b1, blockSize);
-        delay(d);
+        animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, true);
+        animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, false);
     }
     else if(loopRun.equals(FADECOLOR))
     {
@@ -140,9 +140,9 @@ void loop()
         int d = stringToInt(loopArgs[6]);
         endRun(r1, g1, b1, r2, g2, b2, d);
     }
-    else if(loopRun.equals(SPARKLE))
+    else if(loopRun.equals(SNOW))
     {
-        sparkle();
+        snow();
     }
 }
 
@@ -294,9 +294,9 @@ int run(String params)
         loopArgs[6] = args[7]; //delay
         return 1;
     }
-    else if(command.equals(SPARKLE))
+    else if(command.equals(SNOW))
     {
-        loopRun = SPARKLE;
+        loopRun = SNOW;
         return 1;
     }
     else if(command.equals(PARTICLES))
@@ -322,21 +322,21 @@ int run(String params)
     }
 }
 
-int sparkle()
+int snow()
 {
-    for(int i=0; i<strip.numPixels() / 15; i++)
+    for(int i=0; i<strip.numPixels() / 10; i++)
     { //pick the random pixels
-        uint8_t pix = random(strip.numPixels());
+        int pix = random(strip.numPixels());
         strip.setPixelColor(pix, strip.Color(0, 0, 0));
         strip.show();
         delay(random(50));
     }
     
-    for(int i=0; i<strip.numPixels() / 15; i++)
+    for(int i=0; i<strip.numPixels() / 10; i++)
     { //pick the random pixels
-        uint8_t pix = random(strip.numPixels());
-        uint8_t brightness = random(255);
-        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness));
+        int pix = random(strip.numPixels());
+        int brightness = random(255);
+        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .20)); //poor mans white balance
         strip.show();
         delay(random(50));
     }
@@ -353,6 +353,43 @@ int endRun(uint8_t r1, uint8_t g1, uint8_t b1,
         strip.show();
         delay(d);
     }
+}
+
+int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1, 
+    uint8_t r2, uint8_t g2, uint8_t b2, uint8_t blockSize, int d, bool inBlock)
+{
+    for(int j=0; j<blockSize; j++)
+    {
+        for(int i=0; i<strip.numPixels(); i++) {
+            if(i % blockSize == 0)
+            {
+                inBlock = !inBlock;
+            }
+            
+            int pix = 0;
+            if( (i + j) >= strip.numPixels())
+            {
+                pix = (i + j) - strip.numPixels();
+            }
+            else 
+            {
+                pix = i + j;
+            }
+            
+            if(inBlock)
+            {
+                strip.setPixelColor(pix, strip.Color(r1, g1, b1));
+            }
+            else
+            {
+                strip.setPixelColor(pix, strip.Color(r2, g2, b2));
+            }
+        }
+        strip.show();
+        delay(d);
+    }
+    
+    return 1;
 }
 
 int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1, 
@@ -462,7 +499,6 @@ int stringToInt(String s)
 
 String* stringSplit(String s, char delim)
 {
-    String* strArr = new String[20];
     int arrcnt = 0;
     String token = "";
     for(uint8_t i=0; i<s.length(); i++)
