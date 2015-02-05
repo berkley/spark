@@ -31,13 +31,14 @@ setInterval(function() {
  // console.log("connections: ", Object.keys(sockets));
   screen.setConfig(config);
   if(on)
-	 screen.setVPixel(sockets, count, 255, 0, 0);
+	 screen.setVPixel(sockets, count, 0, 0, 255);
   else
     screen.setVPixel(sockets, count, 0, 255, 0);
+  
 	count++;
-	if(count == 10)
+	if(count == 256)
   {
 		count = 0;
     on = !on;
   }
-}, 100);
+}, 10);

@@ -15,5 +15,10 @@
         }
     ],
     "screen":[{"name":"Core1", "vPixelStart":0, "vPixelEnd":4, "pixelStart":0, "pixelEnd":4},
-              {"name":"Core2", "vPixelStart":5, "vPixelEnd":9, "pixelStart":0, "pixelEnd":4}]
+              {"name":"Core2", "vPixelStart":5, "vPixelEnd":9, "pixelStart":0, "pixelEnd":4},
+              {"name":"Freddy", 
+               "vPixelStart":0, "vPixelEnd":256, 
+               "pixelStart":0, "pixelEnd":256, 
+               "pixelsPerRow":32, "rows":8, 
+               "wiring":"serial"}]
 }

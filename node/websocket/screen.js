@@ -16,7 +16,7 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 		if(socket)
 		{
 			var data = getSocketData(coreId, vPixel, red, green, blue);
-			// console.log("data: ", data);
+			console.log("data: ", data);
 			socket.send(data, function(err){
 				if(err)
 				{
@@ -28,6 +28,29 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 
 };
 
+// var actualPixPerChannel = 48;
+// 	    var mod = addr % actualPixPerChannel;
+// 	    var base = addr - mod;
+// 	    var newaddr;
+// 	    var upperBounds = actualPixPerChannel - WIDTH - 1;
+// 	    var addrMinusBase = addr - base;
+
+// 	    if(addrMinusBase >= 0 && addrMinusBase < WIDTH)
+// 	    {
+// 	        newaddr = addrMinusBase;
+// 	    }
+// 	    if(addrMinusBase >= WIDTH && addrMinusBase <= upperBounds)
+// 	    { //invert
+// 	        var offset = addrMinusBase - WIDTH;
+// 	        newaddr = upperBounds - offset;
+// 	    }
+// 	    if(addrMinusBase > upperBounds)
+// 	    {
+// 	        newaddr = addrMinusBase;
+// 	    }
+	    
+// 	    return newaddr + base;
+
 var getSocketData = function(coreId, vPixel, red, green, blue) {
 	var screen = config.get("screen");
 	var name = getNameForCoreId(coreId);
@@ -36,7 +59,24 @@ var getSocketData = function(coreId, vPixel, red, green, blue) {
 		if(screen[i].name == name)
 		{
 			var vPixelStart = screen[i].vPixelStart;
-			var data = (vPixel - vPixelStart) + "," + red + "," + green + "," + blue;
+			var pixelId = (vPixel - vPixelStart); //simple case where we have one long strip, not an array
+			if(screen[i].rows && screen[i].rows > 1)
+			{ //this is an array, so the pixelId may be different depending on the wiring
+				if(screen[i].wiring == "serial")
+				{
+					var rowNum = parseInt(vPixel / screen[i].pixelsPerRow);
+					if(rowNum % 2 != 0)
+					{
+						var rowLength = screen[i].pixelsPerRow
+						var mod = vPixel % rowLength;
+						console.log("rowNum: ", rowNum);
+						console.log("vpix mod rowLength: ", mod)
+						pixelId = ((rowLength * rowNum) + (rowLength - mod)) - 1;
+						console.log("pixelId: ", pixelId);
+					}
+				}
+			}
+			var data = pixelId + "," + red + "," + green + "," + blue;
 			return data;
 		}
 	}

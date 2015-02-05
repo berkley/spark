@@ -42,6 +42,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LATCH "latch"
 #define ENDRUN "endrun"
 #define SNOW "snow"
+#define WEBSOCKET "websocket" //<- finish this
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
