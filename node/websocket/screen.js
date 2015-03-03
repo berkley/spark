@@ -25,7 +25,62 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 			});
 		}
 	}
+};
 
+exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
+	if(sockets.length < 1)
+		return;
+	var coreId = getCoreForPixel(upperLeftVPixel);
+	if(coreId)
+	{
+		var socket = sockets[coreId];
+		if(socket)
+		{
+			//key: vals[0]: -97
+	        //     vals[1]: upperLeft
+	        //     vals[2]: bmp width
+	        //     vals[3]: bmp height
+	        //     vals[4]: r1
+	        //     vals[5]: g1
+	        //     vals[6]: b1
+			var data =  "-97," + upperLeftVPixel + ",8,8,";
+			for(var i=0; i<bmp.length; i++)
+			{
+				data += bmp[i];
+				if(i != bmp.length - 1)
+					data += ",";
+			}
+
+			socket.send(data, function(err){
+				if(err)
+				{
+					console.log("Error sending WS data ", data);
+				}
+				callback(err);
+			});
+		}
+	}
+};
+
+exports.setVScreen = function(sockets, screenName, red, green, blue, callback) {
+	if(sockets.length < 1)
+		return;
+	var coreId = getCoreIdForName(screenName);
+	if(coreId)
+	{
+		var socket = sockets[coreId];
+		if(socket)
+		{
+			var data =  "-98," + red + "," + green + "," + blue;
+			socket.send(data, function(err){
+				if(err)
+				{
+					console.log("Error sending WS data ", data);
+				}
+				callback(err);
+			});
+		}
+	}
 };
 
 // var actualPixPerChannel = 48;

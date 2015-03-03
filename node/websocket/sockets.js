@@ -19,6 +19,7 @@ wss.on('connection', function connection(ws) {
     console.log("message from core ", coreid);
     sockets[coreid] = ws;
     console.log("connections: ", Object.keys(sockets));
+    setTimeout(drawInvader, 1000);
   });
 
   ws.send("-99,0,0,0");
@@ -26,19 +27,47 @@ wss.on('connection', function connection(ws) {
 
 var count = 0;
 var on = true;
+var invader = [0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 254,254,254, 254,254,254, 255,255,255, 255,255,255, 0,0,0, 255,255,255, 255,255,255, 0,255,0, 255,255,255, 255,255,255, 0,255,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 15,15,15, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 15,15,15, 0,0,0, 255,255,255, 0,0,0, 0,0,0];
+var blank = [0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 15,15,15, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 15,15,15, 0,0,0, 0,0,0, 0,0,0, 0,0,0];
+var col = 0;
 
-setInterval(function() {	
- // console.log("connections: ", Object.keys(sockets));
+function drawInvader() {
   screen.setConfig(config);
-  if(on)
-	 screen.setVPixel(sockets, count, 0, 0, 255);
-  else
-    screen.setVPixel(sockets, count, 0, 255, 0);
+    screen.setVScreen(sockets, "Freddy", 0, 0, 0, function(){
+      console.log("all pix off")
+      setTimeout(function(){
+        screen.setVBMP(sockets, col, invader, function(){
+          console.log("bmp on")
+          col++;
+          if(col > 31)
+            col = 0;  
+          console.log("col: ", col);
+          setTimeout(drawInvader, 1000);
+        });
+      }, 0);
+    });
+};
+
+// setInterval(function() {	
+ // console.log("connections: ", Object.keys(sockets));
+  // screen.setConfig(config);
+  // // screen.setVScreen(sockets, "Freddy", 0, 0, 0);
+  // screen.setVBMP(sockets, col, invader, function(){
+
+  // });
+  // col++;
+  // if(col > 31)
+  //   col = 0;
+  // if(on)
+  // {
+  //   screen.setVScreen(sockets, "Robot", 255, 0, 0);
+  //   screen.setVScreen(sockets, "Freddy", 0, 0, 0);
+  // }
+  // else
+  // {
+  //   screen.setVScreen(sockets, "Freddy", 0, 255, 0);
+  //   screen.setVScreen(sockets, "Robot", 0, 0, 0);
+  // }
   
-	count++;
-	if(count == 256)
-  {
-		count = 0;
-    on = !on;
-  }
-}, 10);
+  // on = !on;
+// }, 500);
