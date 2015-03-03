@@ -37,13 +37,15 @@ exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
 		if(socket)
 		{
 			//key: vals[0]: -97
-	        //     vals[1]: upperLeft
-	        //     vals[2]: bmp width
-	        //     vals[3]: bmp height
-	        //     vals[4]: r1
-	        //     vals[5]: g1
-	        //     vals[6]: b1
-			var data =  "-97," + upperLeftVPixel + ",8,8,";
+	        //     vals[1]: reset [1|0] //set the screen to all off before writing the bmp
+	        //     vals[2]: upperLeft
+	        //     vals[3]: bmp width
+	        //     vals[4]: bmp height
+	        //     vals[5]: r1
+	        //     vals[6]: g1
+	        //     vals[7]: b1
+	        //     etc
+			var data =  "-97,1," + upperLeftVPixel + ",8,8,";
 			for(var i=0; i<bmp.length; i++)
 			{
 				data += bmp[i];

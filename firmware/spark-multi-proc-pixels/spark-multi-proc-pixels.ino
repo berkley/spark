@@ -73,16 +73,21 @@ void onMessage(WebSocketClient client, char* message) {
     else if(vals[0] == -97)
     { //write the bitmap to the array starting at column vals[1]
         //key: vals[0]: -97
-        //     vals[1]: upperLeft
-        //     vals[2]: bmp width
-        //     vals[3]: bmp height
-        //     vals[4]: r1
-        //     vals[5]: g1
-        //     vals[6]: b1
+        //     vals[1]: reset [1|0] //set the screen to all off before writing the bmp
+        //     vals[2]: upperLeft
+        //     vals[3]: bmp width
+        //     vals[4]: bmp height
+        //     vals[5]: r1
+        //     vals[6]: g1
+        //     vals[7]: b1
         //     etc
         Serial.print("Setting Bitmap at ");
-        Serial.println(vals[1]);
-        setBitmap(vals, vals[2], vals[3], vals[1]);
+        Serial.println(vals[2]);
+        if(vals[1] == 1)
+        {
+            setAllOff();
+        }
+        setBitmap(vals, vals[3], vals[4], vals[2]);
     }
     else
     {
@@ -91,9 +96,17 @@ void onMessage(WebSocketClient client, char* message) {
     }
 }
 
+void setAllOff()
+{
+    for(int i=0; i<PIXEL_COUNT; i++)
+    {
+        strip.setPixelColor(i, strip.Color(0, 0, 0));
+    }
+}
+
 void setBitmap(int* bmp, int width, int height, int upperLeft)
 {
-    int index = 4;
+    int index = 5; //cut off the metadata at the beginning of the array
     Serial.println("setting bmp...");
     Serial.print("width: ");
     Serial.println(width);

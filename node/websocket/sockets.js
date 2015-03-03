@@ -33,7 +33,7 @@ var col = 0;
 
 function drawInvader() {
   screen.setConfig(config);
-    screen.setVScreen(sockets, "Freddy", 0, 0, 0, function(){
+    // screen.setVScreen(sockets, "Freddy", 0, 0, 0, function(){
       console.log("all pix off")
       setTimeout(function(){
         screen.setVBMP(sockets, col, invader, function(){
@@ -42,10 +42,10 @@ function drawInvader() {
           if(col > 31)
             col = 0;  
           console.log("col: ", col);
-          setTimeout(drawInvader, 1000);
+          setTimeout(drawInvader, 500);
         });
       }, 0);
-    });
+    // });
 };
 
 // setInterval(function() {	
