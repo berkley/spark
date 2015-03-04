@@ -14,12 +14,15 @@ char server[] = "10.0.1.8"; //syncline
 #define BRIGHTNESS_FACTOR 1
 #define PIXEL_TYPE WS2812B
 #define PARAM_ARR_SIZE 265
+#define NUM_BMPS 2
 #define SERIAL_WIRING 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 // String* strArr = new String[265];
 int paramArr[PARAM_ARR_SIZE];
+
+int bitmaps[NUM_BMPS][PARAM_ARR_SIZE];
 
 String getCoreID()
 {
@@ -71,23 +74,30 @@ void onMessage(WebSocketClient client, char* message) {
         strip.show();
     }
     else if(vals[0] == -97)
-    { //write the bitmap to the array starting at column vals[1]
-        //key: vals[0]: -97
-        //     vals[1]: reset [1|0] //set the screen to all off before writing the bmp
-        //     vals[2]: upperLeft
-        //     vals[3]: bmp width
-        //     vals[4]: bmp height
-        //     vals[5]: r1
-        //     vals[6]: g1
-        //     vals[7]: b1
+    { //add a bmp to memory
+        //key: vals[0]: -97 //funcId
+        //     vals[1]: bmp width
+        //     vals[2]: bmp height
+        //     vals[3]: bmp index //the index to assign to this bmp
+        //     vals[3]: r1
+        //     vals[4]: g1
+        //     vals[5]: b1
         //     etc
-        Serial.print("Setting Bitmap at ");
-        Serial.println(vals[2]);
-        if(vals[1] == 1)
+        int index = addBitmap(vals);
+        if(index == -1)
         {
-            setAllOff();
+            client.send("{\"Error\":\"Invalid bmp index\"}");
         }
-        setBitmap(vals, vals[3], vals[4], vals[2]);
+        Serial.print("Bitmap added successfully at index ");
+        Serial.println(index);
+    }
+    else if(vals[0] == -96)
+    { //display a bmp at a given location in the array
+        //key: vals[0]: -96
+        //     vals[1]: column to start display
+        //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+        //     vals[3]: the bmp index number to display (returned from -97)
+        showBitmap(vals);
     }
     else
     {
@@ -104,9 +114,53 @@ void setAllOff()
     }
 }
 
-void setBitmap(int* bmp, int width, int height, int upperLeft)
+//add a bmp to memory and return the index number
+//returns -1 if bmpCount is at NUM_BMPS
+int addBitmap(int* bmp)
 {
-    int index = 5; //cut off the metadata at the beginning of the array
+    int index = bmp[3];
+    if(index >= NUM_BMPS)
+        return -1; //overflow!
+
+    for(int i=0; i<PARAM_ARR_SIZE; i++)
+    {
+        bitmaps[index][i] = bmp[i];
+    }
+    return index;
+}
+
+
+void showBitmap(int* vals)
+{
+    //key: vals[0]: -96
+    //     vals[1]: column to start display
+    //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+    //     vals[3]: the bmp index number to display (returned from -97)
+    int upperLeft = vals[1];
+    int reset = vals[2];
+    int index = vals[3];
+
+    Serial.print("Setting Bitmap at ");
+    Serial.println(upperLeft);
+    if(reset == 1)
+    {
+        setAllOff();
+    }
+
+    //get the bmp from memory and display it at upperLeft
+    //key: vals[0]: -97 //funcId
+    //     vals[1]: bmp width
+    //     vals[2]: bmp height
+    //     vals[3]: bmp index //the index to assign to this bmp
+    //     vals[3]: r1
+    //     vals[4]: g1
+    //     vals[5]: b1
+    //     etc
+    int* bmp = bitmaps[index];
+    int width = bmp[1];
+    int height = bmp[2];
+
+    int offset = 4; //cut off the metadata at the beginning of the array
     Serial.println("setting bmp...");
     Serial.print("width: ");
     Serial.println(width);
@@ -121,15 +175,15 @@ void setBitmap(int* bmp, int width, int height, int upperLeft)
         {
             int addr;
             addr = getPixelAddress(y, x);
-            Serial.print("x: ");
-            Serial.println(x);
-            Serial.print("y: ");
-            Serial.println(y);
-            Serial.print("addr: ");
-            Serial.println(addr);
-            int r = bmp[index + 0] / BRIGHTNESS_FACTOR;
-            int g = bmp[index + 1] / BRIGHTNESS_FACTOR;
-            int b = bmp[index + 2] / BRIGHTNESS_FACTOR;
+            int r = bmp[offset + 0] / BRIGHTNESS_FACTOR;
+            int g = bmp[offset + 1] / BRIGHTNESS_FACTOR;
+            int b = bmp[offset + 2] / BRIGHTNESS_FACTOR;
+            // Serial.print("x: ");
+            // Serial.println(x);
+            // Serial.print("y: ");
+            // Serial.println(y);
+            // Serial.print("addr: ");
+            // Serial.println(addr);
             // Serial.print("r: ");
             // Serial.println(r);
             // Serial.print("g: ");
@@ -137,7 +191,7 @@ void setBitmap(int* bmp, int width, int height, int upperLeft)
             // Serial.print("b: ");
             // Serial.println(b);
             strip.setPixelColor(addr, strip.Color(r, g, b));
-            index += 3;
+            offset += 3;
         }
     }
     

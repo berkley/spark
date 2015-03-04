@@ -1,5 +1,6 @@
 var nconf = require('nconf');
 var config;
+var async = require('async');
 
 exports.setConfig = function(conf) {
 	config = conf;
@@ -25,6 +26,47 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 			});
 		}
 	}
+};
+
+exports.addBitmap = function(sockets, bmp, width, height, index, cb) {
+	async.each(Object.keys(sockets), function(socketKey, callback){
+		var socket = sockets[socketKey];
+		var data = "-97," + width + "," + height + "," + index + ",";
+		for(var i=0; i<bmp.length; i++)
+		{
+			data += bmp[i];
+			if(i != bmp.length - 1)
+			{
+				data += ",";
+			}
+		}
+		console.log("Sending addBitmap data: ", data);
+		socket.send(data, function(err){
+			if(err)
+			{
+				console.log("Error adding bitmap: ", err);
+			}
+			callback(err);
+		});
+	}, 
+	function(err){
+		console.log("done with async");
+		cb(err);
+	});
+};
+
+exports.drawBMP = function(sockets, upperLeft, index, callback){
+	var socket = sockets[getCoreIdForName("Freddy")];
+	var data = "-96," + upperLeft + ",1," + index;
+	
+	console.log("drawing bmp at: ", upperLeft);
+	socket.send(data, function(err){
+		if(err)
+		{
+			console.log("Error drawing bitmap: ", err);
+		}
+		callback(err);
+	});
 };
 
 exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
