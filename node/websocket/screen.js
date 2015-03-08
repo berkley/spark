@@ -46,7 +46,11 @@ exports.addBitmap = function(sockets, bmp, width, height, index, cb) {
 			{
 				console.log("Error adding bitmap: ", err);
 			}
-			callback(err);
+		});
+
+		socket.on('message', function(message){
+				console.log("XXXmessage: ", message);
+				callback();
 		});
 	}, 
 	function(err){
@@ -59,14 +63,31 @@ exports.drawBMP = function(sockets, upperLeft, index, callback){
 	var socket = sockets[getCoreIdForName("Freddy")];
 	var data = "-96," + upperLeft + ",1," + index;
 	
-	console.log("drawing bmp at: ", upperLeft);
+	console.log("drawing bmp " + index + " at: ", upperLeft);
 	socket.send(data, function(err){
 		if(err)
 		{
 			console.log("Error drawing bitmap: ", err);
 		}
-		callback(err);
+		socket = sockets[getCoreIdForName("Robot")];
+		if(!socket)
+		{
+			console.log("XXX");
+			callback(null);
+		}
+
+		socket.send(data, function(err){
+			if(err)
+			{
+				console.log("Error drawing bitmap: ", err);
+			}
+		}).on('message', function(message){
+				console.log("message: ", message);
+				callback(err);
+		});
 	});
+
+	
 };
 
 exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
@@ -100,6 +121,8 @@ exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
 				{
 					console.log("Error sending WS data ", data);
 				}
+			}).on('message', function(message){
+				console.log("message: ", message);
 				callback(err);
 			});
 		}

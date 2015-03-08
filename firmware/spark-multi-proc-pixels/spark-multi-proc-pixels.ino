@@ -90,6 +90,7 @@ void onMessage(WebSocketClient client, char* message) {
         }
         Serial.print("Bitmap added successfully at index ");
         Serial.println(index);
+        client.send("{\"status\":\"ok\"}");
     }
     else if(vals[0] == -96)
     { //display a bmp at a given location in the array
@@ -248,6 +249,7 @@ void setup()
     client.onError(onError);
     client.onClose(onClose);
     client.onOpen(onOpen);
+
     for(int i=0; i<PARAM_ARR_SIZE; i++)
     {
         paramArr[i] = 0;

@@ -26,6 +26,8 @@ wss.on('connection', function connection(ws) {
 
   ws.on('message', function(message) {
     var coreid = JSON.parse(message).coreid;
+    if(!coreid)
+      return;
     console.log("message from core ", coreid);
     sockets[coreid] = ws;
     console.log("connections: ", Object.keys(sockets));
@@ -50,23 +52,21 @@ function setupInvader() {
 
 function drawInvader() {
   screen.setConfig(config);
+  on = !on;
+  col++;
+  if(col > 31)
+    col = 0;  
+
+  console.log("on: ", on);
   if(on)
   {
     screen.drawBMP(sockets, col, 0, function(){
-      col++;
-      if(col > 31)
-        col = 0;  
-      on = !on;
       setTimeout(drawInvader, 250);
     });
   }
   else
   {
     screen.drawBMP(sockets, col, 1, function(){
-      col++;
-      if(col > 31)
-        col = 0;  
-      on = !on;
       setTimeout(drawInvader, 250);
     });
   }
