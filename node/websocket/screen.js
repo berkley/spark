@@ -43,10 +43,7 @@ exports.addBitmap = function(coreNames, bmp, width, height, index, cb) {
 	}
 	console.log("Sending addBitmap data: ", data);
 	sockets.send(coreNames, data, function(err){
-		if(err)
-		{
-			console.log("Error adding bitmap: ", err);
-		}
+		cb(err);
 	});
 };
 

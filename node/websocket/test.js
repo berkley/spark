@@ -23,8 +23,7 @@ function socketMessageHandler(type, message, callback) {
 	if(type == "connection" && JSON.parse(message).message == "ident")
 	{
 		console.log("test heard 'connection' from ", message);
-		// setTimeout(setupInvader, 1000);	
-
+		setupInvader();
 		callback(null);
 	}
 	else if(type == "message")
@@ -41,8 +40,9 @@ var col = 0;
 function setupInvader() {
 	var screens = ["Freddy", "Robot"];
   	screen.addBitmap(screens, invader2_1, invader2_1_width, invader2_1_height, 0, function(){
+  		console.log("done with bmp1");
       screen.addBitmap(screens, invader2_2, invader2_2_width, invader2_2_height, 1, function(){
-        console.log("Done adding bitmaps");
+        console.log("done with bmp2");
         // drawInvader();   
       });
     });
