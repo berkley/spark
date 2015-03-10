@@ -1,9 +1,12 @@
 var nconf = require('nconf');
 var config;
 var async = require('async');
+var util = require('./util.js');
+var sockets = require('./sockets.js');
 
 exports.setConfig = function(conf) {
 	config = conf;
+	util.setConfig(config);
 };
 
 exports.setVPixel = function(sockets, vPixel, red, green, blue) {	
@@ -28,34 +31,22 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 	}
 };
 
-exports.addBitmap = function(sockets, bmp, width, height, index, cb) {
-	async.each(Object.keys(sockets), function(socketKey, callback){
-		var socket = sockets[socketKey];
-		var data = "-97," + width + "," + height + "," + index + ",";
-		for(var i=0; i<bmp.length; i++)
+exports.addBitmap = function(coreNames, bmp, width, height, index, cb) {
+	var data = "-97," + width + "," + height + "," + index + ",";
+	for(var i=0; i<bmp.length; i++)
+	{
+		data += bmp[i];
+		if(i != bmp.length - 1)
 		{
-			data += bmp[i];
-			if(i != bmp.length - 1)
-			{
-				data += ",";
-			}
+			data += ",";
 		}
-		console.log("Sending addBitmap data: ", data);
-		socket.send(data, function(err){
-			if(err)
-			{
-				console.log("Error adding bitmap: ", err);
-			}
-		});
-
-		socket.on('message', function(message){
-				console.log("XXXmessage: ", message);
-				callback();
-		});
-	}, 
-	function(err){
-		console.log("done with async");
-		cb(err);
+	}
+	console.log("Sending addBitmap data: ", data);
+	sockets.send(coreNames, data, function(err){
+		if(err)
+		{
+			console.log("Error adding bitmap: ", err);
+		}
 	});
 };
 
@@ -81,9 +72,6 @@ exports.drawBMP = function(sockets, upperLeft, index, callback){
 			{
 				console.log("Error drawing bitmap: ", err);
 			}
-		}).on('message', function(message){
-				console.log("message: ", message);
-				callback(err);
 		});
 	});
 
@@ -204,41 +192,3 @@ var getSocketData = function(coreId, vPixel, red, green, blue) {
 	}
 };
 
-var getCoreForPixel = function(vPixel) {
-	var screen = config.get("screen");
-	for(var i=0; i<screen.length; i++)
-	{
-		var s = screen[i];
-		var start = s.vPixelStart;
-		var end = s.vPixelEnd;
-		if(vPixel >= start && vPixel <= end)
-		{
-			var id = getCoreIdForName(s.name);
-			return id;
-		}
-	}
-};
-
-var getCoreIdForName = function(name) {
-	var cores = config.get("cores");
-	for(var i=0; i<cores.length; i++)
-	{
-		var core = cores[i];
-		if(core.name == name)
-		{
-			return core.id;
-		}
-	}
-};
-
-var getNameForCoreId = function(coreId) {
-	var cores = config.get("cores");
-	for(var i=0; i<cores.length; i++)
-	{
-		var core = cores[i];
-		if(core.id == coreId)
-		{
-			return core.name;
-		}
-	}
-};

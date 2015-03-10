@@ -6,6 +6,8 @@ WebSocketClient client;
 // char server[] = "10.0.1.6"; //dino
 char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
+
+
 #define WS_PORT 3001
 #define PIXEL_PIN D2
 #define PIXEL_COUNT 256
@@ -44,6 +46,22 @@ String getCoreID()
  return coreIdentifier;
 }
 
+char* getCoreIDJSONWithMessage(String message)
+{
+    String s1 = "{\"coreid\":\"";
+    String s2 = getCoreID();
+    String s3 = "\", \"message\":\"";
+    String s4 = message;
+    String s5 = "\"}";
+    s1.concat(s2);
+    s1.concat(s3);
+    s1.concat(s4);
+    s1.concat(s5);
+    char* str = new char[s1.length() + 1];
+    strcpy(str, s1.c_str());
+    return str;
+}
+
 void onMessage(WebSocketClient client, char* message) {
     Serial.print("Received: ");
     Serial.println(message);
@@ -53,15 +71,8 @@ void onMessage(WebSocketClient client, char* message) {
     
     if(vals[0] == -99) //so lame...but it works
     {
-        String s1 = "{\"coreid\":\"";
-        String s2 = getCoreID();
-        String s3 = "\"}";
-        s1.concat(s2);
-        s1.concat(s3);
-        char* str = new char[s1.length() + 1];
-        strcpy(str, s1.c_str());
-        Serial.println(s1);
-        client.send(str);
+        Serial.println(getCoreIDJSONWithMessage("ident"));
+        client.send(getCoreIDJSONWithMessage("ident"));
         return;
     } 
     else if(vals[0] == -98)
@@ -90,7 +101,8 @@ void onMessage(WebSocketClient client, char* message) {
         }
         Serial.print("Bitmap added successfully at index ");
         Serial.println(index);
-        client.send("{\"status\":\"ok\"}");
+        Serial.println(getCoreIDJSONWithMessage("ok"));
+        client.send(getCoreIDJSONWithMessage("ok"));
     }
     else if(vals[0] == -96)
     { //display a bmp at a given location in the array
@@ -99,11 +111,14 @@ void onMessage(WebSocketClient client, char* message) {
         //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
         //     vals[3]: the bmp index number to display (returned from -97)
         showBitmap(vals);
+        Serial.println(getCoreIDJSONWithMessage("ok"));
+        client.send(getCoreIDJSONWithMessage("ok"));
     }
     else
     {
         strip.setPixelColor(vals[0], strip.Color(vals[1], vals[2], vals[3]));
         strip.show();     
+        client.send(getCoreIDJSONWithMessage("ok"));
     }
 }
 
