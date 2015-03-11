@@ -31,7 +31,7 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 	}
 };
 
-exports.addBitmap = function(coreNames, bmp, width, height, index, cb) {
+exports.addBitmap = function(coreNames, bmp, width, height, index, callback) {
 	var data = "-97," + width + "," + height + "," + index + ",";
 	for(var i=0; i<bmp.length; i++)
 	{
@@ -43,36 +43,16 @@ exports.addBitmap = function(coreNames, bmp, width, height, index, cb) {
 	}
 	console.log("Sending addBitmap data: ", data);
 	sockets.send(coreNames, data, function(err){
-		cb(err);
+		callback(err);
 	});
 };
 
-exports.drawBMP = function(sockets, upperLeft, index, callback){
-	var socket = sockets[getCoreIdForName("Freddy")];
-	var data = "-96," + upperLeft + ",1," + index;
-	
+exports.drawBMP = function(coreNames, upperLeft, index, callback){
+	var data = "-96," + upperLeft + ",1," + index;	
 	console.log("drawing bmp " + index + " at: ", upperLeft);
-	socket.send(data, function(err){
-		if(err)
-		{
-			console.log("Error drawing bitmap: ", err);
-		}
-		socket = sockets[getCoreIdForName("Robot")];
-		if(!socket)
-		{
-			console.log("XXX");
-			callback(null);
-		}
-
-		socket.send(data, function(err){
-			if(err)
-			{
-				console.log("Error drawing bitmap: ", err);
-			}
-		});
+	sockets.send(coreNames, data, function(err){
+		callback(err);
 	});
-
-	
 };
 
 exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {

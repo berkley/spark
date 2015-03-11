@@ -3,8 +3,8 @@ var util = require('./util.js');
 var config;
 
 var sockets = {};
-var listeners = []; //array of listener functions
-var oneTimeListeners = []; //array of listeners that callback once then die
+var listeners = []; //array of function(message)
+var serial = 0;
 
 exports.setConfig = function(conf) {
   console.log("sockets setting config");
@@ -16,47 +16,44 @@ exports.registerListener = function(listener) {
   listeners.push(listener);
 };
 
-exports.registerOneTimeListener = function(listener) {
-  oneTimeListeners.push(listener);
-};
-
-exports.dropListener = function(listener) {
-  for(var i=0; i<listeners.length; i++) {
-    if(listeners[i] === l)
-      listeners.splice(i, 1);
+var notifyListeners = function(message) {
+  for(var i=0; i<listeners.length; i++)
+  {
+    var listener = listeners[i];
+    listener(message); //send the listener the message
+    listeners.splice(i, 1); //remove the listener once called.
   }
-};
+}
 
-exports.dropOneTimeListener = function(listener) {
-  for(var i=0; i<oneTimeListeners.length; i++) {
-    if(listeners[i] === listener)
-      oneTimeListeners.splice(i, 1);
-  }
+function appendTransactionId(data, transactionId) {
+  //add the transactionId as the 2nd value in the CSV
+  var firstCommaIndex = data.indexOf(",");
+  var begin = data.substring(0, firstCommaIndex);
+  var end = data.substring(firstCommaIndex, data.length);
+  var backTogether = begin + "," + transactionId + end;
+  return backTogether;
 };
 
 exports.send = function(cores, data, callback) {
   async.each(cores, function(coreName, cb){
+    var transactionId = serial++;
     var coreId = util.getCoreIdForName(coreName);
     var socket = sockets[coreId];
     console.log("sending data to core ", coreName);
     if(socket)
     {
-      exports.registerOneTimeListener(function(type, message, done){
-        var parsedMessage = JSON.parse(message);
-        console.log("message recieved: ", message, " from core ", parsedMessage.coreid);
-        if(coreId == parsedMessage.coreid && parsedMessage.message !== "ident"){
-          console.log("transaction done for core ", coreId);
-          done(true);  
-          cb();
+      console.log("begin transacting with data ", data, " and id: ", transactionId);
+      data = appendTransactionId(data, transactionId);
+      exports.registerListener(function(message){
+        var jsonMsg = JSON.parse(message);
+        if(jsonMsg.transactionId == transactionId)
+        {
+          console.log("transaction complete for id ", transactionId);
+          callback();
         }
-        else {
-          // ignore this message
-          done(false);
-        }
-
       });
       socket.send(data, function(err){
-        console.log("transaction start: data sent to core ", coreId);
+        //message sent
       });
     }
     else
@@ -77,46 +74,34 @@ console.log("WebSocketServer created on port 3001");
 wss.on('connection', function connection(ws) {
   ws.on('message', function(message) {
     console.log("message from WS: ", message);
+
     var coreid = JSON.parse(message).coreid;
-    if(!coreid)
-    { //normal message
-      notifyListeners("message", message, function(err){
-        return;  
-      });
+    var messageBody = JSON.parse(message).message;
+    var transactionId = JSON.parse(message).transactionId;
+    if(messageBody == "ident")
+    { 
+      console.log("Connection from core ", coreid);
+      sockets[coreid] = ws;  
+      console.log("connections: ", Object.keys(sockets));
+      notifyListeners(message);
     }
-    //else // connection message
-
-    console.log("Connection from core ", coreid);
-
-    sockets[coreid] = ws;
-    console.log("connections: ", Object.keys(sockets));
+    else if(messageBody == "ok")
+    {
+      notifyListeners(message);
+    }
     
-    notifyListeners("connection", message, function(err){
-    });
   });
 
-  ws.send("-99,0,0,0");
+  console.log("sending -99 ping");
+  ws.send("-99,0,0,0"); //initiate comms with the core, ask for an ident
 });
 
-function notifyListeners(type, message, done) {
-  async.each(listeners, function(listener, callback){
-    if(listener)
-      listener(type, message, function(err){
-        callback(err);
-      });
-  }, function(err) {
-    console.log("Done notifying listeners.");
-    async.each(oneTimeListeners, function(listener, callback){
-      listener(type, message, function(xactionComplete) {
-        if (xactionComplete) {
-          exports.dropOneTimeListener(listener);
-        }
-        callback(null);
-      });
-    },function(err){
-      done(err);
-    });
-  });
-
-  
+exports.closeAll = function() {
+  // console.log("closing all sockets");
+  // for(key in Object.keys(sockets))
+  // {
+  //   console.log("closing socket for core ", key);
+  //   if(sockets[key])
+  //     sockets[key].terminate();
+  // }
 };

@@ -3,8 +3,8 @@
 #include "application.h"
 
 WebSocketClient client;
-// char server[] = "10.0.1.6"; //dino
-char server[] = "10.0.1.8"; //syncline
+char server[] = "10.0.1.6"; //dino
+// char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
 
 
@@ -25,10 +25,18 @@ Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 int paramArr[PARAM_ARR_SIZE];
 
 int bitmaps[NUM_BMPS][PARAM_ARR_SIZE];
+String coreId = "";
 
 String getCoreID()
 {
   String coreIdentifier = "";
+  if(coreId.length() > 0)
+  {
+      Serial.println("returning stored coreId");
+      coreIdentifier = coreId;
+      return coreIdentifier;
+  }
+  
   char id[12];
   memcpy(id, (char *)ID1, 12);
   char hex_digit;
@@ -43,20 +51,25 @@ String getCoreID()
      hex_digit += 39;
    coreIdentifier = coreIdentifier + hex_digit;
  }
+ coreId = coreIdentifier;
  return coreIdentifier;
 }
 
-char* getCoreIDJSONWithMessage(String message)
+char* getCoreIDJSONWithMessageAndTransactionId(String message, int transactionId)
 {
     String s1 = "{\"coreid\":\"";
     String s2 = getCoreID();
-    String s3 = "\", \"message\":\"";
-    String s4 = message;
-    String s5 = "\"}";
+    String s3 = "\", \"transactionId\":";
+    String s4 = String(transactionId);
+    String s5 = ", \"message\":\"";
+    String s6 = message;
+    String s7 = "\"}";
     s1.concat(s2);
     s1.concat(s3);
     s1.concat(s4);
     s1.concat(s5);
+    s1.concat(s6);
+    s1.concat(s7);
     char* str = new char[s1.length() + 1];
     strcpy(str, s1.c_str());
     return str;
@@ -66,60 +79,59 @@ void onMessage(WebSocketClient client, char* message) {
     Serial.print("Received: ");
     Serial.println(message);
     
-    // String* vals = stringSplit(message, ',');
     int* vals = stringSplit(message, ',');
     
-    if(vals[0] == -99) //so lame...but it works
+    if(vals[0] == -99)
     {
-        Serial.println(getCoreIDJSONWithMessage("ident"));
-        client.send(getCoreIDJSONWithMessage("ident"));
-        return;
+        Serial.println(getCoreIDJSONWithMessageAndTransactionId("ident", -1));
+        client.send(getCoreIDJSONWithMessageAndTransactionId("ident", -1));
     } 
-    else if(vals[0] == -98)
-    { //set full screen to one color
-        Serial.println("Setting full screen -98");
-        for(int i=0; i<PIXEL_COUNT; i++)
-        {
-            strip.setPixelColor(i, strip.Color(vals[1], vals[2], vals[3]));
-        }
-        strip.show();
-    }
+    // else if(vals[0] == -98)
+    // { //set full screen to one color
+    //     Serial.println("Setting full screen -98");
+    //     for(int i=0; i<PIXEL_COUNT; i++)
+    //     {
+    //         strip.setPixelColor(i, strip.Color(vals[1], vals[2], vals[3]));
+    //     }
+    //     strip.show();
+    // }
     else if(vals[0] == -97)
     { //add a bmp to memory
         //key: vals[0]: -97 //funcId
-        //     vals[1]: bmp width
-        //     vals[2]: bmp height
-        //     vals[3]: bmp index //the index to assign to this bmp
-        //     vals[3]: r1
-        //     vals[4]: g1
-        //     vals[5]: b1
+        //     vals[1]: transactionId
+        //     vals[2]: bmp width
+        //     vals[3]: bmp height
+        //     vals[4]: bmp index //the index to assign to this bmp
+        //     vals[5]: r1
+        //     vals[6]: g1
+        //     vals[7]: b1
         //     etc
         int index = addBitmap(vals);
         if(index == -1)
         {
             client.send("{\"Error\":\"Invalid bmp index\"}");
         }
-        Serial.print("Bitmap added successfully at index ");
         Serial.println(index);
-        Serial.println(getCoreIDJSONWithMessage("ok"));
-        client.send(getCoreIDJSONWithMessage("ok"));
+        // Serial.println(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
+        client.send(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
     }
     else if(vals[0] == -96)
     { //display a bmp at a given location in the array
         //key: vals[0]: -96
-        //     vals[1]: column to start display
-        //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-        //     vals[3]: the bmp index number to display (returned from -97)
+        //     vals[1]: transactionId
+        //     vals[2]: column to start display
+        //     vals[3]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+        //     vals[4]: the bmp index number to display (returned from -97)
         showBitmap(vals);
-        Serial.println(getCoreIDJSONWithMessage("ok"));
-        client.send(getCoreIDJSONWithMessage("ok"));
+        // Serial.println(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
+        client.send(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
     }
-    else
-    {
-        strip.setPixelColor(vals[0], strip.Color(vals[1], vals[2], vals[3]));
-        strip.show();     
-        client.send(getCoreIDJSONWithMessage("ok"));
-    }
+    // else
+    // {
+    //     strip.setPixelColor(vals[0], strip.Color(vals[1], vals[2], vals[3]));
+    //     strip.show();     
+    //     client.send(getCoreIDJSONWithMessage("ok"));
+    // }
 }
 
 void setAllOff()
@@ -134,7 +146,7 @@ void setAllOff()
 //returns -1 if bmpCount is at NUM_BMPS
 int addBitmap(int* bmp)
 {
-    int index = bmp[3];
+    int index = bmp[4];
     if(index >= NUM_BMPS)
         return -1; //overflow!
 
@@ -149,15 +161,14 @@ int addBitmap(int* bmp)
 void showBitmap(int* vals)
 {
     //key: vals[0]: -96
-    //     vals[1]: column to start display
-    //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-    //     vals[3]: the bmp index number to display (returned from -97)
-    int upperLeft = vals[1];
-    int reset = vals[2];
-    int index = vals[3];
+    //     vals[1]: transactionId
+    //     vals[2]: column to start display
+    //     vals[3]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+    //     vals[4]: the bmp index number to display (returned from -97)
+    int upperLeft = vals[2];
+    int reset = vals[3];
+    int index = vals[4];
 
-    Serial.print("Setting Bitmap at ");
-    Serial.println(upperLeft);
     if(reset == 1)
     {
         setAllOff();
@@ -165,18 +176,19 @@ void showBitmap(int* vals)
 
     //get the bmp from memory and display it at upperLeft
     //key: vals[0]: -97 //funcId
-    //     vals[1]: bmp width
-    //     vals[2]: bmp height
-    //     vals[3]: bmp index //the index to assign to this bmp
-    //     vals[3]: r1
-    //     vals[4]: g1
-    //     vals[5]: b1
+    //     vals[1]: transactionId
+    //     vals[2]: bmp width
+    //     vals[3]: bmp height
+    //     vals[4]: bmp index //the index to assign to this bmp
+    //     vals[5]: r1
+    //     vals[6]: g1
+    //     vals[7]: b1
     //     etc
     int* bmp = bitmaps[index];
-    int width = bmp[1];
-    int height = bmp[2];
+    int width = bmp[2];
+    int height = bmp[3];
 
-    int offset = 4; //cut off the metadata at the beginning of the array
+    int offset = 5; //cut off the metadata at the beginning of the array
     Serial.println("setting bmp...");
     Serial.print("width: ");
     Serial.println(width);
