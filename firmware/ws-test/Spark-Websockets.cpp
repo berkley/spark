@@ -99,7 +99,8 @@ void WebSocketClient::reconnect() {
   bool result = false;
   bool isconnected = false;
 	#ifdef TRACE
-		Serial.println("reconnect: Connecting...");
+		Serial.print("reconnect: Connecting to host ");
+		Serial.println(_hostname);
 	#endif
 	
 	int i, count;
@@ -630,7 +631,7 @@ bool WebSocketClient::send (char* message) {
   }
   for(int i = 0; i < 4; i++) {
   	#ifdef TRACE
-		Serial.print("send: writing NOOP");
+		Serial.println("send: writing NOOP");
 	#endif
     _client.write((byte)0x00); // use 0x00 for mask bytes which is effectively a NOOP
   }
@@ -642,19 +643,19 @@ bool WebSocketClient::send (char* message) {
   if(_client.connected())
   {
   	uint8_t num_written = _client.print(message);	
+  	// uint8_t num_written = _client.write(message, sizeof(message));
   	#ifdef TRACE
 		Serial.print("send: client.print ");
 		Serial.print(message);
 		Serial.print(" ");
 		Serial.println(num_written);
 	#endif
+	return true;
   }
   else
   {
   	return false;
   }
-  
-  return true;
 }
 
 

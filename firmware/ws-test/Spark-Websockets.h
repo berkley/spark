@@ -31,7 +31,7 @@
 //#define TRACE // uncomment to support TRACE level debugging of wire protocol
 //#define DEBUG // turn on debugging
 
-#define RETRY_TIMEOUT 5000
+#define RETRY_TIMEOUT 3000
 
 #include <stdlib.h>
 #include "spark_wiring_tcpclient.h"
