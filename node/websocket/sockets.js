@@ -92,8 +92,8 @@ wss.on('connection', function connection(ws) {
     
   });
 
-  console.log("sending -99 ping");
-  ws.send("-99,0,0,0"); //initiate comms with the core, ask for an ident
+  console.log("sending 99 ping");
+  ws.send("99,0,0,0"); //initiate comms with the core, ask for an ident
 });
 
 exports.closeAll = function() {

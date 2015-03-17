@@ -3,10 +3,10 @@
 #include "application.h"
 
 WebSocketClient client;
-char server[] = "10.0.1.6"; //dino
+// char server[] = "10.0.1.6"; //dino
 // char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
-
+char server[] = "10.0.1.25"; //rasp pi
 
 #define WS_PORT 3001
 #define PIXEL_PIN D2
@@ -22,10 +22,11 @@ char server[] = "10.0.1.6"; //dino
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 // String* strArr = new String[265];
-int paramArr[PARAM_ARR_SIZE];
+static uint8_t paramArr[PARAM_ARR_SIZE];
 
-int bitmaps[NUM_BMPS][PARAM_ARR_SIZE];
-String coreId = "";
+static uint8_t bitmaps[NUM_BMPS][PARAM_ARR_SIZE];
+static String coreId = "";
+static String token = "";
 
 String getCoreID()
 {
@@ -81,10 +82,10 @@ void onMessage(WebSocketClient client, char* message) {
     
     int* vals = stringSplit(message, ',');
     
-    if(vals[0] == -99)
+    if(vals[0] == 99)
     {
-        Serial.println(getCoreIDJSONWithMessageAndTransactionId("ident", -1));
-        client.send(getCoreIDJSONWithMessageAndTransactionId("ident", -1));
+        Serial.println(getCoreIDJSONWithMessageAndTransactionId("ident", 0));
+        client.send(getCoreIDJSONWithMessageAndTransactionId("ident", 0));
     } 
     // else if(vals[0] == -98)
     // { //set full screen to one color
@@ -95,7 +96,7 @@ void onMessage(WebSocketClient client, char* message) {
     //     }
     //     strip.show();
     // }
-    else if(vals[0] == -97)
+    else if(vals[0] == 97)
     { //add a bmp to memory
         //key: vals[0]: -97 //funcId
         //     vals[1]: transactionId
@@ -115,7 +116,7 @@ void onMessage(WebSocketClient client, char* message) {
         // Serial.println(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
         client.send(getCoreIDJSONWithMessageAndTransactionId("ok", vals[1]));
     }
-    else if(vals[0] == -96)
+    else if(vals[0] == 96)
     { //display a bmp at a given location in the array
         //key: vals[0]: -96
         //     vals[1]: transactionId
@@ -292,7 +293,6 @@ void loop() {
 int* stringSplit(String s, char delim)
 {
     int arrcnt = 0;
-    String token = "";
     for(int i=0; i<s.length(); i++)
     {
         char c = s.charAt(i);

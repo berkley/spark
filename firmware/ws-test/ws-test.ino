@@ -2,8 +2,8 @@
 #include "application.h"
 
 WebSocketClient client;
-char server[] = "10.0.1.6"; //dino
-// char server[] = "10.0.1.8"; //syncline
+// char server[] = "10.0.1.6"; //dino
+char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
 
 #define WS_PORT 3001
@@ -12,11 +12,11 @@ void onMessage(WebSocketClient client, char* message) {
     Serial.print("Received: ");
     Serial.println(message);
     
-    while(true)
-    {
-        client.send("yay!");
-        delay(1000);
-    }
+    // while(true)
+    // {
+    //     client.send("yay!");
+    //     delay(1000);
+    // }
 }
 
 void onError(WebSocketClient client, char* message) {

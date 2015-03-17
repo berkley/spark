@@ -32,7 +32,7 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 };
 
 exports.addBitmap = function(coreNames, bmp, width, height, index, callback) {
-	var data = "-97," + width + "," + height + "," + index + ",";
+	var data = "97," + width + "," + height + "," + index + ",";
 	for(var i=0; i<bmp.length; i++)
 	{
 		data += bmp[i];
@@ -48,7 +48,7 @@ exports.addBitmap = function(coreNames, bmp, width, height, index, callback) {
 };
 
 exports.drawBMP = function(coreNames, upperLeft, index, callback){
-	var data = "-96," + upperLeft + ",1," + index;	
+	var data = "96," + upperLeft + ",1," + index;	
 	console.log("drawing bmp " + index + " at: ", upperLeft);
 	sockets.send(coreNames, data, function(err){
 		callback(err);
@@ -73,7 +73,7 @@ exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
 	        //     vals[6]: g1
 	        //     vals[7]: b1
 	        //     etc
-			var data =  "-97,1," + upperLeftVPixel + ",8,8,";
+			var data =  "97,1," + upperLeftVPixel + ",8,8,";
 			for(var i=0; i<bmp.length; i++)
 			{
 				data += bmp[i];
@@ -103,7 +103,7 @@ exports.setVScreen = function(sockets, screenName, red, green, blue, callback) {
 		var socket = sockets[coreId];
 		if(socket)
 		{
-			var data =  "-98," + red + "," + green + "," + blue;
+			var data =  "98," + red + "," + green + "," + blue;
 			socket.send(data, function(err){
 				if(err)
 				{

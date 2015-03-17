@@ -28,7 +28,7 @@ wss.on('connection', function connection(ws) {
 
   setInterval(function(){
       // ws.send("ok1 " + count++, function(){});
-  }, 50); 
+  }, 200); 
   ws.send("ok2");
 
 });
