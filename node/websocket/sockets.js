@@ -4,7 +4,7 @@ var config;
 
 var sockets = {};
 var listeners = []; //array of function(message)
-var serial = 0;
+var serial = 100;
 
 exports.setConfig = function(conf) {
   console.log("sockets setting config");
