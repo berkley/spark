@@ -36,6 +36,10 @@ function appendTransactionId(data, transactionId) {
 
 exports.send = function(cores, data, callback) {
   async.each(cores, function(coreName, cb){
+    if(serial > 250)
+    {
+      serial = 0;
+    }
     var transactionId = serial++;
     var coreId = util.getCoreIdForName(coreName);
     var socket = sockets[coreId];
@@ -44,16 +48,16 @@ exports.send = function(cores, data, callback) {
     {
       console.log("begin transacting with data ", data, " and id: ", transactionId);
       data = appendTransactionId(data, transactionId);
-      exports.registerListener(function(message){
-        var jsonMsg = JSON.parse(message);
-        if(jsonMsg.transactionId == transactionId)
-        {
-          console.log("transaction complete for id ", transactionId);
-          callback();
-        }
-      });
+      // exports.registerListener(function(message){
+      //   var jsonMsg = JSON.parse(message);
+      //   if(jsonMsg.transactionId == transactionId)
+      //   {
+      //     console.log("transaction complete for id ", transactionId);
+      //     callback();
+      //   }
+      // });
       socket.send(data, function(err){
-        //message sent
+        callback();
       });
     }
     else

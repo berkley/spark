@@ -1,5 +1,5 @@
-#include "neopixel/neopixel.h"
-#include "Spark-Websockets/Spark-Websockets.h"
+#include "neopixel.h"
+#include "Spark-Websockets.h"
 #include "application.h"
 
 WebSocketClient client;
