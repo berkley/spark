@@ -4,7 +4,6 @@ var config;
 
 var sockets = {};
 var listeners = []; //array of function(message)
-var serial = 100;
 
 exports.setConfig = function(conf) {
   console.log("sockets setting config");
@@ -20,8 +19,7 @@ var notifyListeners = function(message) {
   for(var i=0; i<listeners.length; i++)
   {
     var listener = listeners[i];
-    listener(message); //send the listener the message
-    // listeners.splice(i, 1); //remove the listener once called.
+    listener(message); 
   }
 }
 
@@ -36,26 +34,11 @@ function appendTransactionId(data, transactionId) {
 
 exports.send = function(cores, data, callback) {
   async.each(cores, function(coreName, cb){
-    if(serial > 250)
-    {
-      serial = 0;
-    }
-    var transactionId = serial++;
     var coreId = util.getCoreIdForName(coreName);
     var socket = sockets[coreId];
     console.log("sending data to core ", coreName);
     if(socket)
     {
-      // console.log("begin transacting with data ", data, " and id: ", transactionId);
-      // data = appendTransactionId(data, transactionId);
-      // exports.registerListener(function(message){
-      //   var jsonMsg = JSON.parse(message);
-      //   if(jsonMsg.transactionId == transactionId)
-      //   {
-      //     console.log("transaction complete for id ", transactionId);
-      //     callback();
-      //   }
-      // });
       socket.send(data, function(err){
         cb(null);
       });
@@ -94,23 +77,9 @@ wss.on('connection', function connection(ws) {
       notifyListeners(message);
 
     }
-    // else if(messageBody == "ok")
-    // {
-    //   notifyListeners(message);
-    // }
-    
   });
 
   console.log("sending 99 ping");
   ws.send("99,0,0,0"); //initiate comms with the core, ask for an ident
 });
 
-exports.closeAll = function() {
-  // console.log("closing all sockets");
-  // for(key in Object.keys(sockets))
-  // {
-  //   console.log("closing socket for core ", key);
-  //   if(sockets[key])
-  //     sockets[key].terminate();
-  // }
-};
