@@ -21,7 +21,7 @@ var notifyListeners = function(message) {
   {
     var listener = listeners[i];
     listener(message); //send the listener the message
-    listeners.splice(i, 1); //remove the listener once called.
+    // listeners.splice(i, 1); //remove the listener once called.
   }
 }
 
@@ -46,8 +46,8 @@ exports.send = function(cores, data, callback) {
     console.log("sending data to core ", coreName);
     if(socket)
     {
-      console.log("begin transacting with data ", data, " and id: ", transactionId);
-      data = appendTransactionId(data, transactionId);
+      // console.log("begin transacting with data ", data, " and id: ", transactionId);
+      // data = appendTransactionId(data, transactionId);
       // exports.registerListener(function(message){
       //   var jsonMsg = JSON.parse(message);
       //   if(jsonMsg.transactionId == transactionId)
@@ -57,16 +57,19 @@ exports.send = function(cores, data, callback) {
       //   }
       // });
       socket.send(data, function(err){
-        callback();
+        cb(null);
       });
     }
     else
     {
-      cb(null);
+      cb("socket for core " + coreName + " is null");
     }
   }, 
-  function(err) {
-    callback(err);  
+  function(err)  {
+    console.log("sendDelay: ", config.get("sendDelay"));
+    setTimeout(function(){
+      callback(null);
+    }, config.get("sendDelay")); //delay 500ms before calling back
   });  
   
 };
@@ -87,12 +90,14 @@ wss.on('connection', function connection(ws) {
       console.log("Connection from core ", coreid);
       sockets[coreid] = ws;  
       console.log("connections: ", Object.keys(sockets));
+      console.log("notifyListeners with message: ", message);
       notifyListeners(message);
+
     }
-    else if(messageBody == "ok")
-    {
-      notifyListeners(message);
-    }
+    // else if(messageBody == "ok")
+    // {
+    //   notifyListeners(message);
+    // }
     
   });
 

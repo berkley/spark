@@ -3,10 +3,25 @@ var config;
 var async = require('async');
 var util = require('./util.js');
 var sockets = require('./sockets.js');
+var bitmaps = [];
 
 exports.setConfig = function(conf) {
 	config = conf;
 	util.setConfig(config);
+};
+
+exports.setup = function(coreid, done) {
+	console.log("core " + coreid + " setup");
+
+	async.each(bitmaps, function(bitmap, callback)
+	{
+		console.log("sending bitmap to core " + coreid);
+		sockets.send([util.getNameForCoreId(coreid)], bitmap, function(err){
+			callback(err);
+		});
+	}, function(err){
+		done(err);
+	});
 };
 
 exports.setVPixel = function(sockets, vPixel, red, green, blue) {	
@@ -31,7 +46,7 @@ exports.setVPixel = function(sockets, vPixel, red, green, blue) {
 	}
 };
 
-exports.addBitmap = function(coreNames, bmp, width, height, index, callback) {
+exports.addBitmap = function(bmp, width, height, index) {
 	var data = "97," + width + "," + height + "," + index + ",";
 	for(var i=0; i<bmp.length; i++)
 	{
@@ -41,10 +56,8 @@ exports.addBitmap = function(coreNames, bmp, width, height, index, callback) {
 			data += ",";
 		}
 	}
-	console.log("Sending addBitmap data: ", data);
-	sockets.send(coreNames, data, function(err){
-		callback(err);
-	});
+	bitmaps.push(data);
+	console.log("added bitmaps: ", bitmaps);
 };
 
 exports.drawBMP = function(coreNames, upperLeft, index, callback){

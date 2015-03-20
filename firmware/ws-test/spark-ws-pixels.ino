@@ -4,9 +4,9 @@
 
 WebSocketClient client;
 // char server[] = "10.0.1.6"; //dino
-// char server[] = "10.0.1.8"; //syncline
+char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
-char server[] = "10.0.1.25"; //rasp pi
+// char server[] = "10.0.1.25"; //rasp pi
 
 #define WS_PORT 3001
 #define PIXEL_PIN D2
@@ -100,65 +100,41 @@ void onMessage(WebSocketClient client, char* message) {
         client.send(msg);
         free(msg);
     } 
-    // else if(vals[0] == -98)
-    // { //set full screen to one color
-    //     Serial.println("Setting full screen -98");
-    //     for(int i=0; i<PIXEL_COUNT; i++)
-    //     {
-    //         strip.setPixelColor(i, strip.Color(vals[1], vals[2], vals[3]));
-    //     }
-    //     strip.show();
-    // }
+    else if(paramArr[0] == -98)
+    { //set full screen to one color
+        Serial.println("Setting full screen -98");
+        for(int i=0; i<PIXEL_COUNT; i++)
+        {
+            strip.setPixelColor(i, strip.Color(paramArr[1], paramArr[2], paramArr[3]));
+        }
+        strip.show();
+    }
     else if(paramArr[0] == 97)
     { //add a bmp to memory
         //key: vals[0]: -97 //funcId
-        //     vals[1]: transactionId
-        //     vals[2]: bmp width
-        //     vals[3]: bmp height
-        //     vals[4]: bmp index //the index to assign to this bmp
-        //     vals[5]: r1
-        //     vals[6]: g1
-        //     vals[7]: b1
+        //     vals[1]: bmp width
+        //     vals[2]: bmp height
+        //     vals[3]: bmp index //the index to assign to this bmp
+        //     vals[4]: r1
+        //     vals[5]: g1
+        //     vals[6]: b1
         //     etc
         uint8_t index = addBitmap();
-        if(index == -1)
-        {
-            // client.send("{\"Error\":\"Invalid bmp index\"}");
-        }
         Serial.print("set bmp at index ");
         Serial.println(index);
-        
-        char *msg = getCoreIDJSONWithMessageAndTransactionId("ok", paramArr[1]);
-        Serial.print("97 Sending ");
-        Serial.println(msg);
-        
-        client.send(msg);
-        free(msg);
     }
     else if(paramArr[0] == 96)
     { //display a bmp at a given location in the array
         //key: vals[0]: -96
-        //     vals[1]: transactionId
-        //     vals[2]: column to start display
-        //     vals[3]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-        //     vals[4]: the bmp index number to display (returned from -97)
+        //     vals[1]: column to start display
+        //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+        //     vals[3]: the bmp index number to display (returned from -97)
         showBitmap();
-        char *msg = getCoreIDJSONWithMessageAndTransactionId("ok", paramArr[1]);
-        Serial.print("96 Sending ");
-        Serial.println(msg);
-        client.send(msg);
-        free(msg);
     }
     else
     {
         Serial.println("Function not found");
     }
-    // else
-    // {
-    //     strip.setPixelColor(vals[0], strip.Color(vals[1], vals[2], vals[3]));
-    //     strip.show();     
-        // client.send(getCoreIDJSONWithMessage("ok"));
-    // }
 }
 
 void setAllOff()
@@ -173,7 +149,7 @@ void setAllOff()
 //returns -1 if bmpCount is at NUM_BMPS
 int addBitmap()
 {
-    int index = paramArr[4];
+    int index = paramArr[3];
     Serial.print("Adding bitmap at index ");
     Serial.println(index);
     if(index >= NUM_BMPS)
@@ -194,13 +170,12 @@ int addBitmap()
 void showBitmap()
 {
     //key: vals[0]: -96
-    //     vals[1]: transactionId
-    //     vals[2]: column to start display
-    //     vals[3]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-    //     vals[4]: the bmp index number to display (returned from -97)
-    int upperLeft = paramArr[2];
-    int reset = paramArr[3];
-    int index = paramArr[4];
+    //     vals[1]: column to start display
+    //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+    //     vals[3]: the bmp index number to display (returned from -97)
+    int upperLeft = paramArr[1];
+    int reset = paramArr[2];
+    int index = paramArr[3];
 
     if(reset == 1)
     {
@@ -218,10 +193,10 @@ void showBitmap()
     //     vals[7]: b1
     //     etc
     uint8_t* bmp = bitmaps[index];
-    int width = bmp[2];
-    int height = bmp[3];
+    int width = bmp[1];
+    int height = bmp[2];
 
-    int offset = 5; //cut off the metadata at the beginning of the array
+    int offset = 4; //cut off the metadata at the beginning of the array
     Serial.println("setting bmp...");
     Serial.print("width: ");
     Serial.println(width);
@@ -239,18 +214,6 @@ void showBitmap()
             int r = bmp[offset + 0] / BRIGHTNESS_FACTOR;
             int g = bmp[offset + 1] / BRIGHTNESS_FACTOR;
             int b = bmp[offset + 2] / BRIGHTNESS_FACTOR;
-            // Serial.print("x: ");
-            // Serial.println(x);
-            // Serial.print("y: ");
-            // Serial.println(y);
-            // Serial.print("addr: ");
-            // Serial.println(addr);
-            // Serial.print("r: ");
-            // Serial.println(r);
-            // Serial.print("g: ");
-            // Serial.println(g);
-            // Serial.print("b: ");
-            // Serial.println(b);
             strip.setPixelColor(addr, strip.Color(r, g, b));
             offset += 3;
         }
@@ -319,7 +282,7 @@ void setup()
 }
 
 void loop() {
-    Serial.print("loop");
+    // Serial.print("loop");
     client.monitor();
 }
 

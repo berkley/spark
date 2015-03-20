@@ -22,16 +22,19 @@ var count = 0;
 var on = true;
 var col = 0;
 
-// var screens = ["Freddy", "Robot"];
-var screens = ["Freddy"];
+var drawing = false;
 
-function setupInvader() {
-  	screen.addBitmap(screens, invader2_1, invader2_1_width, invader2_1_height, 0, function(){
-  		console.log("done with bmp1");
-      screen.addBitmap(screens, invader2_2, invader2_2_width, invader2_2_height, 1, function(){
-        console.log("done with bmp2");
+var screens = ["Freddy", "Robot"];
+// var screens = ["Robot"];
+
+function setupInvader(message) {
+  console.log("message in setupInvader: ", message);
+  	screen.setup(JSON.parse(message).coreid, function(){
+      if(!drawing)
+      {
         drawInvader();   
-      });
+        drawing = true;
+      }
     });
 };
 
@@ -44,25 +47,24 @@ function drawInvader() {
   if(on)
   {
     screen.drawBMP(screens, col, 0, function(){
-      setTimeout(drawInvader, 500);
+      drawInvader();
     });
   }
   else
   {
     screen.drawBMP(screens, col, 1, function(){
-      setTimeout(drawInvader, 500);
+      drawInvader();
     });
   }
 };
 
-// process.on('SIGINT', function(code) {
-//   console.log("app exiting");
-//   sockets.closeAll();
-// });
-
 function main() {
+  screen.addBitmap(invader2_1, invader2_1_width, invader2_1_height, 0);
+  screen.addBitmap(invader2_2, invader2_2_width, invader2_2_height, 1);
+
 	sockets.registerListener(function(message){
-    setupInvader();
+    console.log("setting up invader with message ", message);
+    setupInvader(message);
   });
 };
 

@@ -74,16 +74,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-
-
-
-
-
-
 //#define HANDSHAKE
-#define DEBUG
-#define TRACE
-
+// #define DEBUG
+// #define TRACE
 
 const char *WebSocketClientStringTable = {
 			"GET {0} HTTP/1.1\x0d\x0a"
@@ -150,19 +143,27 @@ byte WebSocketClient::nextByte() {
 }
 
 void WebSocketClient::monitor () {
+  #ifdef TRACE
   Serial.println("ws:monitor:0");
+  #endif
   if(!_canConnect) {
-  	Serial.println("ws:monitor:1");
+  	#ifdef TRACE
+    Serial.println("ws:monitor:1");
+    #endif
     return;
   }
   
   if(_reconnecting) {
-  	Serial.println("ws:monitor:2");
+  	#ifdef TRACE
+    Serial.println("ws:monitor:2");
+    #endif
     return;
   }
   
   if(!connected() && millis() > _retryTimeout) {
-  	Serial.println("ws:monitor:3");
+  	#ifdef TRACE
+    Serial.println("ws:monitor:3");
+    #endif
     _retryTimeout = millis() + RETRY_TIMEOUT;
     _reconnecting = true;
     reconnect();
@@ -171,7 +172,9 @@ void WebSocketClient::monitor () {
   }
   
 	if (_client.available() > 2) {
+    #ifdef TRACE
 		Serial.println("ws:monitor:4");
+    #endif
     byte hdr = nextByte();
     bool fin = hdr & 0x80;
     
