@@ -4,6 +4,8 @@ var http = require('http');
 var path = require('path');
 var nconf = require('nconf');
 var fs = require('fs');
+var sockets = require('./websocket/sockets');
+sockets.setConfig(nconf);
 
 var app = express();
 
@@ -31,3 +33,4 @@ app.get('/house/params/:coreId', spark.params); //get the current param state fo
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
+

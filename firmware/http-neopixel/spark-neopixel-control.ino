@@ -7,6 +7,7 @@
 //the number of pixels you are controlling
 #define PIXEL_COUNT 467 //giggle
 // #define PIXEL_COUNT 150 //colossus
+
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
@@ -41,6 +42,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LATCH "latch"
 #define ENDRUN "endrun"
 #define SNOW "snow"
+#define WEBSOCKET "websocket" //<- finish this
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
