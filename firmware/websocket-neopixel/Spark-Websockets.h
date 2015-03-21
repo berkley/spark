@@ -42,7 +42,7 @@ public:
   typedef void (*OnOpen)(WebSocketClient client);
   typedef void (*OnClose)(WebSocketClient client, int code, char* message);
   typedef void (*OnError)(WebSocketClient client, char* message);
-  void connect(const char hostname[], int port = 80, const char protocol[] = NULL, const char path[] = "/");
+  void connect(const byte* server_ip, int port = 80, const char* protocol = NULL, const char* path = "/");
   bool connected();
   void disconnect();
   void monitor();
@@ -52,7 +52,8 @@ public:
   void onError(OnError function);
   bool send(char* message);
 private:
-  const char* _hostname;
+  // const char* _hostname;
+  const byte* _server_ip; //ip address
   int _port;
   const char* _path;
   const char* _protocol;
@@ -61,7 +62,7 @@ private:
   bool _reconnecting;
   unsigned long _retryTimeout;
   void reconnect();
-  void sendHandshake(const char* hostname, const char* path, const char* protocol);
+  void sendHandshake(const byte* server_ip, const char* path, const char* protocol);
   TCPClient _client;
   OnOpen _onOpen;
   OnClose _onClose;

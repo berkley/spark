@@ -74,9 +74,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-//#define HANDSHAKE
-// #define DEBUG
-// #define TRACE
+#define HANDSHAKE
+#define DEBUG
+#define TRACE
 
 const char *WebSocketClientStringTable = {
 			"GET {0} HTTP/1.1\x0d\x0a"
@@ -90,8 +90,9 @@ const char *WebSocketClientStringTable = {
 
 
 
-void WebSocketClient::connect(const char hostname[], int port, const char protocol[], const char path[]) {
-  _hostname = hostname;
+void WebSocketClient::connect(const byte* server_ip, int port, const char* protocol, const char* path) {
+  // _hostname = hostname;
+  _server_ip = server_ip;
   _port = port;
   _protocol = protocol;
   _path = path;
@@ -101,14 +102,36 @@ void WebSocketClient::connect(const char hostname[], int port, const char protoc
 
 void WebSocketClient::reconnect() {
   bool result = false;
-  if (_client.connect(_hostname, _port)) {
-    sendHandshake(_hostname, _path, _protocol);
+#ifdef DEBUG
+    Serial.print("Connecting to host ");
+    Serial.print((char*)_server_ip);
+    Serial.print(" On port ");
+    Serial.print(_port);
+#endif
+  if (_client.connect(_server_ip, _port)) 
+  {
+    sendHandshake(_server_ip, _path, _protocol);
     result = readHandshake();
+  }
+  else
+  {
+    Serial.print("_client.connect failed to ");
+    Serial.print((char*)_server_ip);
+    Serial.print(":");
+    Serial.println(_port);
+    // Serial.println("Failed connection....");
+
+    _client.flush();
+    _client.stop();
   }
   if(!result) {
     
 #ifdef DEBUG
-    Serial.println("Connection Failed!");
+    Serial.print("Connection Failed! ");
+    Serial.println((char*)_server_ip);
+    Serial.print("Me: ");
+    Serial.println(WiFi.localIP());
+    
 #endif
     if(_onError != NULL) {
       _onError(*this, "Connection Failed!");
@@ -143,27 +166,15 @@ byte WebSocketClient::nextByte() {
 }
 
 void WebSocketClient::monitor () {
-  #ifdef TRACE
-  Serial.println("ws:monitor:0");
-  #endif
   if(!_canConnect) {
-  	#ifdef TRACE
-    Serial.println("ws:monitor:1");
-    #endif
     return;
   }
   
   if(_reconnecting) {
-  	#ifdef TRACE
-    Serial.println("ws:monitor:2");
-    #endif
     return;
   }
   
   if(!connected() && millis() > _retryTimeout) {
-  	#ifdef TRACE
-    Serial.println("ws:monitor:3");
-    #endif
     _retryTimeout = millis() + RETRY_TIMEOUT;
     _reconnecting = true;
     reconnect();
@@ -172,9 +183,6 @@ void WebSocketClient::monitor () {
   }
   
 	if (_client.available() > 2) {
-    #ifdef TRACE
-		Serial.println("ws:monitor:4");
-    #endif
     byte hdr = nextByte();
     bool fin = hdr & 0x80;
     
@@ -205,7 +213,6 @@ Serial.println(opCode);
       }
     }
     
-    Serial.println("ws:monitor:5");
 #ifdef TRACE
 Serial.print("len = ");
 Serial.println(len);
@@ -376,25 +383,38 @@ void WebSocketClient::onError(OnError fn) {
 }
 
 
-void WebSocketClient::sendHandshake(const char* hostname, const char* path, const char* protocol) {
+void WebSocketClient::sendHandshake(const byte server_ip[], const char* path, const char* protocol) {
 	Serial.println("Sending handshake!");  
 	String handshake = "";
 
 	handshake.concat(WebSocketClientStringTable);
+  String serverName = "";
+  serverName.concat(server_ip[0]);
+  serverName.concat(".");
+  serverName.concat(server_ip[1]);
+  serverName.concat(".");
+  serverName.concat(server_ip[2]);
+  serverName.concat(".");
+  serverName.concat(server_ip[3]);
 
 	handshake.replace("{0}",path);
-	handshake.replace("{1}",hostname);
+	handshake.replace("{1}",serverName);
 	handshake.replace("{2}",(const char*)_port);
+
+  Serial.print("handshake: ");
+  Serial.println(handshake);
 
 	//trying to generate hash, now - fails.
 	generateHash(_key,45);
 	Serial.println(_key);
 
-	_client.print(handshake); 
 #ifdef HANDSHAKE
   Serial.println(handshake);
   Serial.println("Handshake sent");
 #endif
+
+	_client.print(handshake); 
+
 }
 
 bool WebSocketClient::readHandshake() {

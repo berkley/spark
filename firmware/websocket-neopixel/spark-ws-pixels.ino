@@ -2,11 +2,14 @@
 #include "Spark-Websockets.h"
 #include "application.h"
 
+SYSTEM_MODE(MANUAL);
+
 WebSocketClient client;
 // char server[] = "10.0.1.6"; //dino
-char server[] = "10.0.1.8"; //syncline
+// char server[] = "10.0.1.8"; //syncline
 // char server[] = "192.168.1.145"; //albina press wifi
-// char server[] = "10.0.1.25"; //rasp pi
+// const char server[] = "10.0.2.1"; //rasp pi
+const byte server[] = {10, 0, 2, 1};
 
 #define WS_PORT 3001
 #define PIXEL_PIN D2
@@ -224,6 +227,9 @@ void showBitmap()
 
 int getPixelAddress(int row, int col)
 {
+    if(col >= WIDTH)
+        col = col - WIDTH;
+
     if(SERIAL_WIRING)
     {
         int addr;
@@ -265,19 +271,35 @@ void setup()
 {
     Serial.begin(9600);
     Serial.println("Setup complete");
+
     strip.begin();
     strip.show();
-    client.connect(server, WS_PORT);
-    client.onMessage(onMessage);
-    client.onError(onError);
-    client.onClose(onClose);
-    client.onOpen(onOpen);
 
     for(int i=0; i<PARAM_ARR_SIZE; i++)
     {
         paramArr[i] = 0;
     }
     strip.setPixelColor(0, strip.Color(255, 0, 0));
+    strip.show();
+
+    WiFi.on();
+    WiFi.connect();
+    while(!WiFi.ready())
+    {
+        Serial.print("Wifi connecting...");
+        delay(1000);
+    }
+
+    strip.setPixelColor(0, strip.Color(0, 0, 255));
+    strip.show();
+
+    client.connect(server, WS_PORT);
+    client.onMessage(onMessage);
+    client.onError(onError);
+    client.onClose(onClose);
+    client.onOpen(onOpen);    
+
+    strip.setPixelColor(0, strip.Color(0, 255, 0));
     strip.show();
 }
 

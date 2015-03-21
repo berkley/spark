@@ -21,6 +21,7 @@ var invader2_2_height = 8;
 var count = 0;
 var on = true;
 var col = 0;
+var forward = true;
 
 var drawing = false;
 
@@ -40,9 +41,19 @@ function setupInvader(message) {
 
 function drawInvader() {
   on = !on;
-  col++;
-  if(col > 31)
-    col = 0;  
+
+  if(!forward)
+  {
+    col--;
+    if(col == -1)
+      col = 31;  
+  }
+  else
+  {
+    col++;
+    if(col > 31)
+      col = 0;  
+  }
 
   if(on)
   {
@@ -66,6 +77,15 @@ function main() {
     console.log("setting up invader with message ", message);
     setupInvader(message);
   });
+
+  setTimeout(function(){
+    switchDirection();
+  }, 2000)
+};
+
+function switchDirection() {
+  forward = !forward;
+  setTimeout(function(){ switchDirection(); }, Math.random() * 5000);
 };
 
 main();
