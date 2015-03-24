@@ -13,12 +13,13 @@ exports.setConfig = function(conf) {
 exports.setup = function(coreid, done) {
 	console.log("core " + coreid + " setup");
 
-	async.each(bitmaps, function(bitmap, callback)
+	async.eachSeries(bitmaps, function(bitmap, callback)
 	{
 		console.log("sending bitmap to core " + coreid);
 		sockets.send([util.getNameForCoreId(coreid)], bitmap, function(err){
+			console.log("screen.send callback");
 			callback(err);
-		});
+		}, 1000);
 	}, function(err){
 		done(err);
 	});

@@ -1,5 +1,5 @@
 var WebSocket = require('ws')
-  , ws = new WebSocket('ws://localhost:3001');
+  , ws = new WebSocket('ws://10.0.1.:3001');
 console.log("WebSocketServer created on port 3001");
 
 var serial = 0;

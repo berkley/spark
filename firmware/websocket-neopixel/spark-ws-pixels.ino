@@ -5,11 +5,9 @@
 SYSTEM_MODE(MANUAL);
 
 WebSocketClient client;
-// char server[] = "10.0.1.6"; //dino
-// char server[] = "10.0.1.8"; //syncline
-// char server[] = "192.168.1.145"; //albina press wifi
-// const char server[] = "10.0.2.1"; //rasp pi
-const byte server[] = {10, 0, 2, 1};
+// const byte server[] = {10, 0, 1, 6}; //dino
+// const byte server[] = {10, 0, 2, 1}; //raspi
+const byte server[] = {10, 0, 1, 8}; //syncline
 
 #define WS_PORT 3001
 #define PIXEL_PIN D2
@@ -19,7 +17,7 @@ const byte server[] = {10, 0, 2, 1};
 #define BRIGHTNESS_FACTOR 1
 #define PIXEL_TYPE WS2812B
 #define PARAM_ARR_SIZE 265
-#define NUM_BMPS 2
+#define NUM_BMPS 10
 #define SERIAL_WIRING 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
@@ -133,6 +131,11 @@ void onMessage(WebSocketClient client, char* message) {
         //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
         //     vals[3]: the bmp index number to display (returned from -97)
         showBitmap();
+    }
+    else if(paramArr[0] == 95)
+    { //turn off all pixels
+        setAllOff();
+        strip.show();
     }
     else
     {
