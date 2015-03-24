@@ -57,15 +57,20 @@ var drawcount = 0;
 var drawing = false;
 
 var screens = ["Freddy", "Robot"];
-// var screens = ["Robot"];
+var brightness = 64;
 
 function setupInvader(message) {
   console.log("message in setupInvader: ", message);
-  	screen.setup(JSON.parse(message).coreid, function(){
+  var coreid = JSON.parse(message).coreid
+  	screen.setup(coreid, function(){
+      console.log("done with setup, setting brightness");
+      screen.setBrightness([util.getNameForCoreId(coreid)], brightness, function(){
+        console.log("Screen birghtness set to ", brightness);
+      });
       if(!drawing)
       {
-        draw();   
-        drawing = true;
+          draw();   
+          drawing = true;
       }
     });
 };
