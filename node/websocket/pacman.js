@@ -1,6 +1,7 @@
 var sockets = require('./sockets.js');
 var screen = require('./screen.js');
 var nconf = require('nconf');
+var util = require('./util.js');
 
 nconf.argv()
      .env()
@@ -8,15 +9,6 @@ nconf.argv()
 
 sockets.setConfig(nconf);
 screen.setConfig(nconf);
-
-
-var invader2_1 = [0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 255,255,255, 255,255,255, 255,0,0, 255,255,255, 255,255,255, 255,0,0, 255,255,255, 255,255,255,255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 255,255,255, 255,255,255, 0,0,0, 255,255,255, 0,0,0, 255,255,255, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 255,255,255];
-var invader2_1_width = 8;
-var invader2_1_height = 8;
-
-var invader2_2 = [0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 255,255,255, 254,254,254, 254,254,254, 255,255,255, 255,255,255, 0,0,0, 255,255,255, 255,255,255, 0,255,0, 255,255,255, 255,255,255, 0,255,0, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 15,15,15, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 0,0,0, 0,0,0, 0,0,0, 255,255,255, 15,15,15, 0,0,0, 255,255,255, 0,0,0, 0,0,0];
-var invader2_2_width = 8;
-var invader2_2_height = 8;
 
 var ghost_1_1 = [29,29,29, 15,15,44, 41,23,105, 255,15,15, 255,15,15, 41,23,105, 15,15,44, 15,15,15, 36,14,11, 147,153,204, 96,136,255, 255,82,80, 255,82,80, 96,136,255, 147,153,204, 27,3,0, 222,15,15, 255,208,204, 255,255,255, 255,80,80, 255,80,80, 255,255,255, 255,208,204, 209,0,0, 255,15,15, 255,31,31, 255,96,96, 255,0,0, 255,0,0, 255,96,96, 255,31,31, 247,0,0, 255,15,15, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 240,0,0, 255,15,15, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 255,0,0, 240,0,0, 255,11,11, 255,0,0, 240,0,0, 255,0,0, 255,0,0, 240,0,0, 255,0,0, 249,0,0, 186,29,29, 227,15,15, 56,15,15, 202,15,15, 202,15,15, 56,15,15, 227,15,15, 176,15,15];
 var ghost_1_1_w = 8;
@@ -57,15 +49,15 @@ var drawcount = 0;
 var drawing = false;
 
 var screens = ["Freddy", "Robot"];
-var brightness = 64;
+var brightness = 32;
 
-function setupInvader(message) {
-  console.log("message in setupInvader: ", message);
+function setup(message) {
+  console.log("message in setup: ", message);
   var coreid = JSON.parse(message).coreid
   	screen.setup(coreid, function(){
       console.log("done with setup, setting brightness");
-      screen.setBrightness([util.getNameForCoreId(coreid)], brightness, function(){
-        console.log("Screen birghtness set to ", brightness);
+      screen.setBrightness([util.getNameForCoreId(coreid)], brightness, function(bright, err){
+        console.log("Screen birghtness set to ", bright);
       });
       if(!drawing)
       {
@@ -76,6 +68,9 @@ function setupInvader(message) {
 };
 
 function draw() {
+  if(drawcount > 80)
+    drawcount = 0;
+
   console.log("drawing: ", drawcount);
   if(drawcount >= 0 && drawcount < 40)
   {
@@ -102,6 +97,10 @@ function drawGhost() {
   if(col > 31)
     col = 0; 
 
+  seq++;
+  if(seq > 3)
+    seq = 0;
+
   if(seq == 0)
   {
     screen.drawBMP(screens, col, 3, function(){
@@ -126,30 +125,18 @@ function drawGhost() {
       draw();
     });
   }
-
-  seq++;
-  if(seq > 3)
-    seq = 0;
 };
 
 function drawPac() {
   console.log("drawing pac: ", seq);
-  // if(!forward)
-  // {
-  //   col--;
-  //   if(col == -1)
-  //     col = 31;  
-  // }
-  // else
-  // {
-  //   col++;
-  //   if(col > 31)
-  //     col = 0;  
-  // }
-
+  
   col++;
   if(col > 31)
     col = 0; 
+
+  seq++;
+  if(seq > 2)
+    seq = 0;
 
   if(seq == 0)
   {
@@ -169,46 +156,9 @@ function drawPac() {
       draw();
     });
   }
-
-  seq++;
-  if(seq > 2)
-    seq = 0;
-};
-
-function drawInvader() {
-  console.log("draw invader: ", on);
-  on = !on;
-
-  if(!forward)
-  {
-    col--;
-    if(col == -1)
-      col = 31;  
-  }
-  else
-  {
-    col++;
-    if(col > 31)
-      col = 0;  
-  }
-
-  if(on)
-  {
-    screen.drawBMP(screens, col, 0, function(){
-      draw();
-    });
-  }
-  else
-  {
-    screen.drawBMP(screens, col, 1, function(){
-      draw();
-    });
-  }
 };
 
 function main() {
-  // screen.addBitmap(invader2_1, invader2_1_width, invader2_1_height, 0);
-  // screen.addBitmap(invader2_2, invader2_2_width, invader2_2_height, 1);
   screen.addBitmap(pac1, pac1_width, pac1_height, 0);
   screen.addBitmap(pac2, pac2_width, pac2_height, 1);
   screen.addBitmap(pac3, pac3_width, pac3_height, 2);
@@ -218,19 +168,9 @@ function main() {
   screen.addBitmap(ghost_1_4, ghost_1_4_w, ghost_1_4_h, 6);
 
 	sockets.registerListener(function(message){
-    console.log("setting up invader with message ", message);
-    setupInvader(message);
+    console.log("setting up pacman with message ", message);
+    setup(message);
   });
-
-  setTimeout(function(){
-    switchDirection();
-  }, 2000)
-};
-
-function switchDirection() {
-  console.log("!!!!!!!!!!!!switching direction!!!!!!!!!!!!!!");
-  forward = !forward;
-  setTimeout(function(){ switchDirection(); }, Math.random() * 5000);
 };
 
 main();

@@ -5,8 +5,8 @@
 SYSTEM_MODE(MANUAL);
 
 WebSocketClient client;
-// const byte server[] = {10, 0, 1, 6}; //dino
-const byte server[] = {10, 0, 2, 1}; //raspi    
+const byte server[] = {10, 0, 1, 6}; //dino
+// const byte server[] = {10, 0, 2, 1}; //raspi    
 // const byte server[] = {10, 0, 1, 8}; //syncline  
 // const byte server[] = {192, 168, 1, 10}; //xfinity
 
@@ -102,9 +102,9 @@ void onMessage(WebSocketClient client, char* message) {
         client.send(msg);
         free(msg);
     } 
-    else if(paramArr[0] == -98)
+    else if(paramArr[0] == 98)
     { //set full screen to one color
-        Serial.println("Setting full screen -98");
+        Serial.println("Setting full screen 98");
         for(int i=0; i<PIXEL_COUNT; i++)
         {
             strip.setPixelColor(i, strip.Color(paramArr[1], paramArr[2], paramArr[3]));
@@ -113,7 +113,7 @@ void onMessage(WebSocketClient client, char* message) {
     }
     else if(paramArr[0] == 97)
     { //add a bmp to memory
-        //key: vals[0]: -97 //funcId
+        //key: vals[0]: 97 //funcId
         //     vals[1]: bmp width
         //     vals[2]: bmp height
         //     vals[3]: bmp index //the index to assign to this bmp
@@ -127,7 +127,7 @@ void onMessage(WebSocketClient client, char* message) {
     }
     else if(paramArr[0] == 96)
     { //display a bmp at a given location in the array
-        //key: vals[0]: -96
+        //key: vals[0]: 96
         //     vals[1]: column to start display
         //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
         //     vals[3]: the bmp index number to display (returned from -97)
@@ -136,6 +136,11 @@ void onMessage(WebSocketClient client, char* message) {
     else if(paramArr[0] == 95)
     { //turn off all pixels
         setAllOff();
+        strip.show();
+    }
+    else if(paramArr[0] == 94)
+    { //set brightness
+        strip.setBrightness(paramArr[1]);
         strip.show();
     }
     else

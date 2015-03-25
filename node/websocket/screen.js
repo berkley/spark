@@ -61,10 +61,11 @@ exports.drawBMP = function(coreNames, column, index, callback){
 
 //set the brightness of the pixels on core with id coreid
 exports.setBrightness = function(coreNames, brightness, callback) {
-	var data = "95," + brightness;
-	console.log("Setting brightness to ", brightness);
+	brightness = brightness || config.get("defaultBrightness");
+	var data = "94," + brightness;
+	console.log("Screen setting brightness to ", brightness);
 	sockets.send(coreNames, data, function(err){
-		callback(err);
+		callback(brightness, err);
 	});
 };
 
@@ -77,7 +78,7 @@ exports.setColor = function(coreNames, red, green, blue, callback) {
 };
 
 //set a single pixel (x,y) to (reg, green, blue) on the cores in coreNames
-exports.setPixel(coreNames, x, y, red, green, blue, callback) {
+exports.setPixel = function(coreNames, x, y, red, green, blue, callback) {
 	console.log("Not yet implemented");
 	callback("Not yet implemented");
 };
