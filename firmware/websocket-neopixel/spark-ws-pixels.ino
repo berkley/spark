@@ -13,9 +13,8 @@ const byte server[] = {10, 0, 1, 6}; //dino
 #define WS_PORT 3001
 #define PIXEL_PIN D2
 #define PIXEL_COUNT 256
-#define WIDTH 32
-#define HEIGHT 8
-#define BRIGHTNESS_FACTOR 1
+#define SCREEN_WIDTH 32
+#define SCREEN_HEIGHT 8
 #define PIXEL_TYPE WS2812B
 #define PARAM_ARR_SIZE 265
 #define NUM_BMPS 10
@@ -181,21 +180,29 @@ int addBitmap()
 
 void showBitmap()
 {
-    //key: vals[0]: -96
+    //key: vals[0]: 96
     //     vals[1]: column to start display
     //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-    //     vals[3]: the bmp index number to display (returned from -97)
+    //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
+    //              If set to false, the bitmap will disappear as it leaves the screen
+    //     vals[4]: the bmp index number to display (returned from -97)
+    //     vals[5]: negative index [0 | 1] //set to 1 if upperLeft should be treated as a negative number
     int upperLeft = paramArr[1];
     int reset = paramArr[2];
-    int index = paramArr[3];
+    int wraparound = paramArr[3];
+    int index = paramArr[4];
+    int negative = paramArr[5];
+
+    if(negative) //to save memory, the bmps are stored as uint8_t, so we need a negative flag for certain cases
+        upperLeft *= -1;
 
     if(reset == 1)
     {
         setAllOff();
     }
 
-    //get the bmp from memory and display it at upperLeft
-    //key: vals[0]: -97 //funcId
+    //get the bmp from memory and display it at column
+    //key: vals[0]: 97 //funcId
     //     vals[1]: transactionId
     //     vals[2]: bmp width
     //     vals[3]: bmp height
@@ -216,16 +223,24 @@ void showBitmap()
     Serial.println(height);
     Serial.print("upperLeft: ");
     Serial.println(upperLeft);
-    
+    Serial.print("wraparound: ");
+    Serial.println(wraparound);
+
     for(int y=0; y<height; y++)
     {
         for(int x=upperLeft; x<(width + upperLeft); x++)
         {
-            int addr;
-            addr = getPixelAddress(y, x);
-            int r = bmp[offset + 0] / BRIGHTNESS_FACTOR;
-            int g = bmp[offset + 1] / BRIGHTNESS_FACTOR;
-            int b = bmp[offset + 2] / BRIGHTNESS_FACTOR;
+            int addr = getPixelAddress(y, x, wraparound);
+            // Serial.print("Addr: ");
+            // Serial.println(addr);
+            if(addr == -1)
+            {
+                Serial.println("addr == -1");
+                continue;
+            }
+            int r = bmp[offset + 0];
+            int g = bmp[offset + 1];
+            int b = bmp[offset + 2];
             strip.setPixelColor(addr, strip.Color(r, g, b));
             offset += 3;
         }
@@ -234,28 +249,47 @@ void showBitmap()
     strip.show();
 }
 
-int getPixelAddress(int row, int col)
+int getPixelAddress(int row, int col, int wraparound)
 {
-    if(col >= WIDTH)
-        col = col - WIDTH;
+    if(wraparound)
+    {
+        if(col >= SCREEN_WIDTH)
+        {
+            col = col - SCREEN_WIDTH;
+            // Serial.println("col is greater than screen width and wraparound is true");
+        }
+        else if(col <= 0)
+        {
+            // Serial.println("col is less than screen width and wraparound is true");
+            col = SCREEN_WIDTH - col;
+        }
+    }
+    else
+    {
+        if(col >= SCREEN_WIDTH || col <= 0)
+        {
+            // Serial.println("col is greater than screen width or < 0 and wraparound is false");
+            return -1;
+        }
+    }
 
     if(SERIAL_WIRING)
     {
         int addr;
         if(row % 2 == 0)
         {
-          addr = (row * WIDTH) + col;
+          addr = (row * SCREEN_WIDTH) + col;
         }
         else
         {
-          int offset = WIDTH - ((col * 2) + 1) ;
-          addr = ((row * WIDTH) + col) + offset;
+          int offset = SCREEN_WIDTH - ((col * 2) + 1) ;
+          addr = ((row * SCREEN_WIDTH) + col) + offset;
         }
         return addr;
     }
     else
     {
-        return (row * WIDTH) + col;
+        return (row * SCREEN_WIDTH) + col;
     }
 }
 

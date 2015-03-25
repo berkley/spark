@@ -21,7 +21,7 @@ var invader2_2_height = 8;
 
 var count = 0;
 var on = true;
-var col = 0;
+var col = -8;
 var forward = true;
 
 var drawing = false;
@@ -35,7 +35,7 @@ function setupInvader(message) {
     screen.setup(coreid, function(){
       console.log("done with setup, setting brightness");
       screen.setBrightness([util.getNameForCoreId(coreid)], undefined, function(bright, err){
-        console.log("Screen brightness set to ", bright);
+        console.log("Screen birghtness set to ", bright);
       });
       if(!drawing)
       {
@@ -57,19 +57,19 @@ function drawInvader() {
   else
   {
     col++;
-    if(col > 31)
-      col = 0;  
+    if(col > 32)
+      col = -8;  
   }
 
   if(on)
   {
-    screen.drawBMP(screens, col, true, 0, function(){
+    screen.drawBMP(screens, col, false, 0, function(){
       drawInvader();
     });
   }
   else
   {
-    screen.drawBMP(screens, col, true, 1, function(){
+    screen.drawBMP(screens, col, false, 1, function(){
       drawInvader();
     });
   }

@@ -51,8 +51,18 @@ exports.addBitmap = function(bmp, width, height, index) {
 //////////////////////////////////////////////////////////////
 
 //draw the bitmap stored at index on a core at column on the cores in coreNames
-exports.drawBMP = function(coreNames, column, index, callback){
-	var data = "96," + column + ",1," + index;	
+exports.drawBMP = function(coreNames, column, wraparound, index, callback){
+	var wrap = 1;
+	var negative = 0;
+	if(!wraparound)
+		wrap = 0;
+	if(column < 0)
+	{
+		negative = 1;
+		column *= -1;
+	}
+
+	var data = "96," + column + ",1," + wrap + "," + index + "," + negative;	
 	console.log("drawing bmp " + index + " at: ", column);
 	sockets.send(coreNames, data, function(err){
 		callback(err);
@@ -113,7 +123,7 @@ exports.drawVBMP = function(column, index, callback) {
 		{
 			console.log("drawing vbmp on screen ", screen.name);
 			column = column - screen.vColStart;
-			exports.drawBMP([screen.name], column, index, function(err){
+			exports.drawBMP([screen.name], column, false, index, function(err){
 				callback(err);
 			});
 		}
