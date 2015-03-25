@@ -61,8 +61,9 @@ function setup(message) {
       });
       if(!drawing)
       {
-          draw();   
-          drawing = true;
+        console.log("BEGIN DRAW");
+        draw();   
+        drawing = true;
       }
     });
 };
@@ -94,7 +95,7 @@ function draw() {
 
 function drawGhost() {
   col++;
-  if(col > 31)
+  if(col > 63)
     col = 0; 
 
   seq++;
@@ -103,25 +104,25 @@ function drawGhost() {
 
   if(seq == 0)
   {
-    screen.drawBMP(screens, col, 3, function(){
+    screen.drawVBMP(col, 3, function(){
       draw();
     });
   }
   else if(seq == 1)
   {
-    screen.drawBMP(screens, col, 4, function(){
+    screen.drawVBMP(col, 4, function(){
       draw();
     });
   }
   else if(seq == 2)
   {
-    screen.drawBMP(screens, col, 5, function(){
+    screen.drawVBMP(col, 5, function(){
       draw();
     });
   }
   else if(seq == 3)
   {
-    screen.drawBMP(screens, col, 6, function(){
+    screen.drawVBMP(col, 6, function(){
       draw();
     });
   }
@@ -131,7 +132,7 @@ function drawPac() {
   console.log("drawing pac: ", seq);
   
   col++;
-  if(col > 31)
+  if(col > 63)
     col = 0; 
 
   seq++;
@@ -140,19 +141,19 @@ function drawPac() {
 
   if(seq == 0)
   {
-    screen.drawBMP(screens, col, 0, function(){
+    screen.drawVBMP(col, 0, function(){
       draw();
     });
   }
   else if(seq == 1)
   {
-    screen.drawBMP(screens, col, 1, function(){
+    screen.drawVBMP(col, 1, function(){
       draw();
     });
   }
   else if(seq == 2)
   {
-    screen.drawBMP(screens, col, 2, function(){
+    screen.drawVBMP(col, 2, function(){
       draw();
     });
   }

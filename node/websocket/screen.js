@@ -101,123 +101,23 @@ exports.setRow = function(coreNames, row, red, green, blue, callback) {
 
 //draw a bitmap starting at column on the virtual screen (across cores)
 exports.drawVBMP = function(column, index, callback) {
-	callback("Not yet implemented");	
+	console.log("Drawing VBMP ", index, " at col ", column);
+	var screens = config.get("screen");
+	console.log("screens: ", screens);
+	for(var i=0; i<screens.length; i++)
+	{
+		var screen = screens[i];
+		console.log("screen: ", screen);
+		console.log("screen.name: ", screen.name);
+		if(column >= screen.vColStart && column <= screen.vColEnd)
+		{
+			console.log("drawing vbmp on screen ", screen.name);
+			column = column - screen.vColStart;
+			exports.drawBMP([screen.name], column, index, function(err){
+				callback(err);
+			});
+		}
+	}
 };
 
-// exports.setVPixel = function(sockets, vPixel, red, green, blue) {	
-// 	// console.log("setting vPixel " + vPixel + " to rgb: " + red + "," + green + "," + blue);
-// 	if(sockets.length < 1)
-// 		return;
-// 	var coreId = getCoreForPixel(vPixel);
-// 	if(coreId)
-// 	{
-// 		var socket = sockets[coreId];
-// 		if(socket)
-// 		{
-// 			var data = getSocketData(coreId, vPixel, red, green, blue);
-// 			console.log("data: ", data);
-// 			socket.send(data, function(err){
-// 				if(err)
-// 				{
-// 					console.log("Error sending WS data ", data);
-// 				}
-// 			});
-// 		}
-// 	}
-// };
-
-// exports.setVBMP = function(sockets, upperLeftVPixel, bmp, callback) {
-// 	if(sockets.length < 1)
-// 		return;
-// 	var coreId = getCoreForPixel(upperLeftVPixel);
-// 	if(coreId)
-// 	{
-// 		var socket = sockets[coreId];
-// 		if(socket)
-// 		{
-// 			//key: vals[0]: -97
-// 	        //     vals[1]: reset [1|0] //set the screen to all off before writing the bmp
-// 	        //     vals[2]: upperLeft
-// 	        //     vals[3]: bmp width
-// 	        //     vals[4]: bmp height
-// 	        //     vals[5]: r1
-// 	        //     vals[6]: g1
-// 	        //     vals[7]: b1
-// 	        //     etc
-// 			var data =  "97,1," + upperLeftVPixel + ",8,8,";
-// 			for(var i=0; i<bmp.length; i++)
-// 			{
-// 				data += bmp[i];
-// 				if(i != bmp.length - 1)
-// 					data += ",";
-// 			}
-
-// 			socket.send(data, function(err){
-// 				if(err)
-// 				{
-// 					console.log("Error sending WS data ", data);
-// 				}
-// 			}).on('message', function(message){
-// 				console.log("message: ", message);
-// 				callback(err);
-// 			});
-// 		}
-// 	}
-// };
-
-
-
-// var actualPixPerChannel = 48;
-// 	    var mod = addr % actualPixPerChannel;
-// 	    var base = addr - mod;
-// 	    var newaddr;
-// 	    var upperBounds = actualPixPerChannel - WIDTH - 1;
-// 	    var addrMinusBase = addr - base;
-
-// 	    if(addrMinusBase >= 0 && addrMinusBase < WIDTH)
-// 	    {
-// 	        newaddr = addrMinusBase;
-// 	    }
-// 	    if(addrMinusBase >= WIDTH && addrMinusBase <= upperBounds)
-// 	    { //invert
-// 	        var offset = addrMinusBase - WIDTH;
-// 	        newaddr = upperBounds - offset;
-// 	    }
-// 	    if(addrMinusBase > upperBounds)
-// 	    {
-// 	        newaddr = addrMinusBase;
-// 	    }
-	    
-// 	    return newaddr + base;
-
-// var getSocketData = function(coreId, vPixel, red, green, blue) {
-// 	var screen = config.get("screen");
-// 	var name = getNameForCoreId(coreId);
-// 	for(var i=0; i<screen.length; i++)
-// 	{
-// 		if(screen[i].name == name)
-// 		{
-// 			var vPixelStart = screen[i].vPixelStart;
-// 			var pixelId = (vPixel - vPixelStart); //simple case where we have one long strip, not an array
-// 			if(screen[i].rows && screen[i].rows > 1)
-// 			{ //this is an array, so the pixelId may be different depending on the wiring
-// 				if(screen[i].wiring == "serial")
-// 				{
-// 					var rowNum = parseInt(vPixel / screen[i].pixelsPerRow);
-// 					if(rowNum % 2 != 0)
-// 					{
-// 						var rowLength = screen[i].pixelsPerRow
-// 						var mod = vPixel % rowLength;
-// 						console.log("rowNum: ", rowNum);
-// 						console.log("vpix mod rowLength: ", mod)
-// 						pixelId = ((rowLength * rowNum) + (rowLength - mod)) - 1;
-// 						console.log("pixelId: ", pixelId);
-// 					}
-// 				}
-// 			}
-// 			var data = pixelId + "," + red + "," + green + "," + blue;
-// 			return data;
-// 		}
-// 	}
-// };
 
