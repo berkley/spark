@@ -5,9 +5,9 @@
 SYSTEM_MODE(MANUAL);
 
 WebSocketClient client;
-const byte server[] = {10, 0, 1, 6}; //dino
+// const byte server[] = {10, 0, 1, 6}; //dino
 // const byte server[] = {10, 0, 2, 1}; //raspi    
-// const byte server[] = {10, 0, 1, 8}; //syncline  
+const byte server[] = {10, 0, 1, 8}; //syncline  
 // const byte server[] = {192, 168, 1, 10}; //xfinity
 
 #define WS_PORT 3001

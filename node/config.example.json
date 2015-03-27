@@ -2,6 +2,7 @@
     "access_token": "PUT YOUR ACCESS TOKEN HERE",
     "port": 3000,
     "sendDelay":300,
+    "defaultBrightness":32,
     "spark_url":"https://api.spark.io/v1/devices",
     "cores": [
         {

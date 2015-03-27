@@ -53,7 +53,6 @@ exports.send = function(cores, data, callback, sendDelay) {
   function(err)  {
     console.log("sendDelay: ", sendDelay);
     setTimeout(function() {
-      console.log("calling back from async...");
       callback(null);
     }, sendDelay); 
   });  

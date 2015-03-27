@@ -69,6 +69,14 @@ exports.drawBMP = function(coreNames, column, wraparound, index, callback){
 	});
 };
 
+exports.allOff = function(coreNames, callback){
+	var data = "95";
+	console.log("Turning all pixels off for cores ", coreNames);
+	sockets.send(coreNames, data, function(err){
+		callback(err);
+	});
+};
+
 //set the brightness of the pixels on core with id coreid
 exports.setBrightness = function(coreNames, brightness, callback) {
 	brightness = brightness || config.get("defaultBrightness");
