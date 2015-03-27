@@ -73,18 +73,14 @@ function draw() {
     drawcount = 0;
 
   console.log("drawing: ", drawcount);
-  if(drawcount >= 0 && drawcount < 40)
+  if(drawcount >= 0 && drawcount < 31)
   {
     drawPac();
   }
-  else if(drawcount >= 40 && drawcount <= 80)
+  else if(drawcount >= 31 && drawcount <= 64)
   {
     drawGhost();
   }
-  // else if(drawcount >= 100 && drawcount <= 200)
-  // {
-  //   drawInvader();
-  // }
   else
   {
     drawcount = 0;
