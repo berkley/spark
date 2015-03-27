@@ -129,7 +129,10 @@ void onMessage(WebSocketClient client, char* message) {
         //key: vals[0]: 96
         //     vals[1]: column to start display
         //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-        //     vals[3]: the bmp index number to display (returned from -97)
+        //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
+        //              If set to false, the bitmap will disappear as it leaves the screen
+        //     vals[4]: the bmp index number to display (returned from -97)
+        //     vals[5]: negative index [0 | 1] //set to 1 if upperLeft should be treated as a negative number
         showBitmap();
     }
     else if(paramArr[0] == 95)

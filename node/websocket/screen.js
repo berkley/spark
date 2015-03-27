@@ -118,24 +118,54 @@ exports.setRow = function(coreNames, row, red, green, blue, callback) {
 //////////////////////////////////////////////////////////////
 
 //draw a bitmap starting at column on the virtual screen (across cores)
+//NOTE: this should really iterate over the BMP, not the screens
 exports.drawVBMP = function(column, index, callback) {
 	console.log("Drawing VBMP ", index, " at col ", column);
 	var screens = config.get("screen");
-	console.log("screens: ", screens);
+	var bmp = bitmaps[index];
+	console.log("bmp.width: ", bmp[1]);
+	console.log("bmp.height: ", bmp[2]);
+	// console.log("screens: ", screens);
 	for(var i=0; i<screens.length; i++)
 	{
 		var screen = screens[i];
 		console.log("screen: ", screen);
 		console.log("screen.name: ", screen.name);
 		if(column >= screen.vColStart && column <= screen.vColEnd)
-		{
-			console.log("drawing vbmp on screen ", screen.name);
-			column = column - screen.vColStart;
-			exports.drawBMP([screen.name], column, false, index, function(err){
-				callback(err);
-			});
+		{	//find which screen the bmp col starts on
+			var colDiff = column - screen.vColEnd;
+			var startCol = column - screen.vColStart;
+			if(colDiff < 0) //we are straddling two screens
+			{
+				column = column - screen.vColStart;
+				var nextScreenIndex = i + 1;
+				if(nextScreenIndex >= screens.length)
+					nextScreenIndex = 0;
+				var nextScreen = screens[nextScreenIndex];
+
+
+				async.parallel([
+					function(cb){
+						exports.drawBMP([screen.name], startCol, false, index, function(err){
+							cb(err);
+						}); //draw the first part
+					},
+					function(cb){
+						exports.drawBMP([nextScreen.name], colDiff, false, index, function(err){
+							cb(err);
+						}); //draw the next part
+					}
+				], function(err){
+					callback(err);
+				});
+			}
+			else
+			{
+				console.log("drawing vbmp on screen ", screen.name);
+				exports.drawBMP([screen.name], startCol, false, index, function(err){
+					callback(err);
+				});
+			}
 		}
 	}
 };
-
-
