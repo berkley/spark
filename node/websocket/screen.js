@@ -64,6 +64,7 @@ exports.drawBMP = function(coreNames, column, wraparound, index, callback){
 
 	var data = "96," + column + ",1," + wrap + "," + index + "," + negative;	
 	console.log("drawing bmp " + index + " at: ", column);
+	console.log("cores: ", coreNames);
 	sockets.send(coreNames, data, function(err){
 		callback(err);
 	});
@@ -129,12 +130,14 @@ exports.drawVBMP = function(column, index, callback) {
 	for(var i=0; i<screens.length; i++)
 	{
 		var screen = screens[i];
-		console.log("screen: ", screen);
-		console.log("screen.name: ", screen.name);
+		// console.log("screen: ", screen);
+		// console.log("screen.name: ", screen.name);
 		if(column >= screen.vColStart && column <= screen.vColEnd)
 		{	//find which screen the bmp col starts on
 			var colDiff = column - screen.vColEnd;
 			var startCol = column - screen.vColStart;
+			console.log("colDiff: ", colDiff);
+			console.log("startCol: ", startCol);
 			if(colDiff < 0) //we are straddling two screens
 			{
 				column = column - screen.vColStart;
@@ -146,11 +149,13 @@ exports.drawVBMP = function(column, index, callback) {
 
 				async.parallel([
 					function(cb){
+						console.log("DRAW1 ", screen.name, " col:", startCol);
 						exports.drawBMP([screen.name], startCol, false, index, function(err){
 							cb(err);
 						}); //draw the first part
 					},
 					function(cb){
+						console.log("DRAW2 ", screen.name, " col:", colDiff);
 						exports.drawBMP([nextScreen.name], colDiff, false, index, function(err){
 							cb(err);
 						}); //draw the next part
@@ -161,7 +166,8 @@ exports.drawVBMP = function(column, index, callback) {
 			}
 			else
 			{
-				console.log("drawing vbmp on screen ", screen.name);
+				console.log("DRAW3 ", screen.name, " col:", startCol);
+				// console.log("drawing vbmp on screen ", screen.name);
 				exports.drawBMP([screen.name], startCol, false, index, function(err){
 					callback(err);
 				});
