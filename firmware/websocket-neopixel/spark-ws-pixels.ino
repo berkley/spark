@@ -132,7 +132,7 @@ void onMessage(WebSocketClient client, char* message) {
         //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
         //              If set to false, the bitmap will disappear as it leaves the screen
         //     vals[4]: the bmp index number to display (returned from -97)
-        //     vals[5]: negative index [0 | 1] //set to 1 if upperLeft should be treated as a negative number
+        //     vals[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
         showBitmap();
     }
     else if(paramArr[0] == 95)
@@ -189,20 +189,18 @@ void showBitmap()
     //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
     //              If set to false, the bitmap will disappear as it leaves the screen
     //     vals[4]: the bmp index number to display (returned from -97)
-    //     vals[5]: negative index [0 | 1] //set to 1 if upperLeft should be treated as a negative number
-    int upperLeft = paramArr[1];
+    //     vals[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
+    int colStart = paramArr[1];
     int reset = paramArr[2];
     int wraparound = paramArr[3];
     int index = paramArr[4];
     int negative = paramArr[5];
 
     if(negative) //to save memory, the bmps are stored as uint8_t, so we need a negative flag for certain cases
-        upperLeft *= -1;
+        colStart *= -1;
 
     if(reset == 1)
-    {
         setAllOff();
-    }
 
     //get the bmp from memory and display it at column
     //key: vals[0]: 97 //funcId
@@ -217,34 +215,37 @@ void showBitmap()
     uint8_t* bmp = bitmaps[index];
     int width = bmp[1];
     int height = bmp[2];
-
     int offset = 4; //cut off the metadata at the beginning of the array
+
     Serial.println("setting bmp...");
     Serial.print("width: ");
     Serial.println(width);
     Serial.print("height: ");
     Serial.println(height);
-    Serial.print("upperLeft: ");
-    Serial.println(upperLeft);
+    Serial.print("colStart: ");
+    Serial.println(colStart);
     Serial.print("wraparound: ");
     Serial.println(wraparound);
 
     for(int y=0; y<height; y++)
     {
-        for(int x=upperLeft; x<(width + upperLeft); x++)
+        for(int x=colStart; x<(width + colStart); x++)
         {
-            int addr = getPixelAddress(y, x, wraparound);
+            int addr = getPixelAddress(y, x, wraparound);   
             // Serial.print("Addr: ");
             // Serial.println(addr);
             if(addr == -1)
             {
                 Serial.println("addr == -1");
-                continue;
+                //dont' draw anything.  It's off the screen.
             }
-            int r = bmp[offset + 0];
-            int g = bmp[offset + 1];
-            int b = bmp[offset + 2];
-            strip.setPixelColor(addr, strip.Color(r, g, b));
+            else
+            {
+                int r = bmp[offset + 0];
+                int g = bmp[offset + 1];
+                int b = bmp[offset + 2];
+                strip.setPixelColor(addr, strip.Color(r, g, b));
+            }
             offset += 3;
         }
     }
@@ -269,7 +270,7 @@ int getPixelAddress(int row, int col, int wraparound)
     }
     else
     {
-        if(col >= SCREEN_WIDTH || col <= 0)
+        if(col >= SCREEN_WIDTH || col < 0)
         {
             // Serial.println("col is greater than screen width or < 0 and wraparound is false");
             return -1;

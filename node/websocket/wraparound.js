@@ -67,7 +67,7 @@ function drawPac() {
   if(seq > 2)
     seq = 0;
 
-  screen.drawBMP(screens, col, false, seq, function(){
+  screen.drawBMP(screens, col, true, seq, function(){
       draw();
   });
 };
