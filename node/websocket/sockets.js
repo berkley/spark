@@ -32,7 +32,9 @@ function appendTransactionId(data, transactionId) {
   return backTogether;
 };
 
-exports.send = function(cores, data, callback) {
+exports.send = function(cores, data, callback, sendDelay) {
+  sendDelay = sendDelay || config.get("sendDelay");
+  console.log("sending with delay ", sendDelay);
   async.each(cores, function(coreName, cb){
     var coreId = util.getCoreIdForName(coreName);
     var socket = sockets[coreId];
@@ -49,10 +51,11 @@ exports.send = function(cores, data, callback) {
     }
   }, 
   function(err)  {
-    console.log("sendDelay: ", config.get("sendDelay"));
-    setTimeout(function(){
+    console.log("sendDelay: ", sendDelay);
+    setTimeout(function() {
+      console.log("calling back from async...");
       callback(null);
-    }, config.get("sendDelay")); //delay 500ms before calling back
+    }, sendDelay); 
   });  
   
 };

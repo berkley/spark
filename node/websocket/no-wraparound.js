@@ -1,6 +1,7 @@
 var sockets = require('./sockets.js');
 var screen = require('./screen.js');
 var nconf = require('nconf');
+var util = require('./util.js');
 
 nconf.argv()
      .env()
@@ -20,7 +21,7 @@ var invader2_2_height = 8;
 
 var count = 0;
 var on = true;
-var col = 0;
+var col = -8;
 var forward = true;
 
 var drawing = false;
@@ -30,11 +31,16 @@ var screens = ["Freddy", "Robot"];
 
 function setupInvader(message) {
   console.log("message in setupInvader: ", message);
-  	screen.setup(JSON.parse(message).coreid, function(){
+  var coreid = JSON.parse(message).coreid
+    screen.setup(coreid, function(){
+      console.log("done with setup, setting brightness");
+      screen.setBrightness([util.getNameForCoreId(coreid)], undefined, function(bright, err){
+        console.log("Screen birghtness set to ", bright);
+      });
       if(!drawing)
       {
-        drawInvader();   
-        drawing = true;
+          drawInvader();   
+          drawing = true;
       }
     });
 };
@@ -51,19 +57,19 @@ function drawInvader() {
   else
   {
     col++;
-    if(col > 31)
-      col = 0;  
+    if(col > 32)
+      col = -8;  
   }
 
   if(on)
   {
-    screen.drawBMP(screens, col, 0, function(){
+    screen.drawBMP(screens, col, false, 0, function(){
       drawInvader();
     });
   }
   else
   {
-    screen.drawBMP(screens, col, 1, function(){
+    screen.drawBMP(screens, col, false, 1, function(){
       drawInvader();
     });
   }
@@ -73,14 +79,14 @@ function main() {
   screen.addBitmap(invader2_1, invader2_1_width, invader2_1_height, 0);
   screen.addBitmap(invader2_2, invader2_2_width, invader2_2_height, 1);
 
-	sockets.registerListener(function(message){
+  sockets.registerListener(function(message){
     console.log("setting up invader with message ", message);
     setupInvader(message);
   });
 
-  setTimeout(function(){
-    switchDirection();
-  }, 2000)
+  // setTimeout(function(){
+  //   switchDirection();
+  // }, 2000)
 };
 
 function switchDirection() {
