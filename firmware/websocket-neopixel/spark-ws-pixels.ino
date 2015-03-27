@@ -20,6 +20,8 @@ const byte server[] = {10, 0, 1, 8}; //syncline
 #define NUM_BMPS 10
 #define SERIAL_WIRING 1
 
+// #define PRINT_DEBUG 0;
+
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 // String* strArr = new String[265];
@@ -85,25 +87,22 @@ char* getCoreIDJSONWithMessageAndTransactionId(String message, int transactionId
 }
 
 void onMessage(WebSocketClient client, char* message) {
-    Serial.print("Received: ");
-    Serial.println(message);
+    print("Received: ", message);
     
     stringSplit(message, ',');
     
-    Serial.print("Looking for function # ");
-    Serial.println(paramArr[0]);
+    print("Looking for function # ", String(paramArr[0]));
     
     if(paramArr[0] == 99)
     {
         char *msg = getCoreIDJSONWithMessageAndTransactionId("ident", 0);
-        Serial.print("99 returning ");
-        Serial.println(msg);
+        print("99 returning ", msg);
         client.send(msg);
         free(msg);
     } 
     else if(paramArr[0] == 98)
     { //set full screen to one color
-        Serial.println("Setting full screen 98");
+        print("Setting full screen 98", "");
         for(int i=0; i<PIXEL_COUNT; i++)
         {
             strip.setPixelColor(i, strip.Color(paramArr[1], paramArr[2], paramArr[3]));
@@ -121,8 +120,7 @@ void onMessage(WebSocketClient client, char* message) {
         //     vals[6]: b1
         //     etc
         uint8_t index = addBitmap();
-        Serial.print("set bmp at index ");
-        Serial.println(index);
+        print("set bmp at index ", String(index));
     }
     else if(paramArr[0] == 96)
     { //display a bmp at a given location in the array
@@ -147,7 +145,7 @@ void onMessage(WebSocketClient client, char* message) {
     }
     else
     {
-        Serial.println("Function not found");
+        print("Function not found", "");
     }
 }
 
@@ -164,12 +162,11 @@ void setAllOff()
 int addBitmap()
 {
     int index = paramArr[3];
-    Serial.print("Adding bitmap at index ");
-    Serial.println(index);
+    print("Adding bitmap at index ", String(index));
+    
     if(index >= NUM_BMPS)
     {
-        Serial.print("Index is >= ");
-        Serial.println(NUM_BMPS);
+        print("Index is >= ", String(NUM_BMPS));
         return -1; //overflow!
     }
 
@@ -217,26 +214,20 @@ void showBitmap()
     int height = bmp[2];
     int offset = 4; //cut off the metadata at the beginning of the array
 
-    Serial.println("setting bmp...");
-    Serial.print("width: ");
-    Serial.println(width);
-    Serial.print("height: ");
-    Serial.println(height);
-    Serial.print("colStart: ");
-    Serial.println(colStart);
-    Serial.print("wraparound: ");
-    Serial.println(wraparound);
+    print("setting bmp...", "");
+    print("width: ", String(width));
+    print("height: ", String(height));
+    print("colStart: ", String(colStart));
+    print("wraparound: ", String(wraparound));
 
     for(int y=0; y<height; y++)
     {
         for(int x=colStart; x<(width + colStart); x++)
         {
             int addr = getPixelAddress(y, x, wraparound);   
-            // Serial.print("Addr: ");
-            // Serial.println(addr);
             if(addr == -1)
             {
-                Serial.println("addr == -1");
+                print("addr == -1", "");
                 //dont' draw anything.  It's off the screen.
             }
             else
@@ -260,11 +251,9 @@ int getPixelAddress(int row, int col, int wraparound)
         if(col >= SCREEN_WIDTH)
         {
             col = col - SCREEN_WIDTH;
-            // Serial.println("col is greater than screen width and wraparound is true");
         }
         else if(col <= 0)
         {
-            // Serial.println("col is less than screen width and wraparound is true");
             col = SCREEN_WIDTH - col;
         }
     }
@@ -272,7 +261,6 @@ int getPixelAddress(int row, int col, int wraparound)
     {
         if(col >= SCREEN_WIDTH || col < 0)
         {
-            // Serial.println("col is greater than screen width or < 0 and wraparound is false");
             return -1;
         }
     }
@@ -298,27 +286,25 @@ int getPixelAddress(int row, int col, int wraparound)
 }
 
 void onError(WebSocketClient client, char* message) {
-    Serial.print("Error: ");
-    Serial.println(message);
+    print("Error: ", message);
 }
 
 void onOpen(WebSocketClient client) {
-    Serial.print("Connection Opened on port ");
-    Serial.println(WS_PORT);
+    print("Connection Opened on port ", String(WS_PORT));
 }
 
 void onClose(WebSocketClient client, int code, char* message) {
-    Serial.println("Connection closed");
-    Serial.print("reopening connection on port");
-    Serial.println(WS_PORT);
+    print("Connection closed", "");
+    print("reopening connection on port ", String(WS_PORT));
     client.connect(server, WS_PORT);
 }
 
 void setup() 
 {
+    #ifdef PRINT_DEBUG
     Serial.begin(9600);
-    Serial.println("Setup complete");
-
+    #endif
+    
     strip.begin();
     strip.show();
 
@@ -348,10 +334,11 @@ void setup()
 
     strip.setPixelColor(0, strip.Color(0, 255, 0));
     strip.show();
+
+    Serial.println("Setup complete");
 }
 
 void loop() {
-    // Serial.print("loop");
     client.monitor();
 }
 
@@ -374,4 +361,12 @@ void stringSplit(String s, char delim)
         }
     }
     paramArr[arrcnt] = (uint8_t)token.toInt();
+}
+
+void print(String msg, String value)
+{
+    #ifdef PRINT_DEBUG
+    Serial.print(msg);
+    Serial.println(value);
+    #endif
 }

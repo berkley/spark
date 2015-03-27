@@ -57,7 +57,7 @@ function drawPac() {
 
   screen.drawBMP(screens, col, true, 0, function(){
       draw();
-  });
+  }, 100);
 };
 
 function main() {
