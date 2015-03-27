@@ -67,24 +67,9 @@ function drawPac() {
   if(seq > 2)
     seq = 0;
 
-  if(seq == 0)
-  {
-    screen.drawVBMP(col, 0, function(){
+  screen.drawVBMP(col, seq, function(){
       draw();
-    });
-  }
-  else if(seq == 1)
-  {
-    screen.drawVBMP(col, 1, function(){
-      draw();
-    });
-  }
-  else if(seq == 2)
-  {
-    screen.drawVBMP(col, 2, function(){
-      draw();
-    });
-  }
+  });
 };
 
 function main() {
