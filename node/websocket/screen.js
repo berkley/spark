@@ -89,7 +89,7 @@ exports.setBrightness = function(coreNames, brightness, callback) {
 };
 
 //set a screen to all one color
-exports.setColor = function(coreNames, red, green, blue, callback) {
+exports.setScreen = function(coreNames, red, green, blue, callback) {
 	var data =  "98," + red + "," + green + "," + blue;
 	sockets.send(coreNames, data, function(err){
 		callback(err);
@@ -97,21 +97,38 @@ exports.setColor = function(coreNames, red, green, blue, callback) {
 };
 
 //set a single pixel (x,y) to (reg, green, blue) on the cores in coreNames
-exports.setPixel = function(coreNames, x, y, red, green, blue, callback) {
-	console.log("Not yet implemented");
-	callback("Not yet implemented");
+exports.setPixel = function(coreNames, x, y, red, green, blue, reset,  callback, sendDelay) {
+	var res = "0";
+	if(reset)
+		res = "1";
+
+	var data =  "93," + x + "," + y + "," + red + "," + green + "," + blue + "," + res;
+	sockets.send(coreNames, data, function(err){
+		callback(err);
+	}, sendDelay);
 };
 
 //set a single column to (reg, green, blue) on the cores in coreNames
-exports.setColumn = function(coreNames, column, red, green, blue, callback) {
-	console.log("Not yet implemented.");
-	callback("Not yet implemented");
+exports.setColumn = function(coreNames, column, red, green, blue, reset, callback, sendDelay) {
+	var res = "0";
+	if(reset)
+		res = "1";
+
+	var data =  "92," + column + "," + red + "," + green + "," + blue + "," + res;
+	sockets.send(coreNames, data, function(err){
+		callback(err);
+	}, sendDelay);
 };
 
 //set a single row row to (reg, green, blue) on the cores in coreNames
-exports.setRow = function(coreNames, row, red, green, blue, callback) {
-	console.log("Not yet implemented.");
-	callback("Not yet implemented");
+exports.setRow = function(coreNames, row, red, green, blue, reset, callback, sendDelay) {
+	var res = "0";
+	if(reset)
+		res = "1";
+	var data =  "91," + row + "," + red + "," + green + "," + blue + "," + res;
+	sockets.send(coreNames, data, function(err){
+		callback(err);
+	}, sendDelay);
 };
 
 //////////////////////////////////////////////////////////////

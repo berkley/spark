@@ -111,26 +111,26 @@ void onMessage(WebSocketClient client, char* message) {
     }
     else if(paramArr[0] == 97)
     { //add a bmp to memory
-        //key: vals[0]: 97 //funcId
-        //     vals[1]: bmp width
-        //     vals[2]: bmp height
-        //     vals[3]: bmp index //the index to assign to this bmp
-        //     vals[4]: r1
-        //     vals[5]: g1
-        //     vals[6]: b1
+        //key: paramArr[0]: 97 //funcId
+        //     paramArr[1]: bmp width
+        //     paramArr[2]: bmp height
+        //     paramArr[3]: bmp index //the index to assign to this bmp
+        //     paramArr[4]: r1
+        //     paramArr[5]: g1
+        //     paramArr[6]: b1
         //     etc
         uint8_t index = addBitmap();
         print("set bmp at index ", String(index));
     }
     else if(paramArr[0] == 96)
     { //display a bmp at a given location in the array
-        //key: vals[0]: 96
-        //     vals[1]: column to start display
-        //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-        //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
+        //key: paramArr[0]: 96
+        //     paramArr[1]: column to start display
+        //     paramArr[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+        //     paramArr[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
         //              If set to false, the bitmap will disappear as it leaves the screen
-        //     vals[4]: the bmp index number to display (returned from -97)
-        //     vals[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
+        //     paramArr[4]: the bmp index number to display (returned from -97)
+        //     paramArr[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
         showBitmap();
     }
     else if(paramArr[0] == 95)
@@ -141,6 +141,59 @@ void onMessage(WebSocketClient client, char* message) {
     else if(paramArr[0] == 94)
     { //set brightness
         strip.setBrightness(paramArr[1]);
+        strip.show();
+    }
+    else if(paramArr[0] == 93)
+    { //set single pixel
+        //key: paramArr[0]: 93
+        //     paramArr[1]: x
+        //     paramArr[2]: y
+        //     paramArr[3]: red
+        //     paramArr[4]: green
+        //     paramArr[5]: blue
+        //     paramArr[6]: reset [0|1]
+        if(paramArr[6] == 1)
+            setAllOff();
+        int addr = getPixelAddress(paramArr[2], paramArr[1], true);
+        print("Setting pixel", String(addr));
+        strip.setPixelColor(addr, strip.Color(paramArr[3], paramArr[4], paramArr[5]));   
+        strip.show();
+    }
+    else if(paramArr[0] == 92)
+    { //set a column to one color
+        //key: paramArr[0]: 92
+        //     paramArr[1]: column
+        //     paramArr[2]: red
+        //     paramArr[3]: green
+        //     paramArr[4]: blue
+        //     paramArr[5]: reset [0|1]
+        if(paramArr[5] == 1)
+            setAllOff();
+        print("Setting column ", String(paramArr[1]));
+        for(int i=0; i<SCREEN_HEIGHT; i++)
+        {
+            int addr = getPixelAddress(i, paramArr[1], false);
+            strip.setPixelColor(addr, strip.Color(paramArr[2], paramArr[3], paramArr[4]));       
+        }
+        strip.show();
+    }
+    else if(paramArr[0] == 91)
+    { //set a row to one color
+        //key: paramArr[0]: 91
+        //     paramArr[1]: row
+        //     paramArr[2]: red
+        //     paramArr[3]: green
+        //     paramArr[4]: blue
+        //     paramArr[5]: reset [0|1]
+        if(paramArr[5] == 1)
+            setAllOff();
+
+        print("Setting row ", String(paramArr[1]));
+        for(int i=0; i<SCREEN_WIDTH; i++)
+        {
+            int addr = getPixelAddress(paramArr[1], i, true);
+            strip.setPixelColor(addr, strip.Color(paramArr[2], paramArr[3], paramArr[4]));       
+        }
         strip.show();
     }
     else
@@ -180,13 +233,13 @@ int addBitmap()
 
 void showBitmap()
 {
-    //key: vals[0]: 96
-    //     vals[1]: column to start display
-    //     vals[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
-    //     vals[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
+    //key: paramArr[0]: 96
+    //     paramArr[1]: column to start display
+    //     paramArr[2]: reset [0 | 1] //reset the display to 0,0,0 before writing the bmp if 1
+    //     paramArr[3]: wraparound [0 | 1] //wrap the bitmap around from 31 to 0. 
     //              If set to false, the bitmap will disappear as it leaves the screen
-    //     vals[4]: the bmp index number to display (returned from -97)
-    //     vals[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
+    //     paramArr[4]: the bmp index number to display (returned from -97)
+    //     paramArr[5]: negative index [0 | 1] //set to 1 if colStart should be treated as a negative number
     int colStart = paramArr[1];
     int reset = paramArr[2];
     int wraparound = paramArr[3];
@@ -200,14 +253,14 @@ void showBitmap()
         setAllOff();
 
     //get the bmp from memory and display it at column
-    //key: vals[0]: 97 //funcId
-    //     vals[1]: transactionId
-    //     vals[2]: bmp width
-    //     vals[3]: bmp height
-    //     vals[4]: bmp index //the index to assign to this bmp
-    //     vals[5]: r1
-    //     vals[6]: g1
-    //     vals[7]: b1
+    //key: paramArr[0]: 97 //funcId
+    //     paramArr[1]: transactionId
+    //     paramArr[2]: bmp width
+    //     paramArr[3]: bmp height
+    //     paramArr[4]: bmp index //the index to assign to this bmp
+    //     paramArr[5]: r1
+    //     paramArr[6]: g1
+    //     paramArr[7]: b1
     //     etc
     uint8_t* bmp = bitmaps[index];
     int width = bmp[1];
