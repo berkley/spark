@@ -1,7 +1,7 @@
-var sockets = require('./sockets.js');
-var screen = require('./screen.js');
+var sockets = require('../sockets.js');
+var screen = require('../screen.js');
 var nconf = require('nconf');
-var util = require('./util.js');
+var util = require('../util.js');
 
 nconf.argv()
      .env()

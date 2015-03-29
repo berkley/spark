@@ -1,7 +1,7 @@
-var sockets = require('./sockets.js');
-var screen = require('./screen.js');
+var sockets = require('../sockets.js');
+var screen = require('../screen.js');
 var nconf = require('nconf');
-var util = require('./util.js');
+var util = require('../util.js');
 
 nconf.argv()
      .env()
@@ -52,12 +52,12 @@ function drawPac() {
   console.log("drawing pac at ", col);
   
   col++;
-  if(col > 63)
+  if(col > 31)
     col = 0; 
 
-  screen.drawVBMP(col, 0, function(){
+  screen.drawBMP(screens, col, true, 0, function(){
       draw();
-  });
+  }, 100);
 };
 
 function main() {
