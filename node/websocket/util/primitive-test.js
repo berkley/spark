@@ -44,12 +44,34 @@ function draw() {
     drawCols();
   else if(drawcount >= 32 && drawcount < 40)
     drawRows();
-  //TODO test setPixel here 
+  else if(drawcount >= 40 && drawcount <= 255)
+    drawPixels();
 
   drawcount++;
-  if(drawcount > 39)
+  if(drawcount > 255)
     drawcount = 0;
 }
+
+var x = 0;
+var y = 0;
+function drawPixels() {
+  var red = Math.random() * 255;
+  var green = Math.random() * 255;
+  var blue = Math.random() * 255;
+  console.log("drawing pixel: ", drawcount);
+
+  if(x >= 31)
+  {
+    x = 0;
+    y++;
+  }
+  if(y >= 7)
+    y = 0;
+  screen.setPixel(screens, x, y, red, green, blue, true, function(){
+      draw();
+  }, 500);
+  x++;
+};
 
 function drawCols() {
   var red = Math.random() * 255;
