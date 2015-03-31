@@ -51,7 +51,12 @@ exports.addBitmap = function(bmp, width, height, index) {
 //////////////////////////////////////////////////////////////
 
 //draw the bitmap stored at index on a core at column on the cores in coreNames
-exports.drawBMP = function(coreNames, column, wraparound, index, callback, sendDelay){
+exports.drawBMP = function(coreNames, column, wraparound, index, callback, sendDelay, reset){
+	if(reset)
+		resetScreen = 1;
+	else
+		resetScreen = 0;
+
 	var wrap = 1;
 	var negative = 0;
 	if(!wraparound)
@@ -62,7 +67,7 @@ exports.drawBMP = function(coreNames, column, wraparound, index, callback, sendD
 		column *= -1;
 	}
 
-	var data = "96," + column + ",1," + wrap + "," + index + "," + negative;	
+	var data = "96," + column + "," + resetScreen + "," + wrap + "," + index + "," + negative;	
 	console.log("drawing bmp " + index + " at: ", column);
 	console.log("cores: ", coreNames);
 	sockets.send(coreNames, data, function(err){
@@ -137,24 +142,19 @@ exports.setRow = function(coreNames, row, red, green, blue, reset, callback, sen
 
 //draw a bitmap starting at column on the virtual screen (across cores)
 //NOTE: this should really iterate over the BMP, not the screens
-exports.drawVBMP = function(column, index, callback) {
+exports.drawVBMP = function(column, index, callback, resetScreen) {
+	if(resetScreen == undefined) resetScreen = true; //default reset to true
 	console.log("Drawing VBMP ", index, " at col ", column);
 	var screens = config.get("screen");
 	var bmp = bitmaps[index];
-	console.log("bmp.width: ", bmp[1]);
-	console.log("bmp.height: ", bmp[2]);
 	// console.log("screens: ", screens);
 	for(var i=0; i<screens.length; i++)
 	{
 		var screen = screens[i];
-		// console.log("screen: ", screen);
-		// console.log("screen.name: ", screen.name);
 		if(column >= screen.vColStart && column <= screen.vColEnd)
 		{	//find which screen the bmp col starts on
 			var colDiff = column - screen.vColEnd;
 			var startCol = column - screen.vColStart;
-			console.log("colDiff: ", colDiff);
-			console.log("startCol: ", startCol);
 			if(colDiff < 0) //we are straddling two screens
 			{
 				column = column - screen.vColStart;
@@ -169,13 +169,13 @@ exports.drawVBMP = function(column, index, callback) {
 						console.log("DRAW1 ", screen.name, " col:", startCol);
 						exports.drawBMP([screen.name], startCol, false, index, function(err){
 							cb(err);
-						}); //draw the first part
+						}, undefined, resetScreen); //draw the first part
 					},
 					function(cb){
 						console.log("DRAW2 ", screen.name, " col:", colDiff);
 						exports.drawBMP([nextScreen.name], colDiff, false, index, function(err){
 							cb(err);
-						}); //draw the next part
+						}, undefined, resetScreen); //draw the next part
 					}
 				], function(err){
 					callback(err);
@@ -187,7 +187,7 @@ exports.drawVBMP = function(column, index, callback) {
 				// console.log("drawing vbmp on screen ", screen.name);
 				exports.drawBMP([screen.name], startCol, false, index, function(err){
 					callback(err);
-				});
+				}, undefined, resetScreen);
 			}
 		}
 	}

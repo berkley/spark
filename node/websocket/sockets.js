@@ -51,7 +51,6 @@ exports.send = function(cores, data, callback, sendDelay) {
     }
   }, 
   function(err)  {
-    console.log("sendDelay: ", sendDelay);
     setTimeout(function() {
       callback(null);
     }, sendDelay); 
