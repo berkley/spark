@@ -990,8 +990,51 @@ CONN-08352</description>
 <busses>
 </busses>
 <nets>
-<net name="N$2" class="0">
+<net name="N$3" class="0">
 <segment>
+<pinref part="STRIP-DATA-OUT1" gate="G$1" pin="P"/>
+<wire x1="22.86" y1="119.38" x2="2.54" y2="119.38" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="119.38" x2="2.54" y2="91.44" width="0.1524" layer="91"/>
+<pinref part="STRIP-DATA-IN2" gate="G$1" pin="P"/>
+<wire x1="2.54" y1="91.44" x2="22.86" y2="91.44" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$7" class="0">
+<segment>
+<pinref part="STRIP-DATA-OUT2" gate="G$1" pin="P"/>
+<wire x1="22.86" y1="63.5" x2="2.54" y2="63.5" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="63.5" x2="2.54" y2="35.56" width="0.1524" layer="91"/>
+<pinref part="STRIP-DATA-IN3" gate="G$1" pin="P"/>
+<wire x1="2.54" y1="35.56" x2="22.86" y2="35.56" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$10" class="0">
+<segment>
+<pinref part="STRIP-DATA-OUT3" gate="G$1" pin="P"/>
+<wire x1="22.86" y1="7.62" x2="2.54" y2="7.62" width="0.1524" layer="91"/>
+<wire x1="2.54" y1="7.62" x2="2.54" y2="-20.32" width="0.1524" layer="91"/>
+<pinref part="STRIP-DATA-IN4" gate="G$1" pin="P"/>
+<wire x1="2.54" y1="-20.32" x2="22.86" y2="-20.32" width="0.1524" layer="91"/>
+</segment>
+</net>
+<net name="N$13" class="0">
+<segment>
+<pinref part="STRIP-DATA-OUT4" gate="G$1" pin="P"/>
+<wire x1="-73.66" y1="-48.26" x2="22.86" y2="-48.26" width="0.1524" layer="91"/>
+<pinref part="STRIP-DATA-OUT-AUX" gate="G$1" pin="P"/>
+</segment>
+</net>
+<net name="N$5" class="0">
+<segment>
+<pinref part="J1" gate="G$1" pin="-"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="GND@2"/>
+<wire x1="-66.04" y1="137.16" x2="-73.66" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="-73.66" y1="137.16" x2="-81.28" y2="137.16" width="0.1524" layer="91"/>
+<wire x1="-81.28" y1="137.16" x2="-81.28" y2="152.4" width="0.1524" layer="91"/>
+<junction x="-73.66" y="137.16"/>
+<wire x1="-73.66" y1="137.16" x2="-73.66" y2="147.32" width="0.1524" layer="91"/>
+<wire x1="-73.66" y1="147.32" x2="-30.48" y2="147.32" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="147.32" x2="-30.48" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="-22.86" y1="149.86" x2="-22.86" y2="139.7" width="0.1524" layer="91"/>
 <junction x="-22.86" y="127"/>
 <wire x1="-22.86" y1="139.7" x2="-22.86" y2="127" width="0.1524" layer="91"/>
@@ -1025,58 +1068,23 @@ CONN-08352</description>
 <junction x="-22.86" y="-40.64"/>
 <pinref part="STRIP-NEG8" gate="G$1" pin="P"/>
 <wire x1="22.86" y1="-40.64" x2="-22.86" y2="-40.64" width="0.1524" layer="91"/>
+<wire x1="-30.48" y1="149.86" x2="-22.86" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$3" class="0">
+<net name="N$6" class="0">
 <segment>
-<pinref part="STRIP-DATA-OUT1" gate="G$1" pin="P"/>
-<wire x1="22.86" y1="119.38" x2="2.54" y2="119.38" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="119.38" x2="2.54" y2="91.44" width="0.1524" layer="91"/>
-<pinref part="STRIP-DATA-IN2" gate="G$1" pin="P"/>
-<wire x1="2.54" y1="91.44" x2="22.86" y2="91.44" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$4" class="0">
-<segment>
-<pinref part="STRIP-DATA-IN1" gate="G$1" pin="P"/>
-<wire x1="-25.4" y1="147.32" x2="22.86" y2="147.32" width="0.1524" layer="91"/>
-<pinref part="SPARK_CORE" gate="G$1" pin="D2"/>
-<wire x1="-30.48" y1="96.52" x2="-25.4" y2="96.52" width="0.1524" layer="91"/>
-<wire x1="-25.4" y1="147.32" x2="-25.4" y2="96.52" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$7" class="0">
-<segment>
-<pinref part="STRIP-DATA-OUT2" gate="G$1" pin="P"/>
-<wire x1="22.86" y1="63.5" x2="2.54" y2="63.5" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="63.5" x2="2.54" y2="35.56" width="0.1524" layer="91"/>
-<pinref part="STRIP-DATA-IN3" gate="G$1" pin="P"/>
-<wire x1="2.54" y1="35.56" x2="22.86" y2="35.56" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$10" class="0">
-<segment>
-<pinref part="STRIP-DATA-OUT3" gate="G$1" pin="P"/>
-<wire x1="22.86" y1="7.62" x2="2.54" y2="7.62" width="0.1524" layer="91"/>
-<wire x1="2.54" y1="7.62" x2="2.54" y2="-20.32" width="0.1524" layer="91"/>
-<pinref part="STRIP-DATA-IN4" gate="G$1" pin="P"/>
-<wire x1="2.54" y1="-20.32" x2="22.86" y2="-20.32" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$13" class="0">
-<segment>
-<pinref part="STRIP-DATA-OUT4" gate="G$1" pin="P"/>
-<wire x1="-73.66" y1="-48.26" x2="22.86" y2="-48.26" width="0.1524" layer="91"/>
-<pinref part="STRIP-DATA-OUT-AUX" gate="G$1" pin="P"/>
-</segment>
-</net>
-<net name="N$1" class="0">
-<segment>
+<pinref part="J1" gate="G$1" pin="+"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="RAW"/>
+<wire x1="-66.04" y1="142.24" x2="-76.2" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="-76.2" y1="142.24" x2="-78.74" y2="142.24" width="0.1524" layer="91"/>
+<wire x1="-78.74" y1="142.24" x2="-78.74" y2="152.4" width="0.1524" layer="91"/>
+<junction x="-76.2" y="142.24"/>
+<wire x1="-76.2" y1="142.24" x2="-76.2" y2="149.86" width="0.1524" layer="91"/>
+<wire x1="-76.2" y1="149.86" x2="-35.56" y2="149.86" width="0.1524" layer="91"/>
+<wire x1="-35.56" y1="149.86" x2="-35.56" y2="154.94" width="0.1524" layer="91"/>
 <pinref part="STRIP-POS1" gate="G$1" pin="P"/>
-<wire x1="0" y1="154.94" x2="22.86" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="0" y1="152.4" x2="0" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="-15.24" y1="152.4" x2="0" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="-15.24" y1="152.4" x2="-15.24" y2="111.76" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="154.94" x2="22.86" y2="154.94" width="0.1524" layer="91"/>
+<wire x1="-15.24" y1="154.94" x2="-15.24" y2="111.76" width="0.1524" layer="91"/>
 <pinref part="STRIP-POS2" gate="G$1" pin="P"/>
 <wire x1="-15.24" y1="111.76" x2="-15.24" y2="99.06" width="0.1524" layer="91"/>
 <wire x1="-15.24" y1="99.06" x2="-15.24" y2="55.88" width="0.1524" layer="91"/>
@@ -1105,30 +1113,25 @@ CONN-08352</description>
 <junction x="-15.24" y="55.88"/>
 <junction x="-15.24" y="99.06"/>
 <junction x="-15.24" y="111.76"/>
+<junction x="-15.24" y="154.94"/>
+<wire x1="-35.56" y1="154.94" x2="-15.24" y2="154.94" width="0.1524" layer="91"/>
 </segment>
 </net>
-<net name="N$5" class="0">
+<net name="N$1" class="0">
 <segment>
-<pinref part="J1" gate="G$1" pin="-"/>
-<pinref part="SPARK_CORE" gate="G$1" pin="GND@2"/>
-<wire x1="-66.04" y1="137.16" x2="-81.28" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="-81.28" y1="137.16" x2="-81.28" y2="152.4" width="0.1524" layer="91"/>
-</segment>
-</net>
-<net name="N$6" class="0">
-<segment>
-<pinref part="J1" gate="G$1" pin="+"/>
-<pinref part="SPARK_CORE" gate="G$1" pin="RAW"/>
-<wire x1="-66.04" y1="142.24" x2="-78.74" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="-78.74" y1="142.24" x2="-78.74" y2="152.4" width="0.1524" layer="91"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="D2"/>
+<wire x1="-30.48" y1="96.52" x2="-25.4" y2="96.52" width="0.1524" layer="91"/>
+<wire x1="-25.4" y1="96.52" x2="-25.4" y2="147.32" width="0.1524" layer="91"/>
+<pinref part="STRIP-DATA-IN1" gate="G$1" pin="P"/>
+<wire x1="-25.4" y1="147.32" x2="22.86" y2="147.32" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>
 </sheet>
 </sheets>
 <errors>
-<approved hash="104,1,-66.04,142.24,SPARK_CORE,RAW,N$1,,,"/>
-<approved hash="104,1,-66.04,137.16,SPARK_CORE,GND,N$2,,,"/>
+<approved hash="104,1,-66.04,142.24,SPARK_CORE,RAW,N$6,,,"/>
+<approved hash="104,1,-66.04,137.16,SPARK_CORE,GND,N$5,,,"/>
 <approved hash="204,1,-30.48,142.24,SPARK_CORE,VCC,,,,"/>
 <approved hash="204,1,-30.48,132.08,SPARK_CORE,VDDA,,,,"/>
 <approved hash="204,1,-30.48,127,SPARK_CORE,GND,,,,"/>

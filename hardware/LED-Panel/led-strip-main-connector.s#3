@@ -992,14 +992,6 @@ CONN-08352</description>
 <nets>
 <net name="N$2" class="0">
 <segment>
-<pinref part="J1" gate="G$1" pin="-"/>
-<wire x1="-81.28" y1="152.4" x2="-81.28" y2="137.16" width="0.1524" layer="91"/>
-<pinref part="SPARK_CORE" gate="G$1" pin="GND@2"/>
-<wire x1="-81.28" y1="137.16" x2="-73.66" y2="137.16" width="0.1524" layer="91"/>
-<junction x="-73.66" y="137.16"/>
-<wire x1="-73.66" y1="137.16" x2="-66.04" y2="137.16" width="0.1524" layer="91"/>
-<wire x1="-73.66" y1="137.16" x2="-73.66" y2="149.86" width="0.1524" layer="91"/>
-<wire x1="-73.66" y1="149.86" x2="-22.86" y2="149.86" width="0.1524" layer="91"/>
 <wire x1="-22.86" y1="149.86" x2="-22.86" y2="139.7" width="0.1524" layer="91"/>
 <junction x="-22.86" y="127"/>
 <wire x1="-22.86" y1="139.7" x2="-22.86" y2="127" width="0.1524" layer="91"/>
@@ -1033,6 +1025,10 @@ CONN-08352</description>
 <junction x="-22.86" y="-40.64"/>
 <pinref part="STRIP-NEG8" gate="G$1" pin="P"/>
 <wire x1="22.86" y1="-40.64" x2="-22.86" y2="-40.64" width="0.1524" layer="91"/>
+<junction x="-22.86" y="149.86"/>
+<pinref part="J1" gate="G$1" pin="-"/>
+<wire x1="-81.28" y1="152.4" x2="-81.28" y2="149.86" width="0.1524" layer="91"/>
+<wire x1="-81.28" y1="149.86" x2="-22.86" y2="149.86" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$3" class="0">
@@ -1083,16 +1079,7 @@ CONN-08352</description>
 <pinref part="STRIP-POS1" gate="G$1" pin="P"/>
 <wire x1="0" y1="154.94" x2="22.86" y2="154.94" width="0.1524" layer="91"/>
 <wire x1="0" y1="152.4" x2="0" y2="154.94" width="0.1524" layer="91"/>
-<wire x1="-76.2" y1="152.4" x2="-15.24" y2="152.4" width="0.1524" layer="91"/>
-<pinref part="SPARK_CORE" gate="G$1" pin="RAW"/>
-<junction x="-76.2" y="142.24"/>
 <wire x1="-15.24" y1="152.4" x2="0" y2="152.4" width="0.1524" layer="91"/>
-<wire x1="-76.2" y1="142.24" x2="-66.04" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="-76.2" y1="142.24" x2="-76.2" y2="152.4" width="0.1524" layer="91"/>
-<pinref part="J1" gate="G$1" pin="+"/>
-<wire x1="-78.74" y1="152.4" x2="-78.74" y2="142.24" width="0.1524" layer="91"/>
-<wire x1="-78.74" y1="142.24" x2="-76.2" y2="142.24" width="0.1524" layer="91"/>
-<junction x="-15.24" y="152.4"/>
 <wire x1="-15.24" y1="152.4" x2="-15.24" y2="111.76" width="0.1524" layer="91"/>
 <pinref part="STRIP-POS2" gate="G$1" pin="P"/>
 <wire x1="-15.24" y1="111.76" x2="-15.24" y2="99.06" width="0.1524" layer="91"/>
@@ -1122,6 +1109,9 @@ CONN-08352</description>
 <junction x="-15.24" y="55.88"/>
 <junction x="-15.24" y="99.06"/>
 <junction x="-15.24" y="111.76"/>
+<junction x="-15.24" y="152.4"/>
+<pinref part="J1" gate="G$1" pin="+"/>
+<wire x1="-78.74" y1="152.4" x2="-15.24" y2="152.4" width="0.1524" layer="91"/>
 </segment>
 </net>
 </nets>

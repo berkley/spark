@@ -928,30 +928,30 @@ CONN-08352</description>
 <parts>
 <part name="J1" library="SparkFun-Connectors" deviceset="JST_2MM_MALE" device=""/>
 <part name="U$1" library="Spark" deviceset="SPARK_CORE" device="CORE"/>
-<part name="STRIP-POS" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-POS2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-DATA-OUT1" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-NEG" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-NEG2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS1" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-DATA-IN1" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG1" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-POS2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-IN2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-NEG2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-OUT2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-IN2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-IN3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-OUT2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS5" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-OUT3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-IN3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG5" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS6" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-IN4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-OUT3" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG6" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-POS7" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
-<part name="STRIP-DATA-OUT4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-IN4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG7" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-POS8" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-DATA-OUT4" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
+<part name="STRIP-NEG8" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-DATA-OUT-AUX" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 </parts>
 <sheets>
@@ -961,30 +961,30 @@ CONN-08352</description>
 <instances>
 <instance part="J1" gate="G$1" x="-81.28" y="157.48"/>
 <instance part="U$1" gate="G$1" x="-48.26" y="114.3"/>
-<instance part="STRIP-POS" gate="G$1" x="25.4" y="111.76" rot="R180"/>
+<instance part="STRIP-POS2" gate="G$1" x="25.4" y="111.76" rot="R180"/>
 <instance part="STRIP-DATA-OUT1" gate="G$1" x="25.4" y="119.38" rot="R180"/>
-<instance part="STRIP-NEG" gate="G$1" x="25.4" y="127" rot="R180"/>
+<instance part="STRIP-NEG2" gate="G$1" x="25.4" y="127" rot="R180"/>
 <instance part="STRIP-POS1" gate="G$1" x="25.4" y="154.94" rot="R180"/>
 <instance part="STRIP-DATA-IN1" gate="G$1" x="25.4" y="147.32" rot="R180"/>
 <instance part="STRIP-NEG1" gate="G$1" x="25.4" y="139.7" rot="R180"/>
-<instance part="STRIP-POS2" gate="G$1" x="25.4" y="99.06" rot="R180"/>
+<instance part="STRIP-POS3" gate="G$1" x="25.4" y="99.06" rot="R180"/>
 <instance part="STRIP-DATA-IN2" gate="G$1" x="25.4" y="91.44" rot="R180"/>
-<instance part="STRIP-NEG2" gate="G$1" x="25.4" y="83.82" rot="R180"/>
-<instance part="STRIP-POS3" gate="G$1" x="25.4" y="55.88" rot="R180"/>
+<instance part="STRIP-NEG3" gate="G$1" x="25.4" y="83.82" rot="R180"/>
+<instance part="STRIP-POS4" gate="G$1" x="25.4" y="55.88" rot="R180"/>
 <instance part="STRIP-DATA-OUT2" gate="G$1" x="25.4" y="63.5" rot="R180"/>
-<instance part="STRIP-NEG3" gate="G$1" x="25.4" y="71.12" rot="R180"/>
-<instance part="STRIP-POS4" gate="G$1" x="25.4" y="43.18" rot="R180"/>
+<instance part="STRIP-NEG4" gate="G$1" x="25.4" y="71.12" rot="R180"/>
+<instance part="STRIP-POS5" gate="G$1" x="25.4" y="43.18" rot="R180"/>
 <instance part="STRIP-DATA-IN3" gate="G$1" x="25.4" y="35.56" rot="R180"/>
-<instance part="STRIP-NEG4" gate="G$1" x="25.4" y="27.94" rot="R180"/>
-<instance part="STRIP-POS5" gate="G$1" x="25.4" y="0" rot="R180"/>
+<instance part="STRIP-NEG5" gate="G$1" x="25.4" y="27.94" rot="R180"/>
+<instance part="STRIP-POS6" gate="G$1" x="25.4" y="0" rot="R180"/>
 <instance part="STRIP-DATA-OUT3" gate="G$1" x="25.4" y="7.62" rot="R180"/>
-<instance part="STRIP-NEG5" gate="G$1" x="25.4" y="15.24" rot="R180"/>
-<instance part="STRIP-POS6" gate="G$1" x="25.4" y="-12.7" rot="R180"/>
+<instance part="STRIP-NEG6" gate="G$1" x="25.4" y="15.24" rot="R180"/>
+<instance part="STRIP-POS7" gate="G$1" x="25.4" y="-12.7" rot="R180"/>
 <instance part="STRIP-DATA-IN4" gate="G$1" x="25.4" y="-20.32" rot="R180"/>
-<instance part="STRIP-NEG6" gate="G$1" x="25.4" y="-27.94" rot="R180"/>
-<instance part="STRIP-POS7" gate="G$1" x="25.4" y="-40.64" rot="R180"/>
+<instance part="STRIP-NEG7" gate="G$1" x="25.4" y="-27.94" rot="R180"/>
+<instance part="STRIP-POS8" gate="G$1" x="25.4" y="-40.64" rot="R180"/>
 <instance part="STRIP-DATA-OUT4" gate="G$1" x="25.4" y="-48.26" rot="R180"/>
-<instance part="STRIP-NEG7" gate="G$1" x="25.4" y="-55.88" rot="R180"/>
+<instance part="STRIP-NEG8" gate="G$1" x="25.4" y="-55.88" rot="R180"/>
 <instance part="STRIP-DATA-OUT-AUX" gate="G$1" x="-40.64" y="-48.26"/>
 </instances>
 <busses>
@@ -1006,11 +1006,11 @@ CONN-08352</description>
 <wire x1="0" y1="154.94" x2="22.86" y2="154.94" width="0.1524" layer="91"/>
 <junction x="-12.7" y="152.4"/>
 <wire x1="-12.7" y1="152.4" x2="-12.7" y2="111.76" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS2" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="111.76" x2="22.86" y2="111.76" width="0.1524" layer="91"/>
 <junction x="-12.7" y="111.76"/>
 <wire x1="-12.7" y1="111.76" x2="-12.7" y2="99.06" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS2" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS3" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="99.06" x2="22.86" y2="99.06" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -1030,12 +1030,12 @@ CONN-08352</description>
 <wire x1="2.54" y1="139.7" x2="22.86" y2="139.7" width="0.1524" layer="91"/>
 <junction x="-10.16" y="149.86"/>
 <wire x1="-10.16" y1="149.86" x2="-10.16" y2="127" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG2" gate="G$1" pin="P"/>
 <wire x1="-10.16" y1="127" x2="22.86" y2="127" width="0.1524" layer="91"/>
 <junction x="-10.16" y="127"/>
 <wire x1="-10.16" y1="127" x2="-7.62" y2="127" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="127" x2="-7.62" y2="83.82" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG2" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG3" gate="G$1" pin="P"/>
 <wire x1="-7.62" y1="83.82" x2="22.86" y2="83.82" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -1060,23 +1060,23 @@ CONN-08352</description>
 <net name="N$5" class="0">
 <segment>
 <wire x1="-12.7" y1="111.76" x2="-12.7" y2="55.88" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS3" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS4" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="55.88" x2="22.86" y2="55.88" width="0.1524" layer="91"/>
 <junction x="-12.7" y="55.88"/>
 <wire x1="-12.7" y1="55.88" x2="-12.7" y2="43.18" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS4" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS5" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="43.18" x2="22.86" y2="43.18" width="0.1524" layer="91"/>
 </segment>
 </net>
 <net name="N$6" class="0">
 <segment>
 <wire x1="-10.16" y1="127" x2="-10.16" y2="71.12" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG3" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG4" gate="G$1" pin="P"/>
 <wire x1="-10.16" y1="71.12" x2="22.86" y2="71.12" width="0.1524" layer="91"/>
 <junction x="-10.16" y="71.12"/>
 <wire x1="-10.16" y1="71.12" x2="-7.62" y2="71.12" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="71.12" x2="-7.62" y2="27.94" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG4" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG5" gate="G$1" pin="P"/>
 <wire x1="-7.62" y1="27.94" x2="22.86" y2="27.94" width="0.1524" layer="91"/>
 </segment>
 </net>
@@ -1102,14 +1102,14 @@ CONN-08352</description>
 <segment>
 <wire x1="-12.7" y1="-43.18" x2="0" y2="-43.18" width="0.1524" layer="91"/>
 <wire x1="0" y1="-43.18" x2="0" y2="-40.64" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS7" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS8" gate="G$1" pin="P"/>
 <wire x1="0" y1="-40.64" x2="22.86" y2="-40.64" width="0.1524" layer="91"/>
 <wire x1="-12.7" y1="55.88" x2="-12.7" y2="0" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS5" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS6" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="0" x2="22.86" y2="0" width="0.1524" layer="91"/>
 <junction x="-12.7" y="0"/>
 <wire x1="-12.7" y1="0" x2="-12.7" y2="-12.7" width="0.1524" layer="91"/>
-<pinref part="STRIP-POS6" gate="G$1" pin="P"/>
+<pinref part="STRIP-POS7" gate="G$1" pin="P"/>
 <wire x1="-12.7" y1="-12.7" x2="22.86" y2="-12.7" width="0.1524" layer="91"/>
 <wire x1="-12.7" y1="-43.18" x2="-12.7" y2="0" width="0.1524" layer="91"/>
 </segment>
@@ -1118,15 +1118,15 @@ CONN-08352</description>
 <segment>
 <wire x1="-10.16" y1="-45.72" x2="2.54" y2="-45.72" width="0.1524" layer="91"/>
 <wire x1="2.54" y1="-45.72" x2="2.54" y2="-55.88" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG7" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG8" gate="G$1" pin="P"/>
 <wire x1="2.54" y1="-55.88" x2="22.86" y2="-55.88" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="71.12" x2="-10.16" y2="15.24" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG5" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG6" gate="G$1" pin="P"/>
 <wire x1="-10.16" y1="15.24" x2="22.86" y2="15.24" width="0.1524" layer="91"/>
 <junction x="-10.16" y="15.24"/>
 <wire x1="-10.16" y1="15.24" x2="-7.62" y2="15.24" width="0.1524" layer="91"/>
 <wire x1="-7.62" y1="15.24" x2="-7.62" y2="-27.94" width="0.1524" layer="91"/>
-<pinref part="STRIP-NEG6" gate="G$1" pin="P"/>
+<pinref part="STRIP-NEG7" gate="G$1" pin="P"/>
 <wire x1="-7.62" y1="-27.94" x2="22.86" y2="-27.94" width="0.1524" layer="91"/>
 <wire x1="-10.16" y1="-45.72" x2="-10.16" y2="15.24" width="0.1524" layer="91"/>
 </segment>

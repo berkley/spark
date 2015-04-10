@@ -927,7 +927,7 @@ CONN-08352</description>
 </classes>
 <parts>
 <part name="J1" library="SparkFun-Connectors" deviceset="JST_2MM_MALE" device=""/>
-<part name="U$1" library="Spark" deviceset="SPARK_CORE" device="CORE"/>
+<part name="SPARK_CORE" library="Spark" deviceset="SPARK_CORE" device="CORE"/>
 <part name="STRIP-POS2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-DATA-OUT1" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
 <part name="STRIP-NEG2" library="wirepad" deviceset="WIREPAD" device="2,54/0,8"/>
@@ -960,7 +960,7 @@ CONN-08352</description>
 </plain>
 <instances>
 <instance part="J1" gate="G$1" x="-81.28" y="157.48"/>
-<instance part="U$1" gate="G$1" x="-48.26" y="114.3"/>
+<instance part="SPARK_CORE" gate="G$1" x="-48.26" y="114.3"/>
 <instance part="STRIP-POS2" gate="G$1" x="25.4" y="111.76" rot="R180"/>
 <instance part="STRIP-DATA-OUT1" gate="G$1" x="25.4" y="119.38" rot="R180"/>
 <instance part="STRIP-NEG2" gate="G$1" x="25.4" y="127" rot="R180"/>
@@ -994,7 +994,7 @@ CONN-08352</description>
 <segment>
 <pinref part="J1" gate="G$1" pin="+"/>
 <wire x1="-78.74" y1="152.4" x2="-78.74" y2="142.24" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="RAW"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="RAW"/>
 <wire x1="-78.74" y1="142.24" x2="-76.2" y2="142.24" width="0.1524" layer="91"/>
 <junction x="-76.2" y="142.24"/>
 <wire x1="-76.2" y1="142.24" x2="-66.04" y2="142.24" width="0.1524" layer="91"/>
@@ -1018,7 +1018,7 @@ CONN-08352</description>
 <segment>
 <pinref part="J1" gate="G$1" pin="-"/>
 <wire x1="-81.28" y1="152.4" x2="-81.28" y2="137.16" width="0.1524" layer="91"/>
-<pinref part="U$1" gate="G$1" pin="GND@2"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="GND@2"/>
 <wire x1="-81.28" y1="137.16" x2="-73.66" y2="137.16" width="0.1524" layer="91"/>
 <junction x="-73.66" y="137.16"/>
 <wire x1="-73.66" y1="137.16" x2="-66.04" y2="137.16" width="0.1524" layer="91"/>
@@ -1050,7 +1050,7 @@ CONN-08352</description>
 </net>
 <net name="N$4" class="0">
 <segment>
-<pinref part="U$1" gate="G$1" pin="D2"/>
+<pinref part="SPARK_CORE" gate="G$1" pin="D2"/>
 <wire x1="-30.48" y1="96.52" x2="-25.4" y2="96.52" width="0.1524" layer="91"/>
 <wire x1="-25.4" y1="96.52" x2="-25.4" y2="147.32" width="0.1524" layer="91"/>
 <pinref part="STRIP-DATA-IN1" gate="G$1" pin="P"/>
