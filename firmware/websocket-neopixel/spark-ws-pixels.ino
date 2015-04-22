@@ -16,11 +16,11 @@ const byte server[] = {10, 0, 1, 8}; //syncline
 #define SCREEN_WIDTH 32
 #define SCREEN_HEIGHT 8
 #define PIXEL_TYPE WS2812B
-#define PARAM_ARR_SIZE 265
-#define NUM_BMPS 10
+#define PARAM_ARR_SIZE 778 //32 (width) * 8 (height) * 3 (rgb) + 10 (meta)
+#define NUM_BMPS 4
 #define SERIAL_WIRING 1
 
-// #define PRINT_DEBUG 0;
+// #define PRINT_DEBUG 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
