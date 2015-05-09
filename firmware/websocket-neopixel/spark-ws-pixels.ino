@@ -17,10 +17,10 @@ const byte server[] = {10, 0, 1, 8}; //syncline
 #define SCREEN_HEIGHT 8
 #define PIXEL_TYPE WS2812B
 #define PARAM_ARR_SIZE 778 //32 (width) * 8 (height) * 3 (rgb) + 10 (meta)
-#define NUM_BMPS 4
+#define NUM_BMPS 1
 #define SERIAL_WIRING 1
 
-// #define PRINT_DEBUG 1
+#define PRINT_DEBUG 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -223,9 +223,34 @@ int addBitmap()
         return -1; //overflow!
     }
 
-    for(int i=0; i<PARAM_ARR_SIZE; i++)
+    uint32_t flashAddr = 0x80000;
+    // for(int i=0; i<PARAM_ARR_SIZE; i++)
     {
-        bitmaps[index][i] = paramArr[i];
+        /*
+        void sFLASH_Init(void);
+        void sFLASH_EraseSector(uint32_t SectorAddr);
+        void sFLASH_EraseBulk(void);
+        void sFLASH_WriteBuffer(const uint8_t *pBuffer, uint32_t WriteAddr, uint32_t NumByteToWrite);
+        void sFLASH_ReadBuffer(uint8_t *pBuffer, uint32_t ReadAddr, uint32_t NumByteToRead);
+        uint32_t sFLASH_ReadID(void);
+        */
+        // bitmaps[index][i] = paramArr[i];
+        // sFLASH_EraseSector(flashAddr);
+        // sFLASH_WriteByte(flashAddr, paramArr[i]);
+        for(int i=0; i<PARAM_ARR_SIZE; i++)
+        {
+            sFLASH_EraseSector(0x80000 + i);
+        }
+        uint8_t values[1] = { 0 };
+        sFLASH_WriteBuffer(paramArr, 0x80000, PARAM_ARR_SIZE);
+        static uint8_t newArr[PARAM_ARR_SIZE];
+        sFLASH_ReadBuffer(newArr, 0x80000, PARAM_ARR_SIZE);
+        for(int i=0; i<PARAM_ARR_SIZE; i++)
+        {
+            print("p: ", String(paramArr[i]));
+            print(String(i) + ": ", String(newArr[i]));
+        }
+
     }
     return index;
 }
@@ -422,4 +447,63 @@ void print(String msg, String value)
     Serial.print(msg);
     Serial.println(value);
     #endif
+}
+
+////////////////////////// Flash Functions //////////////////
+ /*
+void sFLASH_Init(void);
+void sFLASH_EraseSector(uint32_t SectorAddr);
+void sFLASH_EraseBulk(void);
+void sFLASH_WriteBuffer(const uint8_t *pBuffer, uint32_t WriteAddr, uint32_t NumByteToWrite);
+void sFLASH_ReadBuffer(uint8_t *pBuffer, uint32_t ReadAddr, uint32_t NumByteToRead);
+uint32_t sFLASH_ReadID(void);
+*/
+/////////////////////////////////////////////////////////////
+
+#define LUTStartAddr 0x80000
+#define bytesPerLUTEntry 12
+#define numLUTEntries 255
+#define FLASHEndAddr 0x200000
+uint32_t BMPStartAddr = LUTStartAddr + (bytesPerLUTEntry * numLUTEntries) + 1;
+
+void initFlashLUTSpace()
+{
+    for(int i=LUTStartAddr; i<LUTStartAddr + (bytesPerLUTEntry * numLUTEntries); i++)
+    {
+        sFLASH_EraseSector(i);
+    }
+
+    uint8_t initValues[bytesPerLUTEntry];
+    for(int i=0; i<bytesPerLUTEntry; i++)
+    {
+        initValues[i] = 0;
+    }
+
+    for(int i=LUTStartAddr; i<LUTStartAddr + (bytesPerLUTEntry * numLUTEntries); i+=bytesPerLUTEntry)
+    { 
+        sFLASH_WriteBuffer(initValues, i, bytesPerLUTEntry); //init LUT entry to all 0s
+    }
+}
+
+void initFlashBMPSpace()
+{
+    int bmpLength = FLASHEndAddr - BMPStartAddr;
+    uint8_t initValues[bmpLength];
+    for(int i=BMPStartAddr; i<FLASHEndAddr; i++)
+    {
+        sFLASH_EraseSector(i);
+        initValues[i] = 0;
+    }
+
+    sFLASH_WriteBuffer(initValues, BMPStartAddr, bmpLength); //init BMP space to all 0s
+}
+
+void addFlashLUTEntry(uint8_t index, uint32_t hash, uint32_t startAddress, uint16_t length)
+{
+
+}
+
+void addFlashBMP(uint32_t startAddress, uint16_t length, uint8_t *data)
+{
+
 }
