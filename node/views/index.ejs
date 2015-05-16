@@ -53,6 +53,7 @@
 		<option value="particles">Particles</option>
 		<option value="endrun">End Run</option>
 		<option value="snow">Snow</option>
+		<option value="setBrightness">setBrightness</option>
 	</select><br/>
 
 	<span id="colorSelector1">
@@ -81,6 +82,12 @@
 		<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
 		<br/>
 		<input id='colorpicker2' />
+	</span>
+
+	<span id="brightness">
+		Brightness: <br/>
+		<input type="range"  min="0" max="255" name="brightness" id="brightness" value="255"/>
+		<br/>
 	</span>
 
 	<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
@@ -197,7 +204,7 @@
 			$('#threedDiv').hide();
 			$('#respawnDiv').hide();
 			$('#flickerDiv').hide();
-
+			$('#brightness').hide();
 			$('#spinner').hide();
 		};
 
@@ -408,6 +415,10 @@
 				$('#colorSelector1').hide();
 				$('#colorSelector2').hide();
 				$('#delayDiv').hide();
+			}
+			else if(ev.target.value == 'setBrightness')
+			{
+				$('#brightness').show();
 			}
 
 		});

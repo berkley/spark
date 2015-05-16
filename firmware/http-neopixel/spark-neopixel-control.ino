@@ -43,6 +43,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define ENDRUN "endrun"
 #define SNOW "snow"
 #define WEBSOCKET "websocket" //<- finish this
+#define SETBRIGHTNESS "setBrightness"
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
@@ -316,6 +317,12 @@ int run(String params)
         emitter.maxVelocity = mvf / FPS;
         loopRun = PARTICLES;
         return 1;
+    }
+    else if(command.equals(SETBRIGHTNESS))
+    {
+        int brightness = stringToInt(args[1]);
+        strip.setBrightness(brightness);
+        strip.show();
     }
     else 
     { //command not found
