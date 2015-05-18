@@ -323,6 +323,7 @@ int run(String params)
         int brightness = stringToInt(args[1]);
         strip.setBrightness(brightness);
         strip.show();
+        return 1;
     }
     else 
     { //command not found

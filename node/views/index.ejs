@@ -21,91 +21,105 @@
 		body 
 		{
 			background-color: grey;
-			max-width: 200px;
+			max-width: 220px;
 			margin: 0 auto;
 			float: none;
+		}
+		img.centered
+		{
+			display: block;
+		    margin-left: auto;
+		    margin-right: auto
 		}
     </style>
 </head>
 <body>
 	<br/>
-	<img src="freddy.png"/>
-	<h3>El Casa Poder 2000</h3>
+	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
+	<img class="centered" src="freddy.png"/>
+	<h3 style="text-align:center">El Casa Poder 2000</h3>
 	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
-	Core:
-	<select id="coreIdSelect" name="core">
-		<% for(var i=0; i<cores.length; i++) {%>
-		   <option value="<%= cores[i].id %>"><%= cores[i].name %> - <%= cores[i].description %></option>
-		<% } %>
-		<option value="all">All</option>
-	</select><br/>
-	Program:
-	<select id="actionSelect" name="action">
-		<option value="allOff">All Pixels Off</option>
-		<option value="stop">Stop Program</option>
-		<option value="setAll">Single Color</option>
-		<option value="alternate">Alternate Colors</option>
-		<option value="loopAlternate">Animate Alternate Colors</option>
-		<option value="rainbow">Rainbow</option>
-		<option value="blocks">Blocks</option>
-		<option value="loopBlocks">Animate Blocks</option>
-		<option value="fadeColor">Fade Between 2 Colors</option>
-		<option value="particles">Particles</option>
-		<option value="endrun">End Run</option>
-		<option value="snow">Snow</option>
-		<option value="setBrightness">setBrightness</option>
-	</select><br/>
+	</div>
+	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
 
-	<span id="colorSelector1">
-		Red1: <br/>
-		<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
-		<br/>
-		Green1: <br/>
-		<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
-		<br/>
-		Blue1: <br/>
-		<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
-		<br/>
-		<input id='colorpicker1' />
-		<br/>
-	</span>
+		Core:
+		<select id="coreIdSelect" name="core">
+			<% for(var i=0; i<cores.length; i++) {%>
+			   <option value="<%= cores[i].id %>"><%= cores[i].name %> - <%= cores[i].description %></option>
+			<% } %>
+			<option value="all">All</option>
+		</select>
+
+		<div id="programDiv" style="border:1px solid black; padding:5px; margin:5px">
+			Program:
+			<select id="actionSelect" name="action">
+				<option value="allOff">All Pixels Off</option>
+				<option value="stop">Stop Program</option>
+				<option value="setAll">Single Color</option>
+				<option value="alternate">Alternate Colors</option>
+				<option value="loopAlternate">Animate Alternate Colors</option>
+				<option value="rainbow">Rainbow</option>
+				<option value="blocks">Blocks</option>
+				<option value="loopBlocks">Animate Blocks</option>
+				<option value="fadeColor">Fade Between 2 Colors</option>
+				<option value="particles">Particles</option>
+				<option value="endrun">End Run</option>
+				<option value="snow">Snow</option>
+			</select><br/>
+
+			<span id="colorSelector1">
+				Red1: <br/>
+				<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
+				<br/>
+				Green1: <br/>
+				<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
+				<br/>
+				Blue1: <br/>
+				<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
+				<br/>
+				<input id='colorpicker1' />
+				<br/>
+			</span>
 
 
-	<span id="colorSelector2">
-		Red2: <br/>
-		<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
-		<br/>
-		Green2: <br/>
-		<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
-		<br/>
-		Blue2: <br/>
-		<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
-		<br/>
-		<input id='colorpicker2' />
-	</span>
+			<span id="colorSelector2">
+				Red2: <br/>
+				<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
+				<br/>
+				Green2: <br/>
+				<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
+				<br/>
+				Blue2: <br/>
+				<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
+				<br/>
+				<input id='colorpicker2' />
+			</span>
 
-	<span id="brightness">
-		Brightness: <br/>
-		<input type="range"  min="0" max="255" name="brightness" id="brightness" value="255"/>
-		<br/>
-	</span>
+			<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
+			<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
+			<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
+			<div id="numParticlesDiv">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
+			<div id="maxVelocityDiv">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
+			<div id="threedDiv">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
+			<div id="respawnDiv">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
+			<div id="flickerDiv">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
+			<br/>
+			<button id="goButton">Light It Up</button>
+			<button id="stopButton">Shut it down</button>
+			<br/>
+			<br/>
 
-	<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
-	<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
-	<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
-	<div id="numParticlesDiv">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
-	<div id="maxVelocityDiv">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
-	<div id="threedDiv">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
-	<div id="respawnDiv">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
-	<div id="flickerDiv">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
-	<br/>
-	<button id="goButton">Light It Up</button>
-	<button id="stopButton">Shut it down</button>
-	<br/>
-
-	<div id="status"></div>
-	<div id="result"></div>
-	<img style="width:30px;" id="spinner" width="100" src="spinner.gif"></div>
+			<div id="status"></div>
+			<div id="result"></div>
+			<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
+		</div>
+		
+		<div id="brightnessDiv" style="border:1px solid black; padding:5px; margin:5px">
+			Brightness:
+			<input type="range"  min="0" max="255" name="brightness" id="brightness" value="255"/> 
+			<!-- <button id="setBrightnessButton">Set Brightness</button> -->
+		</div>
+	</div>
 
 	<script>
 		var paramState = null;
@@ -193,6 +207,20 @@
 			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
 		});
 
+		$("#brightness").change(function(ev){
+			console.log("Brightness changed to ", $("#brightness").val());
+			$('#spinner').show();
+	    	$('#status').html("");
+	    	$('#result').html("");
+		    $.get("/house/run/action", 
+		    	{"action":"setBrightness", coreId:$('#coreIdSelect').val(), brightness:$('#brightness').val()}, 
+		    	function(data) {
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+		});
+
 		var hideAll = function() {
 			$('#colorSelector1').hide();
 			$('#colorSelector2').hide();
@@ -204,7 +232,6 @@
 			$('#threedDiv').hide();
 			$('#respawnDiv').hide();
 			$('#flickerDiv').hide();
-			$('#brightness').hide();
 			$('#spinner').hide();
 		};
 
@@ -415,10 +442,6 @@
 				$('#colorSelector1').hide();
 				$('#colorSelector2').hide();
 				$('#delayDiv').hide();
-			}
-			else if(ev.target.value == 'setBrightness')
-			{
-				$('#brightness').show();
 			}
 
 		});
