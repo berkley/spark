@@ -22,4 +22,11 @@
                "apiKey":"YOUR_WEATHER_UNDERGROUND_KEY_HERE",
                "url":"http://api.wunderground.com/api",
                "conditionsRoute":"conditions"}
+    "conditions":{"precipitation":["Drizzle", "Rain", "Snow", "Snow Grains", "Ice Crystals", "Ice Pellets", "Hail", "Rain Mist", "Rain Showers", "Snow Showers", "Snow Blowing Snow Mist", "Ice Pellet Showers", "Hail Showers", "Small Hail Showers", "Freezing Drizzle", "Freezing Rain"],
+                  "reduced_viz":["Mist", "Fog", "Fog Patches", "Smoke", "Volcanic Ash", "Widespread Dust", "Sand", "Haze", "Spray", "Dust Whirls", "Sandstorm", "Blowing Snow", "Blowing Widespread Dust", "Blowing Sand", "Freezing Fog", "Patches of Fog", "Shallow Fog", "Partial Fog"],
+                  "t_storms":["Thunderstorm", "Thunderstorms and Rain", "Thunderstorms and Snow", "Thunderstorms and Ice Pellets", "Thunderstorms with Hail", "Thunderstorms with Small Hail"],
+                  "clear":["Clear"],
+                  "cloudy":["Overcast", "Partly Cloudy", "Mostly Cloudy", "Scattered Clouds"],
+                  "other":["Small Hail", "Squalls", "Funnel Cloud", "Unknown Precipitation", "Unknown", "Low Drifting Snow", "Low Drifting Widespread Dust", "Low Drifting Sand"]
+    }
 }

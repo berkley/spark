@@ -101,10 +101,21 @@ var runWeather = function(data, coreId, res) {
 	//conditions api: http://www.wunderground.com/weather/api/d/docs?d=data/conditions
 	//possible values: http://www.wunderground.com/weather/api/d/docs?d=resources/phrase-glossary
 	//relevant fields:
-	//current_observation.weather 
-	//current_observation.temp_c/f
-	//current_observation.wind_mph
+	//current_observation.weather  == animation
+	  //[weather_type] == [animation]
+	  //=============================
+	  //precipitation == sparkle
+	  //reduced_viz == fade
+	  //t_storms == flash
+	  //clear == single color bright
+	  //cloudy == single color bland
+	  //other == ???
+	//current_observation.temp_c/f == color
+	  //0F - 115F == wheel(0-255)
+	//current_observation.wind_mph == animation_speed
+	  //0MPH - 100MPH
 	
+	//config block for weather
 	// "weather":{"zip":"97215", 
     //               "apiKey":"xxx",
     //               "url":"http://api.wunderground.com/api",

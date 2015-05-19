@@ -351,6 +351,26 @@ int snow()
     }
 }
 
+int rain(int red, int green, int blue, int delay)
+{
+    for(int i=0; i<strip.numPixels() / 10; i++)
+    { //pick the random pixels
+        int pix = random(strip.numPixels());
+        strip.setPixelColor(pix, strip.Color(0, 0, 0));
+        strip.show();
+        delay(random(50));
+    }
+    
+    for(int i=0; i<strip.numPixels() / 10; i++)
+    { //pick the random pixels
+        int pix = random(strip.numPixels());
+        int brightness = random(255);
+        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .20)); //poor mans white balance
+        strip.show();
+        delay(random(50));
+    }
+}
+
 int endRun(uint8_t r1, uint8_t g1, uint8_t b1, 
     uint8_t r2, uint8_t g2, uint8_t b2,
     uint8_t d)
