@@ -85,8 +85,45 @@ exports.action = function(req, res) {
 	{ //brightness: uint8_t 0-255
 		data = "setBrightness," + req.query.brightness;
 	}
+	else if(action == "weather")
+	{ 
+		runWeather(null, coreId, res);
+		return;
+	}
 
 	runPost(data, action, coreId, res);
+};
+
+var runWeather = function(data, coreId, res) {
+	//get current wx from http://api.wunderground.com/api/xxx/conditions/q/97215.json
+	//update every 5 minutes
+
+	//conditions api: http://www.wunderground.com/weather/api/d/docs?d=data/conditions
+	//possible values: http://www.wunderground.com/weather/api/d/docs?d=resources/phrase-glossary
+	//relevant fields:
+	//current_observation.weather 
+	//current_observation.temp_c/f
+	//current_observation.wind_mph
+	
+	// "weather":{"zip":"97215", 
+    //               "apiKey":"xxx",
+    //               "url":"http://api.wunderground.com/api",
+    //               "conditionsRoute":"conditions"}
+	var wxConfig = config.get("weather");
+	var url = wxConfig.url + "/" + wxConfig.apiKey + "/" + wxConfig.conditionsRoute + "/q/" + wxConfig.zip + ".json";
+	console.log("WX_Underground URL: ", url);
+	request.get(url, function(err, response, body) {
+		if(err)
+		{
+			console.log("Error getting weather info: ", err);
+			res.send(500, err);
+		}
+		else
+		{
+			console.log("got weather info: ", body);
+			res.send(200, body);
+		}
+	});
 };
 
 var runPost = function(data, action, coreId, res) {
