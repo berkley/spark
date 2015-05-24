@@ -1,5 +1,6 @@
 var request = require('request');
 var nconf = require('nconf');
+var async = require('async');
 var config;
 
 exports.setConfig = function(conf) {

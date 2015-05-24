@@ -1,6 +1,5 @@
 var request = require('request');
 var nconf = require('nconf');
-var async = require('async');
 var util = require('./util.js');
 
 var config;
