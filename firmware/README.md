@@ -79,3 +79,6 @@ example:
 This turns the valve on PIN_2 off.
 
 This request is handled by the run() function in the firmware.  The Params are parsed and the given action is executed.
+
+== Water Control Hardware Diagrams ==
+![The System](https://farm9.staticflickr.com/8797/17515634753_a16f015f75_b.jpg)
