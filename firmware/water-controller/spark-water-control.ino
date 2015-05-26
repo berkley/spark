@@ -58,25 +58,36 @@ int run(String params)
     String command = args[0];
     strcpy(parameters, params.c_str());
     strcpy(action, command.c_str());
-    
+    int pinState;
+
     if(command.equals(ON))
     {
-        int pinNum = stringToInt(args[1]);
-        int pin = pinForId(pinNum);
-        digitalWrite(pin, HIGH); 
-        return 1;
+        pinState = HIGH;
     }
     else if(command.equals(OFF))
     {
-        int pinNum = stringToInt(args[1]);
-        int pin = pinForId(pinNum);
-        digitalWrite(pin, LOW);    
-        return 1;
+        pinState = LOW;   
     }
     else 
     { //command not found
         return 0;
     }
+
+    if(args[1].equals("all"))
+    {
+        for(int i=0; i<8; i++)
+        {
+            int pin = pinForId(i);
+            digitalWrite(pin, pinState);         
+        }
+    }
+    else
+    {
+        int pinNum = stringToInt(args[1]);
+        int pin = pinForId(pinNum);
+        digitalWrite(pin, pinState);    
+    }
+    return 1;
 }
 
 int pinForId(int id)
