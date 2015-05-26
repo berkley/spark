@@ -12,7 +12,7 @@ exports.setConfig = function(conf) {
 exports.index = function(req, res) {
 	var cores = {"cores":config.get("cores")};
 	console.log(cores);
-	res.render('index', cores);
+	res.render('lights', cores);
 };
 
 exports.params = function(req, res) {
