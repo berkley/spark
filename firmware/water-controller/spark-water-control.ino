@@ -32,6 +32,12 @@ void setup()
     pinMode(PIN_6, OUTPUT);
     pinMode(PIN_7, OUTPUT);
 
+    for(int i=0; i<8; i++)
+    {
+        int pin = pinForId(i);
+        digitalWrite(pin, LOW); //init all off
+    }
+
     //register the run command as an API endpoint
     Spark.function("run", run);
     //register the action variable as a GET parameter
