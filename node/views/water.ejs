@@ -44,7 +44,7 @@
 		Valve:
 		<select id="valveSelect" name="valves">
 			<% for(var i=0; i<water.valves.length; i++) {%>
-			   <option value="<%= water.valves[i].name %>"><%= water.valves[i].name %></option>
+			   <option value="<%= water.valves[i].id %>"><%= water.valves[i].name %></option>
 			<% } %>
 			<option value="all">All</option>
 		</select>

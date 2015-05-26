@@ -18,6 +18,7 @@ exports.runPost = function(data, action, coreId, res) {
 		var resData = [];
 		async.each(cores, function(core, callback){
 			var url = buildUrl("run", core.id);
+			
 			request.post(url, function(err, response, body) {
 				resData.push(body);
 				callback();
@@ -64,16 +65,12 @@ exports.buildParamUrl = function(coreId) {
 };
 
 exports.coreForCoreName = function(coreName) {
-	console.log("looking for core: '" + coreName + "'");
 	var cores = config.get("cores");
 	for(var i=0; i<cores.length; i++)
 	{
 		var core = cores[i];
-		console.log("core: ", cores[i])
-		console.log("core.name: ", core.name);
 		if(core.name == coreName)
 		{
-			console.log("returning core ", i);
 			return core;
 		}
 	}
