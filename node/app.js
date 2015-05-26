@@ -1,5 +1,7 @@
 var express = require('express');
-var spark = require('./routes/spark');
+var lights = require('./routes/lights');
+var water = require('./routes/water');
+var index = require('./routes/index');
 var http = require('http');
 var path = require('path');
 var nconf = require('nconf');
@@ -13,7 +15,8 @@ nconf.argv()
      .env()
      .file({file: 'config.json'});
 
-spark.setConfig(nconf);
+lights.setConfig(nconf);
+water.setConfig(nconf);
 
 app.set('port', nconf.get("port") || process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -26,9 +29,12 @@ app.use(express.methodOverride());
 app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/', spark.index);
-app.get('/house/run/action', spark.action);
-app.get('/house/params/:coreId', spark.params); //get the current param state for the given coreId;
+app.get('/', index.index);
+app.get('/lights', lights.index);
+app.get('/water', water.index);
+app.get('/house/run/action', lights.action);
+app.get('/house/params/:coreId', lights.params); //get the current param state for the given coreId;
+app.get('/water/run/action', water.action);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

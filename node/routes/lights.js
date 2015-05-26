@@ -1,22 +1,24 @@
 var request = require('request');
 var nconf = require('nconf');
-var async = require('async');
+var util = require('./util.js');
+
 var config;
 
 exports.setConfig = function(conf) {
 	config = conf;
+	util.setConfig(config);
 };
 
 exports.index = function(req, res) {
 	var cores = {"cores":config.get("cores")};
 	console.log(cores);
-	res.render('index', cores);
+	res.render('lights', cores);
 };
 
 exports.params = function(req, res) {
 	var coreId = req.params.coreId;
 	console.log("getting params for coreId: " + coreId);
-	var url = buildParamUrl(coreId);
+	var url = util.buildParamUrl(coreId);
 	request.get(url, function(err, response, body) {
 		if(err)
 		{
@@ -86,61 +88,7 @@ exports.action = function(req, res) {
 		data = "setBrightness," + req.query.brightness;
 	}
 
-	runPost(data, action, coreId, res);
+	util.runPost(data, action, coreId, res);
 };
 
-var runPost = function(data, action, coreId, res) {
-	console.log("action: " + action);
-	console.log("coreId: " + coreId);
-	console.log("data: " + data);
 
-	if(coreId == "all")
-	{
-		var cores = config.get("cores");
-		var resData = [];
-		async.each(cores, function(core, callback){
-			var url = buildUrl("run", core.id);
-			request.post(url, function(err, response, body) {
-				resData.push(body);
-				callback();
-				// res.send(body);
-			}).form(buildFormData(data));
-		}, function(err){
-			if(err){
-				console.log("Error making API call to core ", core);	
-			} else {
-				console.log("resData: ", resData);
-				res.send(resData);
-			}
-		});
-	}
-	else
-	{
-		var url = buildUrl("run", coreId);
-		request.post(url, function(err, response, body) {
-			res.send(body);
-		}).form(buildFormData(data));	
-	}
-	
-};
-
-var buildFormData = function(params) {
-	var access_token = config.get("access_token");
-	var formData = {"access_token":access_token ,"params":params};
-	console.log("formData: ", formData);
-	return formData;
-};
-
-var buildUrl = function(action, coreId) {
-	var sparkUrl = config.get("spark_url");
-	var url = sparkUrl + "/" + coreId + "/" + action;
-	console.log("url: ", url);
-	return url;
-};
-
-var buildParamUrl = function(coreId) {
-	var sparkUrl = config.get("spark_url");
-	var url = sparkUrl + "/" + coreId + "/parameters?access_token=" + config.get("access_token");
-	console.log("paramUrl: ", url);
-	return url;
-};

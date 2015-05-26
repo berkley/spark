@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>El Casa Poder 2000</title>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="./freddy.png" />
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="spectrum.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="spectrum.css" type="text/css"/>
+	<meta name="viewport" content="width=250" />
+	<script>
+    $( document ).ready(function() {
+        hideAll();
+        setCurrentState();
+    });
+ 
+    $( window ).load(function() {
+    });
+    </script>
+	<style>
+		body 
+		{
+			background-color: grey;
+			max-width: 220px;
+			margin: 0 auto;
+			float: none;
+		}
+		img.centered
+		{
+			display: block;
+		    margin-left: auto;
+		    margin-right: auto
+		}
+    </style>
+</head>
+<body>
+	<br/>
+	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
+	<img class="centered" src="freddy.png"/>
+	<h3 style="text-align:center">El Casa Poder 2000</h3>
+	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
+	</div>
+	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
+
+		Core:
+		<select id="coreIdSelect" name="core">
+			<% for(var i=0; i<cores.length; i++) {%>
+			   <option value="<%= cores[i].id %>"><%= cores[i].name %> - <%= cores[i].description %></option>
+			<% } %>
+			<option value="all">All</option>
+		</select>
+
+		<div id="programDiv" style="border:1px solid black; padding:5px; margin:5px">
+			Program:
+			<select id="actionSelect" name="action">
+				<option value="allOff">All Pixels Off</option>
+				<option value="stop">Stop Program</option>
+				<option value="setAll">Single Color</option>
+				<option value="alternate">Alternate Colors</option>
+				<option value="loopAlternate">Animate Alternate Colors</option>
+				<option value="rainbow">Rainbow</option>
+				<option value="blocks">Blocks</option>
+				<option value="loopBlocks">Animate Blocks</option>
+				<option value="fadeColor">Fade Between 2 Colors</option>
+				<option value="particles">Particles</option>
+				<option value="endrun">End Run</option>
+				<option value="snow">Snow</option>
+			</select><br/>
+
+			<span id="colorSelector1">
+				Red1: <br/>
+				<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
+				<br/>
+				Green1: <br/>
+				<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
+				<br/>
+				Blue1: <br/>
+				<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
+				<br/>
+				<input id='colorpicker1' />
+				<br/>
+			</span>
+
+
+			<span id="colorSelector2">
+				Red2: <br/>
+				<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
+				<br/>
+				Green2: <br/>
+				<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
+				<br/>
+				Blue2: <br/>
+				<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
+				<br/>
+				<input id='colorpicker2' />
+			</span>
+
+			<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
+			<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
+			<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
+			<div id="numParticlesDiv">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
+			<div id="maxVelocityDiv">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
+			<div id="threedDiv">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
+			<div id="respawnDiv">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
+			<div id="flickerDiv">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
+			<br/>
+			<button id="goButton">Light It Up</button>
+			<button id="stopButton">Shut it down</button>
+			<br/>
+			<br/>
+
+			<div id="status"></div>
+			<div id="result"></div>
+			<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
+		</div>
+		
+		<div id="brightnessDiv" style="border:1px solid black; padding:5px; margin:5px">
+			Brightness:
+			<input type="range"  min="0" max="255" name="brightness" id="brightness" value="255"/> 
+			<!-- <button id="setBrightnessButton">Set Brightness</button> -->
+		</div>
+	</div>
+
+	<script>
+		var paramState = null;
+
+		var createColorPicker = function(id, color, rid, gid, bid) {
+			$(id).spectrum({
+			color: color,
+			preferredFormat: "rgb",
+		    move: function(tinycolor) { },
+		    show: function(tinycolor) { },
+		    hide: function(tinycolor) { },
+		    beforeShow: function(tinycolor) { },
+		    change: function(color) {
+		    	$(rid).val(color.toRgb().r);
+		    	$(gid).val(color.toRgb().g);
+		    	$(bid).val(color.toRgb().b);
+		    }
+			});
+		};
+
+		createColorPicker("#colorpicker1", "F00", "#r1", "#g1", "#b1");
+		createColorPicker("#colorpicker2", "F00", "#r2", "#g2", "#b2");
+
+		var button = document.querySelector("#goButton");
+		var stopButton = document.querySelector("#stopButton");
+		var select = document.querySelector("select");
+
+		var calcColor = function(r, g, b) {
+			var rstr = r.toString(16);
+			var gstr = g.toString(16);
+			var bstr = b.toString(16);
+			if(rstr == '0') {rstr = '00'}
+			if(gstr == '0') {gstr = '00'}
+			if(bstr == '0') {bstr = '00'}
+			var col = "#" + rstr + gstr + bstr;
+			// alert('col: ' + col);
+			return col;
+		};
+
+		$("#r1").change(function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		$("#g1").change(function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		$("#b1").change(function(ev){
+			var rint = parseInt($('#r1').val());
+			var gint = parseInt($('#g1').val());
+			var bint = parseInt($('#b1').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
+		});
+
+		$("#r2").change(function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		$("#g2").change(function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		$("#b2").change(function(ev){
+			var rint = parseInt($('#r2').val());
+			var gint = parseInt($('#g2').val());
+			var bint = parseInt($('#b2').val());
+			var col = calcColor(rint, gint, bint);
+			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
+		});
+
+		$("#brightness").change(function(ev){
+			console.log("Brightness changed to ", $("#brightness").val());
+			$('#spinner').show();
+	    	$('#status').html("");
+	    	$('#result').html("");
+		    $.get("/house/run/action", 
+		    	{"action":"setBrightness", coreId:$('#coreIdSelect').val(), brightness:$('#brightness').val()}, 
+		    	function(data) {
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+		});
+
+		var hideAll = function() {
+			$('#colorSelector1').hide();
+			$('#colorSelector2').hide();
+			$('#delayDiv').hide();
+			$('#durationDiv').hide();
+			$('#blockSizeDiv').hide();
+			$('#numParticlesDiv').hide();
+			$('#maxVelocityDiv').hide();
+			$('#threedDiv').hide();
+			$('#respawnDiv').hide();
+			$('#flickerDiv').hide();
+			$('#spinner').hide();
+		};
+
+		$("#coreIdSelect").change(function(ev) {
+			setCurrentState();
+		});
+
+		var setCurrentState = function() {
+			//get the current param list from the core
+			//populate the controls with the state data
+			var coreId = $('#coreIdSelect').val();
+			if(coreId == "all")
+			{
+				coreId = $('#defaultCoreId').val();
+			}
+
+			$.get("/house/params/" + coreId, function(data) {
+				var paramStr = jQuery.parseJSON(data).result;
+				var params = paramStr.split(',');
+				console.log("params: ", params);
+				paramState = params;
+
+				document.getElementById("actionSelect").value = params[0];
+				var event = jQuery.Event("change");
+				$('#actionSelect').trigger("change");
+			});
+		};
+
+		var getParamsFromCore = function() {
+			$('#spinner').show();
+			$.get("/house/run/action", 
+		    	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
+		    	function(data) {
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+		};
+
+		var runQuery = function(verb) {
+	    	$('#spinner').show();
+	    	$('#status').html("");
+	    	$('#result').html("");
+		    $.get("/house/run/action", 
+		    	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
+		    	function(data) {
+		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+			  $('#result').html( data );
+			  $('#spinner').hide();
+			});
+	    };
+
+		$('#actionSelect').change(function(ev) {
+			hideAll();
+			console.log("event: " + ev.target.value);
+			if(ev.target.value == 'stop')
+			{
+
+			}
+			else if(ev.target.value == 'allOff')
+			{
+			}
+			else if(ev.target.value == 'setAll')
+			{
+				$('#colorSelector1').show();
+				if(paramState[0] == 'setAll')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r1').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'alternate')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				if(paramState[0] == 'alternate')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'loopAlternate')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				if(paramState[0] == 'loopAlternate')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+
+				}
+			}
+			else if(ev.target.value == 'rainbow')
+			{
+			}
+			else if(ev.target.value == 'loopBlocks')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				$('#blockSizeDiv').show();
+				if(paramState[0] == 'loopBlocks')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#blockSize').val(paramState[8]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'blocks')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#blockSizeDiv').show();
+				if(paramState[0] == 'blocks')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#blockSize').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'fadeColor')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+				$('#durationDiv').show();
+
+				if(paramState[0] == 'fadeColor')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#duration').val(paramState[8]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'particles')
+			{
+				$('#numParticlesDiv').show();
+				$('#maxVelocityDiv').show();
+				$('#threedDiv').show();
+				$('#respawnDiv').show();
+				$('#flickerDiv').show();
+				if(paramState[0] == 'particles')
+				{
+					$('#numParticles').val(paramState[1]);
+					$('#maxVelocity').val(paramState[2]);
+					$('#respawn').prop('checked', $.parseJSON(paramState[3]));
+					$('#threed').prop('checked', $.parseJSON(paramState[4]));
+					$('#flicker').prop('checked', $.parseJSON(paramState[5]));
+				}
+			}
+			else if(ev.target.value == 'endrun')
+			{
+				$('#colorSelector1').show();
+				$('#colorSelector2').show();
+				$('#delayDiv').show();
+
+				if(paramState[0] == 'endrun')
+				{
+					$('#r1').val(paramState[1]);
+					$('#g1').val(paramState[2]);
+					$('#b1').val(paramState[3]);
+					$('#r2').val(paramState[4]);
+					$('#g2').val(paramState[5]);
+					$('#b2').val(paramState[6]);
+					$('#delay').val(paramState[7]);
+					$('#r1').trigger('change');
+					$('#r2').trigger('change');
+				}
+			}
+			else if(ev.target.value == 'snow')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+			}
+
+		});
+
+		stopButton.addEventListener("click", function(ev) {
+			runQuery("stop");
+		}, false);
+
+	    button.addEventListener("click", function(ev) {
+	    	runQuery($('#actionSelect').val());
+	    }, false);
+
+	    
+	</script>
+
+</body>
+</html>
