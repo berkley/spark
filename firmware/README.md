@@ -1,6 +1,9 @@
 firmware
 ========
 
+spark-neopixel-control.ino
+--------------------------
+
 Special Note: You will need to import the neopixel library from the spark IDE for this to work.  You will also need to comment out the #include "particles/particles.h" line and the body of the particles() function.  We're working on the particles code and will release the particles library when it's working.
 
 This is the control firmware for the spark core device(s).  You'll need to use the spark web IDE (http://spark.io) to flash each of your devices with this firmware before using the node server.
@@ -53,3 +56,26 @@ POST: https://api.spark.io/v1/devices/<deviceId>/run
   					       params: 'fadeColor,255,0,0,0,0,255,50,5000'}
 NOTES: this POST fades from red to blue, stepping the color every 50ms with a total duration of 5 seconds
 ```
+
+spark-water-control.ino
+-----------------------
+This firmware provides a POST route to turn valves on or off.  Each pin should be connected to a solenoid valve (or servo valve) via a transistor or relay connected to the pin.  
+
+The node app communicates with the spark core via the spark API.  The API calls are a POST of the form 
+```	
+	https://api.spark.io/v1/devices/<deviceId>/run
+	formData:  { access_token: '<accessToken>',
+	                   params: '<action>,<pinId>' }
+```
+
+* <action> is either "on" or "off"
+* pinId is the id associated with the pin that you have the valve connected to.  It will need to be coordinated with the config.json in the node app.
+
+example:
+```
+	formData:  { access_token: 'XXXX',
+  				 params: 'off,2' }
+```
+This turns the valve on PIN_2 off.
+
+This request is handled by the run() function in the firmware.  The Params are parsed and the given action is executed.
