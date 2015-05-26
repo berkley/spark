@@ -23,11 +23,11 @@ exports.action = function(req, res) {
 	var data = "";
 	if(action == "on")
 	{
-		data = "on," + req.query.valve; //TODO - add pin numbers
+		data = "on," + req.query.valve;
 	}
 	else if(action == "off")
 	{
-		data = "off," + req.query.valve; //TODO - add pin numbers
+		data = "off," + req.query.valve;
 	}
 
 	util.runPost(data, action, core.id, res);
