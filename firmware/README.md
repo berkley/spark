@@ -81,5 +81,5 @@ This turns the valve on PIN_2 off.
 This request is handled by the run() function in the firmware.  The Params are parsed and the given action is executed.
 
 == Water Control Hardware Diagrams ==
-![Scheamtic](https://farm9.staticflickr.com/8896/18110055446_de6b91cd10_b.jpg)
-![The System](https://farm9.staticflickr.com/8797/17515634753_a16f015f75_b.jpg)
+![Scheamtic](https://farm9.staticflickr.com/8896/18110055446_de6b91cd10_b.jpg =300px)
+![The System](https://farm9.staticflickr.com/8797/17515634753_a16f015f75_b.jpg =300px)
