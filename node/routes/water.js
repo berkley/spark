@@ -17,7 +17,9 @@ exports.index = function(req, res) {
 
 exports.action = function(req, res) {
 	var action = req.query.action;
-	var coreId = req.query.coreId;
+	var core = util.coreForCoreName(req.query.coreName.trim());
+	console.log("core: ", core);
+
 	var data = "";
 	if(action == "on")
 	{
@@ -28,5 +30,5 @@ exports.action = function(req, res) {
 		data = "off,"; //TODO - add pin numbers
 	}
 
-	util.runPost(data, action, coreId, res);
+	util.runPost(data, action, core.id, res);
 };

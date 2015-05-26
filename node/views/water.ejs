@@ -71,8 +71,8 @@
 	    	$('#spinner').show();
 	    	$('#status').html("");
 	    	$('#result').html("");
-		    $.get("/house/run/action", 
-		    	{"action":verb, coreId:$('#defaultCoreId').val(), valve:$('#valveSelect').val()}, 
+		    $.get("/water/run/action", 
+		    	{"action":verb, coreName:$('#defaultCoreId').val(), valve:$('#valveSelect').val()}, 
 		    	function(data) {
 		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
 			  $('#result').html( data );

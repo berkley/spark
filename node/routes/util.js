@@ -62,3 +62,20 @@ exports.buildParamUrl = function(coreId) {
 	console.log("paramUrl: ", url);
 	return url;
 };
+
+exports.coreForCoreName = function(coreName) {
+	console.log("looking for core: '" + coreName + "'");
+	var cores = config.get("cores");
+	for(var i=0; i<cores.length; i++)
+	{
+		var core = cores[i];
+		console.log("core: ", cores[i])
+		console.log("core.name: ", core.name);
+		if(core.name == coreName)
+		{
+			console.log("returning core ", i);
+			return core;
+		}
+	}
+	return null;
+};
