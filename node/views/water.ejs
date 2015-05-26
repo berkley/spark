@@ -10,8 +10,7 @@
 	<meta name="viewport" content="width=250" />
 	<script>
     $( document ).ready(function() {
-        hideAll();
-        setCurrentState();
+        $('#spinner').hide();
     });
  
     $( window ).load(function() {
@@ -44,8 +43,8 @@
 
 		Valve:
 		<select id="valveSelect" name="valves">
-			<% for(var i=0; i<valves.length; i++) {%>
-			   <option value="<%= valves[i].name %>"><%= valves[i].name %></option>
+			<% for(var i=0; i<water.valves.length; i++) {%>
+			   <option value="<%= water.valves[i].name %>"><%= water.valves[i].name %></option>
 			<% } %>
 			<option value="all">All</option>
 		</select>
@@ -54,169 +53,26 @@
 		<button id="goButton">On</button>
 		<button id="stopButton">Off</button>
 		<br/>
-		<br/>
 
 		<div id="status"></div>
 		<div id="result"></div>
-		<!-- <img style="width:30px;" id="spinner" width="100" src="spinner.gif"> -->
+		<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
+		<input type="hidden" id="defaultCoreId" value="<%= water.core %>"/>
 	</div>
 
 	<script>
 		var paramState = null;
 
-		var createColorPicker = function(id, color, rid, gid, bid) {
-			$(id).spectrum({
-			color: color,
-			preferredFormat: "rgb",
-		    move: function(tinycolor) { },
-		    show: function(tinycolor) { },
-		    hide: function(tinycolor) { },
-		    beforeShow: function(tinycolor) { },
-		    change: function(color) {
-		    	$(rid).val(color.toRgb().r);
-		    	$(gid).val(color.toRgb().g);
-		    	$(bid).val(color.toRgb().b);
-		    }
-			});
-		};
-
-		createColorPicker("#colorpicker1", "F00", "#r1", "#g1", "#b1");
-		createColorPicker("#colorpicker2", "F00", "#r2", "#g2", "#b2");
-
-		var button = document.querySelector("#goButton");
+		var goButton = document.querySelector("#goButton");
 		var stopButton = document.querySelector("#stopButton");
 		var select = document.querySelector("select");
-
-		var calcColor = function(r, g, b) {
-			var rstr = r.toString(16);
-			var gstr = g.toString(16);
-			var bstr = b.toString(16);
-			if(rstr == '0') {rstr = '00'}
-			if(gstr == '0') {gstr = '00'}
-			if(bstr == '0') {bstr = '00'}
-			var col = "#" + rstr + gstr + bstr;
-			// alert('col: ' + col);
-			return col;
-		};
-
-		$("#r1").change(function(ev){
-			var rint = parseInt($('#r1').val());
-			var gint = parseInt($('#g1').val());
-			var bint = parseInt($('#b1').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
-		});
-
-		$("#g1").change(function(ev){
-			var rint = parseInt($('#r1').val());
-			var gint = parseInt($('#g1').val());
-			var bint = parseInt($('#b1').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
-		});
-
-		$("#b1").change(function(ev){
-			var rint = parseInt($('#r1').val());
-			var gint = parseInt($('#g1').val());
-			var bint = parseInt($('#b1').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker1", col, "#r1", "#g1", "#b1");
-		});
-
-		$("#r2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
-		});
-
-		$("#g2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
-		});
-
-		$("#b2").change(function(ev){
-			var rint = parseInt($('#r2').val());
-			var gint = parseInt($('#g2').val());
-			var bint = parseInt($('#b2').val());
-			var col = calcColor(rint, gint, bint);
-			createColorPicker("#colorpicker2", col, "#r2", "#g2", "#b2");
-		});
-
-		$("#brightness").change(function(ev){
-			console.log("Brightness changed to ", $("#brightness").val());
-			$('#spinner').show();
-	    	$('#status').html("");
-	    	$('#result').html("");
-		    $.get("/house/run/action", 
-		    	{"action":"setBrightness", coreId:$('#coreIdSelect').val(), brightness:$('#brightness').val()}, 
-		    	function(data) {
-		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
-			  $('#result').html( data );
-			  $('#spinner').hide();
-			});
-		});
-
-		var hideAll = function() {
-			$('#colorSelector1').hide();
-			$('#colorSelector2').hide();
-			$('#delayDiv').hide();
-			$('#durationDiv').hide();
-			$('#blockSizeDiv').hide();
-			$('#numParticlesDiv').hide();
-			$('#maxVelocityDiv').hide();
-			$('#threedDiv').hide();
-			$('#respawnDiv').hide();
-			$('#flickerDiv').hide();
-			$('#spinner').hide();
-		};
-
-		$("#coreIdSelect").change(function(ev) {
-			setCurrentState();
-		});
-
-		var setCurrentState = function() {
-			//get the current param list from the core
-			//populate the controls with the state data
-			var coreId = $('#coreIdSelect').val();
-			if(coreId == "all")
-			{
-				coreId = $('#defaultCoreId').val();
-			}
-
-			$.get("/house/params/" + coreId, function(data) {
-				var paramStr = jQuery.parseJSON(data).result;
-				var params = paramStr.split(',');
-				console.log("params: ", params);
-				paramState = params;
-
-				document.getElementById("actionSelect").value = params[0];
-				var event = jQuery.Event("change");
-				$('#actionSelect').trigger("change");
-			});
-		};
-
-		var getParamsFromCore = function() {
-			$('#spinner').show();
-			$.get("/house/run/action", 
-		    	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
-		    	function(data) {
-		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
-			  $('#result').html( data );
-			  $('#spinner').hide();
-			});
-		};
 
 		var runQuery = function(verb) {
 	    	$('#spinner').show();
 	    	$('#status').html("");
 	    	$('#result').html("");
 		    $.get("/house/run/action", 
-		    	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
+		    	{"action":verb, coreId:$('#defaultCoreId').val(), valve:$('#valveSelect').val()}, 
 		    	function(data) {
 		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
 			  $('#result').html( data );
@@ -224,11 +80,25 @@
 			});
 	    };
 
+	 //    var getParamsFromCore = function() {
+		// 	$('#spinner').show();
+		// 	$.get("/house/run/action", 
+		//     	{"action":verb, coreId:$('#coreIdSelect').val(), r1:$('#r1').val(), g1:$('#g1').val(), b1:$('#b1').val(), r2:$('#r2').val(), g2:$('#g2').val(), b2:$('#b2').val(), delay:$('#delay').val(), blockSize:$('#blockSize').val(), duration:$('#duration').val(), maxVelocity:$('#maxVelocity').val(), numParticles:$('#numParticles').val(), respawn:$('#respawn').prop('checked'), flicker:$('#flicker').prop('checked'), threed:$('#threed').prop('checked')}, 
+		//     	function(data) {
+		//       $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+		// 	  $('#result').html( data );
+		// 	  $('#spinner').hide();
+		// 	});
+		// };
+
+
 		stopButton.addEventListener("click", function(ev) {
+			console.log("off");
 			runQuery("off");
 		}, false);
 
-	    button.addEventListener("click", function(ev) {
+	    goButton.addEventListener("click", function(ev) {
+	    	console.log("on");
 	    	runQuery("on");
 	    }, false);
 

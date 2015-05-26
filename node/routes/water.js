@@ -10,10 +10,9 @@ exports.setConfig = function(conf) {
 };
 
 exports.index = function(req, res) {
-	var water = config.get("water");
-	var valves = {"valves":water.valves};
-	console.log(valves);
-	res.render('water', valves);
+	var water = {"water":config.get("water")};
+	console.log(water);
+	res.render('water', water);
 };
 
 exports.action = function(req, res) {
