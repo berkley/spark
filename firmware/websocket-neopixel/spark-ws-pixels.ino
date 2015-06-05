@@ -2,7 +2,7 @@
 #include "Spark-Websockets.h"
 #include "application.h"
 
-SYSTEM_MODE(MANUAL);
+// SYSTEM_MODE(MANUAL);
 
 WebSocketClient client;
 // const byte server[] = {10, 0, 1, 6}; //dino
@@ -20,7 +20,7 @@ const byte server[] = {10, 0, 1, 8}; //syncline
 #define NUM_BMPS 4
 #define SERIAL_WIRING 1
 
-// #define PRINT_DEBUG 1
+#define PRINT_DEBUG 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -354,45 +354,48 @@ void onClose(WebSocketClient client, int code, char* message) {
 
 void setup() 
 {
-    #ifdef PRINT_DEBUG
+    // #ifdef PRINT_DEBUG
     Serial.begin(9600);
-    #endif
+    // #endif
+
+    Serial.println("Setup begin");
     
-    strip.begin();
-    strip.show();
+    // strip.begin();
+    // strip.show();
 
-    for(int i=0; i<PARAM_ARR_SIZE; i++)
-    {
-        paramArr[i] = 0;
-    }
-    strip.setPixelColor(0, strip.Color(255, 0, 0));
-    strip.show();
+    // for(int i=0; i<PARAM_ARR_SIZE; i++)
+    // {
+    //     paramArr[i] = 0;
+    // }
+    // strip.setPixelColor(0, strip.Color(255, 0, 0));
+    // strip.show();
 
-    WiFi.on();
-    WiFi.connect();
-    while(!WiFi.ready())
-    {
-        Serial.print("Wifi connecting...");
-        delay(1000);
-    }
+    // WiFi.on();
+    // WiFi.connect();
+    // while(!WiFi.ready())
+    // {
+    //     Serial.print("Wifi connecting...");
+    //     delay(1000);
+    // }
 
-    strip.setPixelColor(0, strip.Color(0, 0, 255));
-    strip.show();
+    // strip.setPixelColor(0, strip.Color(0, 0, 255));
+    // strip.show();
 
-    client.connect(server, WS_PORT);
-    client.onMessage(onMessage);
-    client.onError(onError);
-    client.onClose(onClose);
-    client.onOpen(onOpen);    
+    // client.connect(server, WS_PORT);
+    // client.onMessage(onMessage);
+    // client.onError(onError);
+    // client.onClose(onClose);
+    // client.onOpen(onOpen);    
 
-    strip.setPixelColor(0, strip.Color(0, 255, 0));
-    strip.show();
+    // strip.setPixelColor(0, strip.Color(0, 255, 0));
+    // strip.show();
 
     Serial.println("Setup complete");
 }
 
 void loop() {
-    client.monitor();
+    // client.monitor();
+    Serial.println("Loop");
 }
 
 void stringSplit(String s, char delim)
