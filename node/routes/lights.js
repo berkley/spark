@@ -83,6 +83,10 @@ exports.action = function(req, res) {
 	{
 		data = "snow,";
 	}
+	else if(action == "usa")
+	{
+		data = "usa,";
+	}
 	else if(action == "setBrightness")
 	{ //brightness: uint8_t 0-255
 		data = "setBrightness," + req.query.brightness;

@@ -44,6 +44,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SNOW "snow"
 #define WEBSOCKET "websocket" //<- finish this
 #define SETBRIGHTNESS "setBrightness"
+#define USA "usa"
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
@@ -145,6 +146,10 @@ void loop()
     else if(loopRun.equals(SNOW))
     {
         snow();
+    }
+    else if(loopRun.equals(USA))
+    {
+        runUSA();
     }
 }
 
@@ -325,10 +330,62 @@ int run(String params)
         strip.show();
         return 1;
     }
+    else if(command.equals(USA))
+    {
+        loopRun = USA;
+        return 1;
+    }
     else 
     { //command not found
         return 0;
     }
+}
+
+int runUSA()
+{
+    int blockSize = 5;
+    
+    // for(int j=0; j<blockSize; j++)
+    int j = 0;
+    {
+        int count = -1;
+        for(int i=0; i<strip.numPixels(); i++) {
+            if(i % blockSize == 0)
+            {
+                count++;
+                if(count > 2)
+                    count = 0;
+            }
+            
+            
+            int pix = 0;
+            if( (i + j) >= strip.numPixels())
+            {
+                pix = (i + j) - strip.numPixels();
+            }
+            else 
+            {
+                pix = i + j;
+            }
+            
+            if(count == 0)
+            {
+                strip.setPixelColor(pix, strip.Color(255, 0, 0));
+            }
+            else if(count == 1)
+            {
+                strip.setPixelColor(pix, strip.Color(255, 255, 255));
+            }
+            else if(count == 2)
+            {
+                strip.setPixelColor(pix, strip.Color(0, 0, 255));
+            }
+            
+        }
+        strip.show();
+        delay(500);
+    }
+    return 1;
 }
 
 int snow()
