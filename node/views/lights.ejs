@@ -65,6 +65,7 @@
 				<option value="particles">Particles</option>
 				<option value="endrun">End Run</option>
 				<option value="snow">Snow</option>
+				<option value="usa">USA</option>
 			</select><br/>
 
 			<span id="colorSelector1">
@@ -438,6 +439,12 @@
 				}
 			}
 			else if(ev.target.value == 'snow')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+			}
+			else if(ev.target.value == 'usa')
 			{
 				$('#colorSelector1').hide();
 				$('#colorSelector2').hide();
