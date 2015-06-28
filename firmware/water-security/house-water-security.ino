@@ -5,9 +5,9 @@
 #define PIN_1 D1 //front yard
 #define PIN_2 D2 //garden
 #define PIN_3 D3 //side yard
-#define PIN_4 A0 //front door
-#define PIN_5 A1 //back door
-#define PIN_6 A2 //basement door
+#define PIN_4 D4 //front door
+#define PIN_5 D5 //back door
+#define PIN_6 D6 //basement door
 #define PIN_7 D7
 
 int ledPin = D7;
@@ -15,9 +15,9 @@ int frontDoorValue = 0;
 int backDoorValue = 0;
 int basementDoorValue = 0;
 
-const char* frontDoorName = "frontDoorValue";
-const char* backDoorName = "backDoorValue";
-const char* basementDoorName = "basementDoorValue";
+const char* frontDoorName = "frontdoor";
+const char* backDoorName = "backdoor";
+const char* basementDoorName = "basedoor";
 
 char action[64];
 char parameters[64];
@@ -51,7 +51,7 @@ void setup()
     Spark.function("run", run);
     //register the action variable as a GET parameter
     Spark.variable("action", &action, STRING);
-    //retister the parameters variable as a GET parameter
+    //register the parameters variable as a GET parameter
     Spark.variable("parameters", &parameters, STRING);
 
     Spark.variable(frontDoorName, &frontDoorValue, INT);
@@ -61,29 +61,31 @@ void setup()
 
 void loop() 
 {
-    pinVal(PIN_4, frontDoorValue, frontDoorName);
-    pinVal(PIN_5, backDoorValue, backDoorName);
-    pinVal(PIN_6, basementDoorValue, basementDoorName);
+    pinVal(PIN_4, &frontDoorValue, frontDoorName);
+    pinVal(PIN_5, &backDoorValue, backDoorName);
+    pinVal(PIN_6, &basementDoorValue, basementDoorName);
     delay(1000);
+    // Spark.publish("loop", "1", 60, PRIVATE);
 }
 
 void pinVal(int pin, int* pinValue, String pinName)
 {
+//   Spark.publish("pinRead", "1", 60, PRIVATE);
   if(digitalRead(pin) == HIGH)
   {
-    if(pin == 0)
+    if(*pinValue == 0)
     {
-      Spark.publish(pinName,"HIGH", 60, PRIVATE);
-      pinValue = 1; //door is closed
+      Spark.publish(pinName,"Closed", 60, PRIVATE);
+      *pinValue = 1; //door is closed
       digitalWrite(ledPin, LOW);
     }
   }
   else
   {
-    if(basementDoorValue == 1)
+    if(*pinValue == 1)
     {
-      Spark.publish(pinName,"LOW", 60, PRIVATE);
-      pinValue = 0; //door is open
+      Spark.publish(pinName,"Open", 60, PRIVATE);
+      *pinValue = 0; //door is open
       digitalWrite(ledPin, HIGH);
     }
   }
