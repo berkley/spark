@@ -1,23 +1,14 @@
 #include "application.h"
 
-//pins that control diferent watering zones or monitor different doors
+//pins that control diferent watering zones
 #define PIN_0 D0
 #define PIN_1 D1 //front yard
 #define PIN_2 D2 //garden
-#define PIN_3 D3 //side yard
-#define PIN_4 A0 //front door
-#define PIN_5 A1 //back door
-#define PIN_6 A2 //basement door
+#define PIN_3 D3
+#define PIN_4 D4
+#define PIN_5 D5
+#define PIN_6 D6
 #define PIN_7 D7
-
-int ledPin = D7;
-int frontDoorValue = 0;
-int backDoorValue = 0;
-int basementDoorValue = 0;
-
-const char* frontDoorName = "frontDoorValue";
-const char* backDoorName = "backDoorValue";
-const char* basementDoorName = "basementDoorValue";
 
 char action[64];
 char parameters[64];
@@ -36,10 +27,10 @@ void setup()
     pinMode(PIN_1, OUTPUT);
     pinMode(PIN_2, OUTPUT);
     pinMode(PIN_3, OUTPUT);
-    pinMode(PIN_4, INPUT_PULLDOWN);
-    pinMode(PIN_5, INPUT_PULLDOWN);
-    pinMode(PIN_6, INPUT_PULLDOWN);
-    pinMode(ledPin, OUTPUT);
+    pinMode(PIN_4, OUTPUT);
+    pinMode(PIN_5, OUTPUT);
+    pinMode(PIN_6, OUTPUT);
+    pinMode(PIN_7, OUTPUT);
 
     for(int i=0; i<8; i++)
     {
@@ -53,40 +44,11 @@ void setup()
     Spark.variable("action", &action, STRING);
     //retister the parameters variable as a GET parameter
     Spark.variable("parameters", &parameters, STRING);
-
-    Spark.variable(frontDoorName, &frontDoorValue, INT);
-    Spark.variable(backDoorName, &backDoorValue, INT);
-    Spark.variable(basementDoorName, &basementDoorValue, INT);
 }
 
 void loop() 
 {
-    pinVal(PIN_4, frontDoorValue, frontDoorName);
-    pinVal(PIN_5, backDoorValue, backDoorName);
-    pinVal(PIN_6, basementDoorValue, basementDoorName);
-    delay(1000);
-}
-
-void pinVal(int pin, int* pinValue, String pinName)
-{
-  if(digitalRead(pin) == HIGH)
-  {
-    if(pin == 0)
-    {
-      Spark.publish(pinName,"HIGH", 60, PRIVATE);
-      pinValue = 1; //door is closed
-      digitalWrite(ledPin, LOW);
-    }
-  }
-  else
-  {
-    if(basementDoorValue == 1)
-    {
-      Spark.publish(pinName,"LOW", 60, PRIVATE);
-      pinValue = 0; //door is open
-      digitalWrite(ledPin, HIGH);
-    }
-  }
+    
 }
 
 /*
