@@ -10,26 +10,7 @@ exports.setConfig = function(conf) {
 };
 
 exports.index = function(req, res) {
-	// var security = {"security":config.get("security")};
-    console.log({"access":config.get()});
-
 	res.render('security', {"config":config.get()});
 };
 
-exports.action = function(req, res) {
-	var action = req.query.action;
-	var core = util.coreForCoreName(req.query.coreName.trim());
-	console.log("core: ", core);
-
-	var data = "";
-	if(action == "on")
-	{
-		data = "on," + req.query.valve;
-	}
-	else if(action == "off")
-	{
-		data = "off," + req.query.valve;
-	}
-
-	util.runPost(data, action, core.id, res);
-};
+//TODO: monitor the event stream from particle and log the events
