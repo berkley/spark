@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>El Casa Poder 2000</title>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="./freddy.png" />
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="spectrum.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="spectrum.css" type="text/css"/>
+	<meta name="viewport" content="width=250" />
+	<script>
+	var frontdoor;
+	var backdoor;
+	var basementdoor;
+    $( document ).ready(function() {
+        $.get("https://api.spark.io/v1/devices/330043000547343232363230/frontdoor?access_token=<%= config.access_token %>", function(data) {
+        	backdoor = data;
+        	console.log("got xxx: ", data);
+        	if(data.result == 1)
+        	{
+        		$('#frontdoorDiv').html("Front Door Closed");
+        	}
+        	else
+        	{
+        		$('#frontdoorDiv').html("Front Door Open");
+        	}
+        });
+
+        $.get("https://api.spark.io/v1/devices/330043000547343232363230/backdoor?access_token=<%= config.access_token %>", function(data) {
+        	backdoor = data;
+        	console.log("got xxx: ", data);
+        	if(data.result == 1)
+        	{
+        		$('#backdoorDiv').html("Back Door Closed");
+        	}
+        	else
+        	{
+        		$('#backdoorDiv').html("Back Door Open");
+        	}
+        });
+
+        $.get("https://api.spark.io/v1/devices/330043000547343232363230/basedoor?access_token=<%= config.access_token %>", function(data) {
+        	backdoor = data;
+        	console.log("got xxx: ", data);
+        	if(data.result == 1)
+        	{
+        		$('#basementdoorDiv').html("Basement Door Closed");
+        	}
+        	else
+        	{
+        		$('#basementdoorDiv').html("Basement Door Open");
+        	}
+        });
+    });
+ 
+    $( window ).load(function() {
+    });
+    </script>
+	<style>
+		body 
+		{
+			background-color: grey;
+			max-width: 220px;
+			margin: 0 auto;
+			float: none;
+		}
+		img.centered
+		{
+			display: block;
+		    margin-left: auto;
+		    margin-right: auto
+		}
+    </style>
+</head>
+<body>
+	<br/>
+	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
+		<img class="centered" src="freddy.png"/>
+		<h3 style="text-align:center">El Casa Poder 2000</h3>
+	</div>
+	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
+		<div id="frontdoorDiv"></div>
+		<div id="backdoorDiv"></div>
+		<div id="basementdoorDiv"></div>
+	</div>
+	
+</body>
+</html>
