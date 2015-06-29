@@ -2,6 +2,7 @@ var express = require('express');
 var lights = require('./routes/lights');
 var water = require('./routes/water');
 var index = require('./routes/index');
+var security = require('./routes/security');
 var http = require('http');
 var path = require('path');
 var nconf = require('nconf');
@@ -17,6 +18,7 @@ nconf.argv()
 
 lights.setConfig(nconf);
 water.setConfig(nconf);
+security.setConfig(nconf);
 
 app.set('port', nconf.get("port") || process.env.PORT || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -32,6 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.get('/', index.index);
 app.get('/lights', lights.index);
 app.get('/water', water.index);
+app.get('/security', security.index);
 app.get('/house/run/action', lights.action);
 app.get('/house/params/:coreId', lights.params); //get the current param state for the given coreId;
 app.get('/water/run/action', water.action);
