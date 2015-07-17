@@ -44,7 +44,7 @@
 		Valve:
 		<select id="valveSelect" name="valves">
 			<% for(var i=0; i<water.valves.length; i++) {%>
-			   <option value="<%= water.valves[i].id %>"><%= water.valves[i].name %></option>
+			   <option value="<%= water.valves[i].core %>:<%= water.valves[i].valveId %>"><%= water.valves[i].name %></option>
 			<% } %>
 			<option value="all">All</option>
 		</select>
@@ -57,7 +57,6 @@
 		<div id="status"></div>
 		<div id="result"></div>
 		<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
-		<input type="hidden" id="defaultCoreId" value="<%= water.core %>"/>
 	</div>
 
 	<script>
@@ -71,8 +70,10 @@
 	    	$('#spinner').show();
 	    	$('#status').html("");
 	    	$('#result').html("");
+	    	var coreAndValveStr = $('#valveSelect').val();
+	    	var coreAndValve = coreAndValveStr.split(":");
 		    $.get("/water/run/action", 
-		    	{"action":verb, coreName:$('#defaultCoreId').val(), valve:$('#valveSelect').val()}, 
+		    	{"action":verb, coreName:coreAndValve[0], valve:coreAndValve[1]}, 
 		    	function(data) {
 		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
 			  $('#result').html( data );

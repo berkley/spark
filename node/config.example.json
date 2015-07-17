@@ -18,7 +18,7 @@
     ],
     "screen":[{"name":"Core1", "vColStart":0, "vColEnd":31, "colStart":0, "colEnd":31},
               {"name":"Core2", "vColStart":32, "vColEnd":63, "colStart":0, "colEnd":31}],
-    "water":{"core":"Core1",
-             "valves":[{"id":"1", "name":"Front Yard"},
-                       {"id":"2", "name":"Garden"}]}
+    "water":{"valves":[{"valveId":"1", "name":"Front Yard", "core":"Photon1"},
+                       {"valveId":"0", "name":"Garden","core":"Freddy"},
+                       {"valveId":"3", "name":"Side Yard", "core":"Photon1"}]}
 }
