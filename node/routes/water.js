@@ -18,6 +18,7 @@ exports.index = function(req, res) {
 exports.action = function(req, res) {
 	var action = req.query.action;
 	var core = util.coreForCoreName(req.query.coreName.trim());
+
 	console.log("core: ", core);
 
 	var data = "";
