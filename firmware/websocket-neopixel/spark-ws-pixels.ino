@@ -20,7 +20,7 @@ const byte server[] = {10, 0, 1, 8}; //syncline
 #define NUM_BMPS 4
 #define SERIAL_WIRING 1
 
-// #define PRINT_DEBUG 1
+#define PRINT_DEBUG 1
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -354,9 +354,11 @@ void onClose(WebSocketClient client, int code, char* message) {
 
 void setup() 
 {
+    Serial.begin(9600);
     #ifdef PRINT_DEBUG
     Serial.begin(9600);
     #endif
+    Serial.println("SETUP");
     
     strip.begin();
     strip.show();
@@ -392,6 +394,7 @@ void setup()
 }
 
 void loop() {
+    Serial.println("Loop");
     client.monitor();
 }
 

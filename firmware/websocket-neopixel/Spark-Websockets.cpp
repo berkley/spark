@@ -90,7 +90,7 @@ const char *WebSocketClientStringTable = {
 
 
 
-void WebSocketClient::connect(const byte* server_ip, int port, const char* protocol, const char* path) {
+void WebSocketClient::connect(const uint8_t* server_ip, int port, const char* protocol, const char* path) {
   // _hostname = hostname;
   _server_ip = server_ip;
   _port = port;
@@ -152,7 +152,7 @@ void WebSocketClient::disconnect() {
   _client.stop();
 }
 
-byte WebSocketClient::nextByte() {
+uint8_t WebSocketClient::nextByte() {
   while(_client.available() == 0);
   byte b = _client.read();
   
