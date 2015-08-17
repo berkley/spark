@@ -1,28 +1,25 @@
 #include "application.h"
 #include "neopixel/neopixel.h"
-#include "led-strip-particles.h"
+
+#define ARRAYLEN(x)  (sizeof(x) / sizeof((x)[0]))
 
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 467 //giggle
+// #define PIXEL_COUNT 467 //giggle
 // #define PIXEL_COUNT 150 //colossus
+#define PIXEL_COUNT 104 //FREDDY
+#define EYE_PIXEL_COUNT 52
 
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
-//particle params
-#define MAX_COLOR 255
-#define NUM_PARTICLES 12
-#define FPS 30
-#define MILLIS_PER_FRAME (1000 / FPS)
-
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR);
+
+#define MAX_COLOR 255
+
 char action[64];
 char parameters[64];
-
-void setCoordColor(Coord3D coord, uint32_t color);
 
 //program and action names
 #define STOP "stop"
@@ -32,7 +29,6 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define ALTERNATE "alternate"
 #define BLOCKS "blocks"
 #define FADECOLOR "fadeColor"
-#define PARTICLES "particles"
 #define ALLOFF "allOff"
 #define SETALL "setAll"
 #define LOOPALTERNATE "loopAlternate"
@@ -45,12 +41,13 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define WEBSOCKET "websocket" //<- finish this
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
+#define FREDDYMAD "freddymad"
 
-String loopRun = STOP;
+String loopRun = FREDDYMAD;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
-void setup() 
+void setup()
 {
 //   Serial.begin(9600);
   strip.begin();
@@ -63,7 +60,7 @@ void setup()
   Spark.variable("parameters", &parameters, STRING);
 }
 
-void loop() 
+void loop()
 {
     if(loopRun.equals(STOP))
     {
@@ -81,7 +78,7 @@ void loop()
     }
     else if(loopRun.equals(RAINBOW))
     {
-        rainbow(20);        
+        rainbow(20);
     }
     else if(loopRun.equals(ALTERNATE))
     {
@@ -108,7 +105,7 @@ void loop()
         int b2 = stringToInt(loopArgs[5]);
         int d = stringToInt(loopArgs[6]);
         int blockSize = stringToInt(loopArgs[7]);
-        
+
         animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, true);
         animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, false);
     }
@@ -122,15 +119,11 @@ void loop()
         int b2 = stringToInt(loopArgs[5]);
         int d = stringToInt(loopArgs[6]);
         int duration = stringToInt(loopArgs[7]);
-        
+
         fadeColor(r1, g1, b1, r2, g2, b2, d, duration);
         delay(d);
         fadeColor(r2, g2, b2, r1, g1, b1, d, duration);
         delay(d);
-    }
-    else if(loopRun.equals(PARTICLES))
-    {
-        particles(); 
     }
     else if(loopRun.equals(ENDRUN))
     {
@@ -151,6 +144,10 @@ void loop()
     {
         runUSA();
     }
+    else if(loopRun.equals(FREDDYMAD))
+    {
+        runFreddyMad();
+    }
 }
 
 int allOff()
@@ -160,15 +157,15 @@ int allOff()
 }
 
 /*
-    This function handles the API requests to /run.  The params are a 
-    comma separated list.  
+    This function handles the API requests to /run.  The params are a
+    comma separated list.
     params format is <command>,<param0>,<param1>,...,<paramN>
     where <command> is the action to be run and <paramN> are the parameters that an individual
     action needs.
-    
+
     Actions can be divided into two categories: one where the loop() function is used to animate pixel
     values and one where pixel values are set a single time.
-    Looped programs can be run using the loopRun variable.  If loopRun is set to STOP the loop will 
+    Looped programs can be run using the loopRun variable.  If loopRun is set to STOP the loop will
     run with no program selected.
 */
 int run(String params)
@@ -177,7 +174,7 @@ int run(String params)
     String command = args[0];
     strcpy(parameters, params.c_str());
     strcpy(action, command.c_str());
-    
+
     if(command.equals(ALLOFF))
     {
         loopRun = SHUTDOWN;
@@ -306,23 +303,6 @@ int run(String params)
         loopRun = SNOW;
         return 1;
     }
-    else if(command.equals(PARTICLES))
-    {
-        int np = stringToInt(args[1]);
-        int mv = stringToInt(args[2]);
-        bool respawn = stringToBool(args[3]);
-        bool threed = stringToBool(args[4]);
-        bool flicker = stringToBool(args[5]);
-        
-        emitter.respawnOnOtherSide = respawn;
-        emitter.threed = threed;
-        emitter.flicker = flicker;
-        emitter.numParticles = np;
-        float mvf = mv / 10.0;
-        emitter.maxVelocity = mvf / FPS;
-        loopRun = PARTICLES;
-        return 1;
-    }
     else if(command.equals(SETBRIGHTNESS))
     {
         int brightness = stringToInt(args[1]);
@@ -335,16 +315,464 @@ int run(String params)
         loopRun = USA;
         return 1;
     }
-    else 
+    else if(command.equals(FREDDYMAD))
+    {
+        loopRun = FREDDYMAD;
+        return 1;
+    }
+    else
     { //command not found
         return 0;
     }
 }
 
+int setRow(int row, int eye, uint8_t r, uint8_t g, uint8_t b)
+{
+    int offset = 0;
+    if(eye != 0)
+        offset = EYE_PIXEL_COUNT;
+        
+    if(row == 0)
+    { //4 pix
+        for(int i=0; i<4; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 1)
+    { //5 pix
+        for(int i=4; i<9; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 2)
+    { //6 pix
+        for(int i=9; i<15; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 3)
+    { //7 pix
+        for(int i=15; i<22; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 4)
+    { //8 pix, middle row
+        for(int i=22; i<30; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 5)
+    { //7 pix
+        for(int i=30; i<37; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 6)
+    { //6 pix
+        for(int i=37; i<43; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 7)
+    { //5 pix
+        for(int i=43; i<48; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    else if(row == 8)
+    { //4 pix
+        for(int i=48; i<52; i++)
+            strip.setPixelColor(i + offset, strip.Color(r, g, b));
+    }
+    strip.show();
+}
+
+int closeEyes(int del)
+{
+    // drawPupil(0, 0, 255, 0);  drawPupil(1, 0, 255, 0);
+    setRow(0, 0, 255, 0, 0);  setRow(0, 1, 255, 0, 0);
+    setRow(8, 0, 255, 0, 0);  setRow(8, 1, 255, 0, 0);
+    delay(del);
+    // drawPupil(0, 0, 255, 0);  drawPupil(1, 0, 255, 0);
+    setRow(1, 0, 255, 0, 0);  setRow(1, 1, 255, 0, 0);
+    setRow(7, 0, 255, 0, 0);  setRow(7, 1, 255, 0, 0);
+    delay(del);
+    // drawPupil(0, 0, 255, 0);  drawPupil(1, 0, 255, 0);
+    setRow(2, 0, 255, 0, 0);  setRow(2, 1, 255, 0, 0);
+    setRow(6, 0, 255, 0, 0);  setRow(6, 1, 255, 0, 0);
+    delay(del);
+    // drawPupil(0, 0, 255, 0);  drawPupil(1, 0, 255, 0);
+    setRow(3, 0, 255, 0, 0);  setRow(3, 1, 255, 0, 0);
+    setRow(5, 0, 255, 0, 0);  setRow(5, 1, 255, 0, 0);
+    delay(del);
+    // drawPupil(0, 0, 255, 0);  drawPupil(1, 0, 255, 0);
+    setRow(4, 0, 255, 0, 0);  setRow(4, 1, 255, 0, 0);
+}
+
+int openEyes(int del)
+{
+    setRow(4, 0, 0, 0, 0);  setRow(4, 1, 0, 0, 0);
+    drawPupilsRow(2, 0, 255, 0); 
+    strip.show();
+    
+    delay(del);
+    setRow(3, 0, 0, 0, 0);  setRow(3, 1, 0, 0, 0);
+    setRow(5, 0, 0, 0, 0);  setRow(5, 1, 0, 0, 0);
+    drawPupilsRow(1, 0, 255, 0); 
+    drawPupilsRow(3, 0, 255, 0); 
+    strip.show();
+    
+    delay(del);
+    setRow(2, 0, 0, 0, 0);  setRow(2, 1, 0, 0, 0);
+    setRow(6, 0, 0, 0, 0);  setRow(6, 1, 0, 0, 0);
+    drawPupilsRow(0, 0, 255, 0); 
+    drawPupilsRow(4, 0, 255, 0); 
+    strip.show();
+    
+    delay(del);
+    setRow(1, 0, 0, 0, 0);  setRow(1, 1, 0, 0, 0);
+    setRow(7, 0, 0, 0, 0);  setRow(7, 1, 0, 0, 0);
+    delay(del);
+    setRow(0, 0, 0, 0, 0);  setRow(0, 1, 0, 0, 0);
+    setRow(8, 0, 0, 0, 0);  setRow(8, 1, 0, 0, 0);
+    delay(del);
+}
+
+int narrowEyes(int del)
+{
+    closeEyes(del);
+    
+    setRow(4, 0, 0, 0, 0);  setRow(4, 1, 0, 0, 0);
+    drawPupilsRow(2, 0, 255, 0); 
+    strip.show();
+    
+    delay(del);
+    setRow(3, 0, 0, 0, 0);  setRow(3, 1, 0, 0, 0);
+    setRow(5, 0, 0, 0, 0);  setRow(5, 1, 0, 0, 0);
+    drawPupilsRow(1, 0, 255, 0); 
+    drawPupilsRow(3, 0, 255, 0); 
+    strip.show();
+}
+
+
+int drawPupilRow(int eye, int row, uint8_t r, uint8_t g, uint8_t b)
+{
+    int offset = 0;
+    if(eye != 0)
+        offset = EYE_PIXEL_COUNT;
+    int row0[] = {11, 12};
+    int row1[] = {17, 18, 19};
+    int row2[] = {24, 25, 26, 27};
+    int row3[] = {32, 33, 34};
+    int row4[] = {39, 40};
+    
+    if(row == 0)
+        for(int i=0; i<ARRAYLEN(row0); i++)
+            strip.setPixelColor(row0[i] + offset, strip.Color(r, g, b));
+    else if(row == 1)
+        for(int i=0; i<ARRAYLEN(row1); i++)
+            strip.setPixelColor(row1[i] + offset, strip.Color(r, g, b));
+    else if(row == 2)
+        for(int i=0; i<ARRAYLEN(row2); i++)
+            strip.setPixelColor(row2[i] + offset, strip.Color(r, g, b));
+    else if(row == 3)
+        for(int i=0; i<ARRAYLEN(row3); i++)
+            strip.setPixelColor(row3[i] + offset, strip.Color(r, g, b));
+    else if(row == 4)
+        for(int i=0; i<ARRAYLEN(row4); i++)
+            strip.setPixelColor(row4[i] + offset, strip.Color(r, g, b));
+}
+
+int drawPupilsRow(int row, uint8_t r, uint8_t g, uint8_t b)
+{
+    drawPupilRow(0, row, r, g, b);
+    drawPupilRow(1, row, r, g, b);
+}
+
+int drawPupil(int eye, uint8_t r, uint8_t g, uint8_t b)
+{
+    for(int i=0; i<5; i++)
+        drawPupilRow(eye, i, r, g, b);
+}
+
+int drawPupils(uint8_t r, uint8_t g, uint8_t b)
+{
+    drawPupil(0, r, g, b);
+    drawPupil(1, r, g, b);
+}
+
+int blink(int del)
+{
+    closeEyes(del);
+    delay(200);
+    openEyes(del);
+}
+
+int wakeUpFreddy()
+{
+    int blinkDel = 10;
+    
+    narrowEyes(100);
+    delay(2000);
+    blink(blinkDel);
+    delay(random(1000));
+    blink(blinkDel);
+    blink(blinkDel);
+    delay(random(2000));
+    blink(blinkDel);
+    delay(random(2000));
+    blink(blinkDel);
+    blink(blinkDel);
+    delay(random(1000));
+    closeEyes(50);
+    delay(random(1000));
+    blink(blinkDel);
+    delay(5000);
+}
+
+int glowEyeFreddy(int del)
+{
+    for(int j=0; j<25; j++)
+    {
+        for(int i=30; i>0; i--)
+        {
+            drawPupils(75 / i, 0, 130 / i);
+            strip.show();   
+            delay(20);
+        }
+        
+        for(int i=1; i<30; i++)
+        {
+            drawPupils(75 / i, 0, 130 / i);
+            strip.show();   
+            delay(20);
+        }
+    }
+}
+
+int drawHeartRow(int eye, int row, uint8_t r, uint8_t g, uint8_t b)
+{
+    int offset = 0;
+    if(eye != 0)
+        offset = EYE_PIXEL_COUNT;
+    int row0[] = {4, 5, 7, 8};
+    int row1[] = {9, 10, 11, 12, 13, 14};
+    int row2[] = {16, 17, 18, 19, 20};
+    int row3[] = {23, 24, 25, 26, 27, 28};
+    int row4[] = {31, 32, 33, 34, 35};
+    int row5[] = {38, 39, 40, 41};
+    int row6[] = {44, 45, 46};
+    int row7[] = {49, 50};
+    
+    if(row == 0)
+        for(int i=0; i<ARRAYLEN(row0); i++)
+            strip.setPixelColor(row0[i] + offset, strip.Color(r, g, b));
+    else if(row == 1)
+        for(int i=0; i<ARRAYLEN(row1); i++)
+            strip.setPixelColor(row1[i] + offset, strip.Color(r, g, b));
+    else if(row == 2)
+        for(int i=0; i<ARRAYLEN(row2); i++)
+            strip.setPixelColor(row2[i] + offset, strip.Color(r, g, b));
+    else if(row == 3)
+        for(int i=0; i<ARRAYLEN(row3); i++)
+            strip.setPixelColor(row3[i] + offset, strip.Color(r, g, b));
+    else if(row == 4)
+        for(int i=0; i<ARRAYLEN(row4); i++)
+            strip.setPixelColor(row4[i] + offset, strip.Color(r, g, b));
+    else if(row == 5)
+        for(int i=0; i<ARRAYLEN(row5); i++)
+            strip.setPixelColor(row5[i] + offset, strip.Color(r, g, b));
+    else if(row == 6)
+        for(int i=0; i<ARRAYLEN(row6); i++)
+            strip.setPixelColor(row6[i] + offset, strip.Color(r, g, b));
+    else if(row == 7)
+        for(int i=0; i<ARRAYLEN(row7); i++)
+            strip.setPixelColor(row7[i] + offset, strip.Color(r, g, b));
+}
+
+int drawHeartEye(uint8_t r, uint8_t g, uint8_t b)
+{
+    for(int i=0; i<8; i++)
+    {
+        drawHeartRow(0, i, r, g, b);
+        drawHeartRow(1, i, r, g, b);
+    }
+    strip.show();
+}
+
+int heartEyeFreddy(uint8_t r, uint8_t g, uint8_t b)
+{
+    int del = 5;
+    for(int j=0; j<10; j++)
+    {
+        for(int k=0; k<2; k++)
+        {
+            for(int i=20; i>0; i--)
+            {
+                drawHeartEye(75 / i, 0, 130 / i);
+                strip.show();   
+                delay(del);
+            }
+            
+            for(int i=1; i<20; i++)
+            {
+                drawHeartEye(75 / i, 0, 130 / i);
+                strip.show();   
+                delay(del);
+            }
+        }
+        
+        delay(1000);
+    }
+    
+    // for(int i=0; i<50; i++)
+    // {
+    //     drawHeartEye(random(128), random(128), random(128));
+    //     strip.show();
+    //     delay(60);
+    //     drawHeartEye(0, 0, 0);
+    //     strip.show();
+    //     delay(60);
+    // }
+    
+    drawHeartEye(75, 0, 130);
+    strip.show();
+    
+    delay(5000);
+}
+
+int sparkleFreddy()
+{
+    closeEyes(100);
+    delay(1000);
+    blink(100);
+    closeEyes(100);
+    for(int j=0; j<100; j++)
+    {
+        int cnt = 10;
+        int pixNums[cnt];
+        for(int i=0; i<cnt; i++)
+        {
+            int pix = random(strip.numPixels());
+            pixNums[i] = pix;
+            strip.setPixelColor(pix, strip.Color(255,255,255));
+        }
+        strip.show();
+        delay(30);
+        for(int i=0; i<cnt; i++)
+        {
+            int pix = pixNums[i];
+            strip.setPixelColor(pix, strip.Color(255,0,0));
+        }
+        strip.show();
+        delay(30);
+    }
+    blink(100);
+    openEyes(100);
+    delay(2000);
+}
+
+int spiralFreddy(uint8_t r, uint8_t g, uint8_t b, uint8_t r1, uint8_t g1, uint8_t b1)
+{
+    int offset = EYE_PIXEL_COUNT;
+    int del = 50;
+        
+    int order[] = {18, 25, 33, 26, 11, 24, 17, 32, 39, 40, 34, 27, 19, 12, 5, 10, 16, 31, 38, 44, 45, 46, 41, 35, 20, 13, 7, 6, 1, 0, 4, 9, 23, 37, 43, 48, 49, 50, 51, 47, 42, 28, 14, 8, 3, 2};
+    int order0[] = {18, 25, 33, 26};
+    int order1[] = {11, 17, 24, 32, 39, 40, 34, 27, 19, 12};
+    int order2[] = {5, 10, 16, 31, 38, 44, 45, 46, 41, 35, 20, 13, 7, 6};
+    int order3[] = {1, 0, 4, 9, 23, 37, 43, 48, 49, 50, 51, 47, 42, 28, 14, 8, 3, 2};
+    for(int i=0; i<ARRAYLEN(order0); i++)
+    {
+        strip.setPixelColor(order0[i], strip.Color(r, g, b)); 
+        strip.setPixelColor(order0[i] + offset, strip.Color(r, g, b));
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order1); i++)
+    {
+        strip.setPixelColor(order1[i], strip.Color(r + 10, g + 10, b + 10));
+        strip.setPixelColor(order1[i] + offset, strip.Color(r + 10, g + 10, b + 10)); 
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order2); i++)
+    {
+        strip.setPixelColor(order2[i], strip.Color(r + 20, g + 20, b + 20)); 
+        strip.setPixelColor(order2[i] + offset, strip.Color(r + 20, g + 20, b + 20)); 
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order3); i++)
+    {
+        strip.setPixelColor(order3[i], strip.Color(r + 30, g + 30, b + 30)); 
+        strip.setPixelColor(order3[i] + offset, strip.Color(r + 30, g + 30, b + 30)); 
+    }
+    strip.show();
+    delay(del);
+    
+
+    for(int i=0; i<ARRAYLEN(order3); i++)
+    {
+        strip.setPixelColor(order3[i], strip.Color(r1, g1, b1)); 
+        strip.setPixelColor(order3[i] + offset, strip.Color(r1, g1, b1)); 
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order2); i++)
+    {
+        strip.setPixelColor(order2[i], strip.Color(r1, g1, b1)); 
+        strip.setPixelColor(order2[i] + offset, strip.Color(r1, g1, b1)); 
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order1); i++)
+    {
+        strip.setPixelColor(order1[i], strip.Color(r1, g1, b1)); 
+        strip.setPixelColor(order1[i] + offset, strip.Color(r1, g1, b1)); 
+    }
+    strip.show();
+    delay(del);
+    for(int i=0; i<ARRAYLEN(order0); i++)
+    {
+        strip.setPixelColor(order0[i], strip.Color(r1, g1, b1)); 
+        strip.setPixelColor(order0[i] + offset, strip.Color(r1, g1, b1));
+    }
+    strip.show();
+    delay(del);
+}
+
+int runFreddyMad()
+{
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(5000);
+    
+    // for(int i=0; i<50; i++)
+    //     spiralFreddy(random(128), random(128), random(255), random(50), random(50), random(50));
+        
+    // blink(100);
+    // delay(1000);
+    
+    // drawHeartEye(75, 0, 130);
+    // strip.show();
+    // delay(5000);
+    
+    // sparkleFreddy();
+    // delay(1000);
+    
+    // heartEyeFreddy(75, 0, 130);
+    // delay(1000);
+    
+    // rainbow(20);
+    // delay(1000);
+    
+    // wakeUpFreddy();
+    // delay(1000);
+    
+    // glowEyeFreddy(20);
+    // delay(1000);
+    
+    return 1;
+}
+
 int runUSA()
 {
     int blockSize = 5;
-    
+
     // for(int j=0; j<blockSize; j++)
     int j = 0;
     {
@@ -356,18 +784,18 @@ int runUSA()
                 if(count > 2)
                     count = 0;
             }
-            
-            
+
+
             int pix = 0;
             if( (i + j) >= strip.numPixels())
             {
                 pix = (i + j) - strip.numPixels();
             }
-            else 
+            else
             {
                 pix = i + j;
             }
-            
+
             if(count == 0)
             {
                 strip.setPixelColor(pix, strip.Color(255, 0, 0));
@@ -380,7 +808,7 @@ int runUSA()
             {
                 strip.setPixelColor(pix, strip.Color(0, 0, 255));
             }
-            
+
         }
         strip.show();
         delay(500);
@@ -397,7 +825,7 @@ int snow()
         strip.show();
         delay(random(50));
     }
-    
+
     for(int i=0; i<strip.numPixels() / 10; i++)
     { //pick the random pixels
         int pix = random(strip.numPixels());
@@ -408,7 +836,7 @@ int snow()
     }
 }
 
-int endRun(uint8_t r1, uint8_t g1, uint8_t b1, 
+int endRun(uint8_t r1, uint8_t g1, uint8_t b1,
     uint8_t r2, uint8_t g2, uint8_t b2,
     uint8_t d)
 {
@@ -421,7 +849,7 @@ int endRun(uint8_t r1, uint8_t g1, uint8_t b1,
     }
 }
 
-int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1, 
+int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
     uint8_t r2, uint8_t g2, uint8_t b2, uint8_t blockSize, int d, bool inBlock)
 {
     for(int j=0; j<blockSize; j++)
@@ -431,17 +859,17 @@ int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
             {
                 inBlock = !inBlock;
             }
-            
+
             int pix = 0;
             if( (i + j) >= strip.numPixels())
             {
                 pix = (i + j) - strip.numPixels();
             }
-            else 
+            else
             {
                 pix = i + j;
             }
-            
+
             if(inBlock)
             {
                 strip.setPixelColor(pix, strip.Color(r1, g1, b1));
@@ -454,22 +882,22 @@ int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
         strip.show();
         delay(d);
     }
-    
+
     return 1;
 }
 
-int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1, 
+int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
     uint8_t r2, uint8_t g2, uint8_t b2,
     uint8_t blockSize)
-{               
+{
     bool inBlock = true;
-    
+
     for(int i=0; i<strip.numPixels(); i++) {
         if(i % blockSize == 0)
         {
             inBlock = !inBlock;
         }
-        
+
         if(inBlock)
         {
             strip.setPixelColor(i, strip.Color(r1, g1, b1));
@@ -483,7 +911,7 @@ int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
     return 1;
 }
 
-int staticAlternate(uint8_t r1, uint8_t g1, uint8_t b1, 
+int staticAlternate(uint8_t r1, uint8_t g1, uint8_t b1,
     uint8_t r2, uint8_t g2, uint8_t b2)
 {
     for(int i=0; i<strip.numPixels(); i++) {
@@ -505,7 +933,7 @@ int setRGB(String rgb)
     String r = rgb.substring(0,3);
     String g = rgb.substring(3,6);
     String b = rgb.substring(6,10);
-    
+
     setAll(stringToInt(r), stringToInt(g), stringToInt(b));
     return 1;
 }
@@ -585,8 +1013,8 @@ String* stringSplit(String s, char delim)
     return strArr;
 }
 
-int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1, 
-  uint8_t r2, uint8_t g2, uint8_t b2, 
+int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
+  uint8_t r2, uint8_t g2, uint8_t b2,
   int del, int duration)
 {
 
@@ -613,67 +1041,4 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
     return 1;
 }
 
-void particles() {
-    unsigned long frameStartMillis = millis();
-    emitter.stripPosition = 0.5; //random(100) / 100.0;
-
-    // Draw each particle
-    for (int i=0; i < emitter.numParticles; i++) {
-
-        // Update this particle's position
-        Particle prt = emitter.updateParticle(i);
-
-        float zScale = (emitter.threed ? (1.0 - prt.coord.z) : 1.0);
-        double tailLength = (1.0 + abs(prt.velocity.x * 15) * zScale);
-        int16_t startSlot = emitter.numPixels * prt.coord.x;
-        int16_t currentSlot = startSlot;
-        int16_t oldSlot = currentSlot;
-
-        // Draw the particle and its tail
-        // High velocity particles have longer tails
-        for (int ii=0; ii < tailLength; ii++) {
-
-            // Taper the tail fade
-            float colorScale = ((tailLength - (ii * GOLDEN_RATIO)) / tailLength);
-
-            if (ii == 0 && prt.dimmed) {
-            // Flicker the first particle
-                colorScale *= (random(50) / 100) + 0.05;
-            }      
-
-            if (emitter.threed) {
-                colorScale *= zScale;
-            }
-
-            if (colorScale < 0.05) {
-                colorScale = 0.0;
-            }
-
-            // Draw particle
-            strip.setPixelColor(currentSlot, 
-                                strip.Color(prt.redColor * colorScale, 
-                                            prt.greenColor * colorScale, 
-                                            prt.blueColor * colorScale));
-
-            oldSlot = currentSlot;
-            currentSlot = startSlot + ((ii+1) * (prt.velocity.x > 0 ? -1 : 1));
-        }
-
-        //Terminate the tail
-        strip.setPixelColor(oldSlot, strip.Color(0, 0, 0));
-    }
-
-    uint16_t frameElapsedMillis = millis() - frameStartMillis;
-    uint16_t frameDelayMillis = (MILLIS_PER_FRAME - frameElapsedMillis);
-
-    if (frameDelayMillis > 0.0) {
-        Serial.println(frameDelayMillis);
-        delay(frameDelayMillis);
-        strip.show();
-    }
-}
-
-void setCoordColor(Coord3D coord, uint32_t color) {
-    strip.setPixelColor(coord.x * emitter.numPixels, color); 
-}
 
