@@ -41,13 +41,22 @@
 	</div>
 	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
 
-		Valve:
+		Program:
 		<select id="program" name="program">
-			<option value="sparkly">Sparkly</option>
-			<option value="heart">Hearts</option>
+			<option value="stop">Stop</option>
+			<option value="alloff">All Off</option>
+			<option value="hearteyes">Heart Eyes</option>
+			<option value="spiraleyes">Spiral Eyes</option>
+			<option value="sparkleeyes">Sparkle Eyes</option>
+			<option value="statichearteyes">Heart Eyes - animation</option>
+			<option value="rainboweyes">Rainbow Eyes</option>
+			<option value="wakeupeyes">Wake Up!</option>
+			<option value="gloweyes">Glow Eyes</option>
+			<option value="random">Random</option>
 		</select>
 
 		<br/>
+		<button id="fireButton">Fire!</button>
 		<button id="goButton">On</button>
 		<button id="stopButton">Off</button>
 		<br/>
@@ -61,6 +70,7 @@
 		var paramState = null;
 
 		var goButton = document.querySelector("#goButton");
+		var fireButton = document.querySelector("#fireButton");
 		var stopButton = document.querySelector("#stopButton");
 		var select = document.querySelector("select");
 
@@ -68,28 +78,27 @@
 	    	$('#spinner').show();
 	    	$('#status').html("");
 	    	$('#result').html("");
-	    	var coreAndValveStr = $('#valveSelect').val();
-	    	var coreAndValve = coreAndValveStr.split(":");
-		    $.get("/freddy/run/action", 
-		    	{"action":verb, coreName:coreAndValve[0], valve:coreAndValve[1]}, 
+		    $.get("/freddy/run/action?action=" + verb, 
 		    	function(data) {
-		      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
-			  $('#result').html( data );
-			  $('#spinner').hide();
+				      $('#status').html("<h3>Request Complete.  Spark said:</h3>");
+					  $('#result').html( data );
+					  $('#spinner').hide();
 			});
 	    };
 
 		stopButton.addEventListener("click", function(ev) {
 			console.log("off");
-			runQuery("off");
+			runQuery("alloff");
 		}, false);
 
 	    goButton.addEventListener("click", function(ev) {
 	    	console.log("on");
-	    	runQuery("on");
+	    	runQuery($('#program').val());
 	    }, false);
 
-	    
+	    fireButton.addEventListener("click", function(ev) {
+	    	runQuery("fire");
+	    }, false);
 	</script>
 
 </body>

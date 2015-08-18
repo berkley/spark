@@ -18,25 +18,10 @@ exports.index = function(req, res) {
 
 exports.action = function(req, res) {
 	var action = req.query.action;
-	// var core = util.coreForCoreName(req.query.coreName.trim());
-
-	// console.log("core: ", core);
-
-	// var data = "";
-	// if(action == "on")
-	// {
-	// 	data = "on," + req.query.valve;
-	// }
-	// else if(action == "off")
-	// {
-	// 	data = "off," + req.query.valve;
-	// }
-
-	// util.runPost(data, action, core.id, res);
 
 	console.log("connecting....");
 
-	var HOST = '10.0.1.48';
+	var HOST = '10.0.1.47';
 	var PORT = 7000;
 
 	var client = new net.Socket();
@@ -45,7 +30,8 @@ exports.action = function(req, res) {
 	    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
 	    // Write a message to the socket as soon as the client is connected, 
 	    // the server will receive it as message from the client 
-	    client.write(req.query.data);
+	    console.log("req.query", req.query);
+	    client.write(req.query.action);
 
 	});
 

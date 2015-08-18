@@ -38,6 +38,8 @@
 #define WAKEUPEYES "wakeupeyes"
 #define GLOWEYES "gloweyes"
 #define ALLOFF "alloff"
+#define FIRE "fire"
+#define RANDOM "random"
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -85,6 +87,7 @@ void loop()
         client.flush();
         dStr.toCharArray(action, 64);
         loopRun = action;
+        client.stop();
     } 
     else 
     {
@@ -126,10 +129,101 @@ void loop()
     {
         rainbowEyes();
     }
+    else if(loopRun.equals(GLOWEYES))
+    {
+        glowEyes();
+    }
+    else if(loopRun.equals(WAKEUPEYES))
+    {
+        wakeUpEyes();
+    }
+    else if(loopRun.equals(FIRE))
+    {
+        fire();
+    }
+    else if(loopRun.equals(RANDOM))
+    {
+        random();
+    }
     else
     {
         String("INVALID_ACTION").toCharArray(action, 64);
+        loopRun = STOP;
     }
+}
+
+int random()
+{
+    /*
+    0#define HEARTEYES "hearteyes"
+    1#define SPIRALEYES "spiraleyes"
+    2#define SPARKLEEYES "sparkleeyes"
+    3#define STATICHEARTEYES "statichearteyes"
+    4#define RAINBOWEYES "rainboweyes"
+    5#define WAKEUPEYES "wakeupeyes"
+    6#define GLOWEYES "gloweyes"*/
+    int r = random(6);
+    allOff();
+    switch (r)
+    {
+        case 0:
+            heartEyes();
+            break;
+        case 1:
+            spiralEyes();
+            break;
+        case 2:
+            sparkleEyes();
+            break;
+        case 3: 
+            staticHeartEyes();
+            break;
+        case 4:
+            rainbowEyes();
+            break;
+        case 5: 
+            wakeUpFreddy();
+            break;
+        case 6:
+            glowEyes();
+            break;
+        default:
+            staticHeartEyes();
+            break;
+    }
+}
+
+int fire()
+{
+    fadeColor(255, 0, 0, 0, 0, 0, 50, 5000);
+    //TODO: add code here to turn on relay
+
+    for(int j=0; j<50; j++)
+    {
+        int cnt = 10;
+        int pixNums[cnt];
+        for(int i=0; i<cnt; i++)
+        {
+            int pix = random(strip.numPixels());
+            pixNums[i] = pix;
+            strip.setPixelColor(pix, strip.Color(random(255),random(255),random(255)));
+        }
+        strip.show();
+        delay(30);
+        for(int i=0; i<cnt; i++)
+        {
+            int pix = pixNums[i];
+            strip.setPixelColor(pix, strip.Color(255,0,0));
+        }
+        strip.show();
+        delay(30);
+    }
+    //TODO: turn off relay
+    delay(100);
+    blink(100);
+    narrowEyes(100);
+
+    loopRun = RANDOM;
 }
 
 int heartEyes()
