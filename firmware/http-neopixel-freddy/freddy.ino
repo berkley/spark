@@ -1,3 +1,16 @@
+/* pixel map
+                0       1       2       3               
+            4       5       6       7       8           
+        9       10      11      12      13      14      
+    15      16      17      18      19      20      21  
+22      23      24      25      26      27      28      29
+    30      31      32      33      34      35      36  
+        37      38      39      40      41      42      
+            43      44      45      46      47          
+                48      49      50      51              
+*/
+
+
 #include "application.h"
 #include "neopixel/neopixel.h"
 
@@ -11,15 +24,22 @@
 #define PIXEL_COUNT 104 //FREDDY
 #define EYE_PIXEL_COUNT 52
 
+#define TCP_PORT 7000
+
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
+TCPServer server = TCPServer(TCP_PORT);
+TCPClient client;
+
 #define MAX_COLOR 255
 
 char action[64];
 char parameters[64];
+char ip[64];
+char tcpstate[64];
 
 //program and action names
 #define STOP "stop"
@@ -50,104 +70,128 @@ String *strArr = new String[20];
 void setup()
 {
 //   Serial.begin(9600);
+  server.begin();
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   //register the run command as an API endpoint
   Spark.function("run", run);
   //register the action variable as a GET parameter
   Spark.variable("action", &action, STRING);
+  Spark.variable("tcpstate", &tcpstate, STRING);
   //retister the parameters variable as a GET parameter
   Spark.variable("parameters", &parameters, STRING);
+  Spark.variable("ip", &ip, STRING);
+  (String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." +  String(WiFi.localIP()[2]) + "." +  String(WiFi.localIP()[3])).toCharArray(ip, 64);
 }
 
 void loop()
 {
-    if(loopRun.equals(STOP))
+    if (client.connected()) {
+        String("CONNECTED").toCharArray(tcpstate, 64);
+        String dStr = "data:";
+        char data;
+        while (client.available()) 
+        {
+            data = client.read();
+            dStr += String(data);
+        }
+        client.println("OK: " + dStr);
+        client.flush();
+        dStr.toCharArray(action, 64);
+    } 
+    else 
     {
-        delay(1000);
+        // if no client is yet connected, check for a new connection
+        String("DISCONNECTED").toCharArray(tcpstate, 64);
+        client = server.available();
     }
-    else if(loopRun.equals(SHUTDOWN))
-    { //stop all programs and set all pixels to off
-        loopRun = PRESTOP;
-        delay(1000); //give a program time to stop
-    }
-    else if(loopRun.equals(PRESTOP))
-    {
-        loopRun = STOP;
-        allOff();
-    }
-    else if(loopRun.equals(RAINBOW))
-    {
-        rainbow(20);
-    }
-    else if(loopRun.equals(ALTERNATE))
-    {
-        int r1 = stringToInt(loopArgs[0]);
-        int g1 = stringToInt(loopArgs[1]);
-        int b1 = stringToInt(loopArgs[2]);
-        int r2 = stringToInt(loopArgs[3]);
-        int g2 = stringToInt(loopArgs[4]);
-        int b2 = stringToInt(loopArgs[5]);
-        int d = stringToInt(loopArgs[6]);
+      
+    // if(loopRun.equals(STOP))
+    // {
+    //     delay(1000);
+    // }
+    // else if(loopRun.equals(SHUTDOWN))
+    // { //stop all programs and set all pixels to off
+    //     loopRun = PRESTOP;
+    //     delay(1000); //give a program time to stop
+    // }
+    // else if(loopRun.equals(PRESTOP))
+    // {
+    //     loopRun = STOP;
+    //     allOff();
+    // }
+    // else if(loopRun.equals(RAINBOW))
+    // {
+    //     rainbow(20);
+    // }
+    // else if(loopRun.equals(ALTERNATE))
+    // {
+    //     int r1 = stringToInt(loopArgs[0]);
+    //     int g1 = stringToInt(loopArgs[1]);
+    //     int b1 = stringToInt(loopArgs[2]);
+    //     int r2 = stringToInt(loopArgs[3]);
+    //     int g2 = stringToInt(loopArgs[4]);
+    //     int b2 = stringToInt(loopArgs[5]);
+    //     int d = stringToInt(loopArgs[6]);
 
-        staticAlternate(r1, g1, b1, r2, g2, b2);
-        delay(d);
-        staticAlternate(r2, g2, b2, r1, g1, b1);
-        delay(d);
-    }
-    else if(loopRun.equals(BLOCKS))
-    {
-        int r1 = stringToInt(loopArgs[0]);
-        int g1 = stringToInt(loopArgs[1]);
-        int b1 = stringToInt(loopArgs[2]);
-        int r2 = stringToInt(loopArgs[3]);
-        int g2 = stringToInt(loopArgs[4]);
-        int b2 = stringToInt(loopArgs[5]);
-        int d = stringToInt(loopArgs[6]);
-        int blockSize = stringToInt(loopArgs[7]);
+    //     staticAlternate(r1, g1, b1, r2, g2, b2);
+    //     delay(d);
+    //     staticAlternate(r2, g2, b2, r1, g1, b1);
+    //     delay(d);
+    // }
+    // else if(loopRun.equals(BLOCKS))
+    // {
+    //     int r1 = stringToInt(loopArgs[0]);
+    //     int g1 = stringToInt(loopArgs[1]);
+    //     int b1 = stringToInt(loopArgs[2]);
+    //     int r2 = stringToInt(loopArgs[3]);
+    //     int g2 = stringToInt(loopArgs[4]);
+    //     int b2 = stringToInt(loopArgs[5]);
+    //     int d = stringToInt(loopArgs[6]);
+    //     int blockSize = stringToInt(loopArgs[7]);
 
-        animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, true);
-        animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, false);
-    }
-    else if(loopRun.equals(FADECOLOR))
-    {
-        int r1 = stringToInt(loopArgs[0]);
-        int g1 = stringToInt(loopArgs[1]);
-        int b1 = stringToInt(loopArgs[2]);
-        int r2 = stringToInt(loopArgs[3]);
-        int g2 = stringToInt(loopArgs[4]);
-        int b2 = stringToInt(loopArgs[5]);
-        int d = stringToInt(loopArgs[6]);
-        int duration = stringToInt(loopArgs[7]);
+    //     animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, true);
+    //     animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, false);
+    // }
+    // else if(loopRun.equals(FADECOLOR))
+    // {
+    //     int r1 = stringToInt(loopArgs[0]);
+    //     int g1 = stringToInt(loopArgs[1]);
+    //     int b1 = stringToInt(loopArgs[2]);
+    //     int r2 = stringToInt(loopArgs[3]);
+    //     int g2 = stringToInt(loopArgs[4]);
+    //     int b2 = stringToInt(loopArgs[5]);
+    //     int d = stringToInt(loopArgs[6]);
+    //     int duration = stringToInt(loopArgs[7]);
 
-        fadeColor(r1, g1, b1, r2, g2, b2, d, duration);
-        delay(d);
-        fadeColor(r2, g2, b2, r1, g1, b1, d, duration);
-        delay(d);
-    }
-    else if(loopRun.equals(ENDRUN))
-    {
-        int r1 = stringToInt(loopArgs[0]);
-        int g1 = stringToInt(loopArgs[1]);
-        int b1 = stringToInt(loopArgs[2]);
-        int r2 = stringToInt(loopArgs[3]);
-        int g2 = stringToInt(loopArgs[4]);
-        int b2 = stringToInt(loopArgs[5]);
-        int d = stringToInt(loopArgs[6]);
-        endRun(r1, g1, b1, r2, g2, b2, d);
-    }
-    else if(loopRun.equals(SNOW))
-    {
-        snow();
-    }
-    else if(loopRun.equals(USA))
-    {
-        runUSA();
-    }
-    else if(loopRun.equals(FREDDYMAD))
-    {
-        runFreddyMad();
-    }
+    //     fadeColor(r1, g1, b1, r2, g2, b2, d, duration);
+    //     delay(d);
+    //     fadeColor(r2, g2, b2, r1, g1, b1, d, duration);
+    //     delay(d);
+    // }
+    // else if(loopRun.equals(ENDRUN))
+    // {
+    //     int r1 = stringToInt(loopArgs[0]);
+    //     int g1 = stringToInt(loopArgs[1]);
+    //     int b1 = stringToInt(loopArgs[2]);
+    //     int r2 = stringToInt(loopArgs[3]);
+    //     int g2 = stringToInt(loopArgs[4]);
+    //     int b2 = stringToInt(loopArgs[5]);
+    //     int d = stringToInt(loopArgs[6]);
+    //     endRun(r1, g1, b1, r2, g2, b2, d);
+    // }
+    // else if(loopRun.equals(SNOW))
+    // {
+    //     snow();
+    // }
+    // else if(loopRun.equals(USA))
+    // {
+    //     runUSA();
+    // }
+    // else if(loopRun.equals(FREDDYMAD))
+    // {
+        // runFreddyMad();
+    // }
 }
 
 int allOff()
@@ -737,9 +781,9 @@ int spiralFreddy(uint8_t r, uint8_t g, uint8_t b, uint8_t r1, uint8_t g1, uint8_
 
 int runFreddyMad()
 {
-    drawHeartEye(35, 0, 60);
-    strip.show();
-    delay(5000);
+    // drawHeartEye(35, 0, 60);
+    // strip.show();
+    // delay(5000);
     
     // for(int i=0; i<50; i++)
     //     spiralFreddy(random(128), random(128), random(255), random(50), random(50), random(50));
@@ -754,8 +798,8 @@ int runFreddyMad()
     // sparkleFreddy();
     // delay(1000);
     
-    // heartEyeFreddy(75, 0, 130);
-    // delay(1000);
+    heartEyeFreddy(75, 0, 130);
+    delay(1000);
     
     // rainbow(20);
     // delay(1000);
@@ -1040,5 +1084,4 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
 
     return 1;
 }
-
 

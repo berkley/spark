@@ -36,7 +36,7 @@ exports.action = function(req, res) {
 
 	console.log("connecting....");
 
-	var HOST = '10.0.1.47';
+	var HOST = '10.0.1.48';
 	var PORT = 7000;
 
 	var client = new net.Socket();
@@ -45,7 +45,7 @@ exports.action = function(req, res) {
 	    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
 	    // Write a message to the socket as soon as the client is connected, 
 	    // the server will receive it as message from the client 
-	    client.write('I am Chuck Norris!');
+	    client.write(req.query.data);
 
 	});
 
@@ -62,5 +62,6 @@ exports.action = function(req, res) {
 	// Add a 'close' event handler for the client socket
 	client.on('close', function() {
 	    console.log('Connection closed');
+	    res.send(200);
 	});
 };
