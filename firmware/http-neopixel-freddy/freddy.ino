@@ -29,6 +29,16 @@
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
 
+#define STOP "stop"
+#define HEARTEYES "hearteyes"
+#define SPIRALEYES "spiraleyes"
+#define SPARKLEEYES "sparkleeyes"
+#define STATICHEARTEYES "statichearteyes"
+#define RAINBOWEYES "rainboweyes"
+#define WAKEUPEYES "wakeupeyes"
+#define GLOWEYES "gloweyes"
+#define ALLOFF "alloff"
+
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
 TCPServer server = TCPServer(TCP_PORT);
@@ -41,29 +51,7 @@ char parameters[64];
 char ip[64];
 char tcpstate[64];
 
-//program and action names
-#define STOP "stop"
-#define SHUTDOWN "shutdown"
-#define PRESTOP "prestop"
-#define RAINBOW "rainbow"
-#define ALTERNATE "alternate"
-#define BLOCKS "blocks"
-#define FADECOLOR "fadeColor"
-#define ALLOFF "allOff"
-#define SETALL "setAll"
-#define LOOPALTERNATE "loopAlternate"
-#define LOOPBLOCKS "loopBlocks"
-#define LATCHPIXEL "latchPixel"
-#define SETPIXEL "setPixel"
-#define LATCH "latch"
-#define ENDRUN "endrun"
-#define SNOW "snow"
-#define WEBSOCKET "websocket" //<- finish this
-#define SETBRIGHTNESS "setBrightness"
-#define USA "usa"
-#define FREDDYMAD "freddymad"
-
-String loopRun = FREDDYMAD;
+String loopRun = STOP;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
@@ -73,12 +61,9 @@ void setup()
   server.begin();
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
-  //register the run command as an API endpoint
-  Spark.function("run", run);
   //register the action variable as a GET parameter
   Spark.variable("action", &action, STRING);
   Spark.variable("tcpstate", &tcpstate, STRING);
-  //retister the parameters variable as a GET parameter
   Spark.variable("parameters", &parameters, STRING);
   Spark.variable("ip", &ip, STRING);
   (String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." +  String(WiFi.localIP()[2]) + "." +  String(WiFi.localIP()[3])).toCharArray(ip, 64);
@@ -86,289 +71,124 @@ void setup()
 
 void loop()
 {
+    //TCPServer/Client connections
     if (client.connected()) {
         String("CONNECTED").toCharArray(tcpstate, 64);
-        String dStr = "data:";
+        String dStr = "";
         char data;
         while (client.available()) 
         {
             data = client.read();
             dStr += String(data);
         }
-        client.println("OK: " + dStr);
+        client.println("OK:" + dStr);
         client.flush();
         dStr.toCharArray(action, 64);
+        loopRun = action;
     } 
     else 
     {
         // if no client is yet connected, check for a new connection
         String("DISCONNECTED").toCharArray(tcpstate, 64);
         client = server.available();
+        if(client.connected())
+            return;
     }
+    
+    //////////command processing////////////////////
       
-    // if(loopRun.equals(STOP))
-    // {
-    //     delay(1000);
-    // }
-    // else if(loopRun.equals(SHUTDOWN))
-    // { //stop all programs and set all pixels to off
-    //     loopRun = PRESTOP;
-    //     delay(1000); //give a program time to stop
-    // }
-    // else if(loopRun.equals(PRESTOP))
-    // {
-    //     loopRun = STOP;
-    //     allOff();
-    // }
-    // else if(loopRun.equals(RAINBOW))
-    // {
-    //     rainbow(20);
-    // }
-    // else if(loopRun.equals(ALTERNATE))
-    // {
-    //     int r1 = stringToInt(loopArgs[0]);
-    //     int g1 = stringToInt(loopArgs[1]);
-    //     int b1 = stringToInt(loopArgs[2]);
-    //     int r2 = stringToInt(loopArgs[3]);
-    //     int g2 = stringToInt(loopArgs[4]);
-    //     int b2 = stringToInt(loopArgs[5]);
-    //     int d = stringToInt(loopArgs[6]);
+    if(loopRun.equals(STOP))
+    {
+        delay(100);
+    }
+    else if(loopRun.equals(ALLOFF))
+    {
+        allOff();
+        loopRun = STOP;
+    }
+    else if(loopRun.equals(HEARTEYES))
+    {
+        heartEyes();
+    }
+    else if(loopRun.equals(SPIRALEYES))
+    {
+        spiralEyes();
+    }
+    else if(loopRun.equals(SPARKLEEYES))
+    {
+        sparkleEyes();
+    }
+    else if(loopRun.equals(STATICHEARTEYES))
+    {
+        staticHeartEyes();
+    }
+    else if(loopRun.equals(RAINBOWEYES))
+    {
+        rainbowEyes();
+    }
+    else
+    {
+        String("INVALID_ACTION").toCharArray(action, 64);
+    }
+}
 
-    //     staticAlternate(r1, g1, b1, r2, g2, b2);
-    //     delay(d);
-    //     staticAlternate(r2, g2, b2, r1, g1, b1);
-    //     delay(d);
-    // }
-    // else if(loopRun.equals(BLOCKS))
-    // {
-    //     int r1 = stringToInt(loopArgs[0]);
-    //     int g1 = stringToInt(loopArgs[1]);
-    //     int b1 = stringToInt(loopArgs[2]);
-    //     int r2 = stringToInt(loopArgs[3]);
-    //     int g2 = stringToInt(loopArgs[4]);
-    //     int b2 = stringToInt(loopArgs[5]);
-    //     int d = stringToInt(loopArgs[6]);
-    //     int blockSize = stringToInt(loopArgs[7]);
+int heartEyes()
+{
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(100);
+    return 1;
+}
 
-    //     animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, true);
-    //     animateBlocks(r2, g2, b2, r1, g1, b1, blockSize, d, false);
-    // }
-    // else if(loopRun.equals(FADECOLOR))
-    // {
-    //     int r1 = stringToInt(loopArgs[0]);
-    //     int g1 = stringToInt(loopArgs[1]);
-    //     int b1 = stringToInt(loopArgs[2]);
-    //     int r2 = stringToInt(loopArgs[3]);
-    //     int g2 = stringToInt(loopArgs[4]);
-    //     int b2 = stringToInt(loopArgs[5]);
-    //     int d = stringToInt(loopArgs[6]);
-    //     int duration = stringToInt(loopArgs[7]);
+int spiralEyes()
+{
+    for(int i=0; i<50; i++)
+        spiralFreddy(random(128), random(128), random(255), random(50), random(50), random(50));
+    return 1;
+}
 
-    //     fadeColor(r1, g1, b1, r2, g2, b2, d, duration);
-    //     delay(d);
-    //     fadeColor(r2, g2, b2, r1, g1, b1, d, duration);
-    //     delay(d);
-    // }
-    // else if(loopRun.equals(ENDRUN))
-    // {
-    //     int r1 = stringToInt(loopArgs[0]);
-    //     int g1 = stringToInt(loopArgs[1]);
-    //     int b1 = stringToInt(loopArgs[2]);
-    //     int r2 = stringToInt(loopArgs[3]);
-    //     int g2 = stringToInt(loopArgs[4]);
-    //     int b2 = stringToInt(loopArgs[5]);
-    //     int d = stringToInt(loopArgs[6]);
-    //     endRun(r1, g1, b1, r2, g2, b2, d);
-    // }
-    // else if(loopRun.equals(SNOW))
-    // {
-    //     snow();
-    // }
-    // else if(loopRun.equals(USA))
-    // {
-    //     runUSA();
-    // }
-    // else if(loopRun.equals(FREDDYMAD))
-    // {
-        // runFreddyMad();
-    // }
+int sparkleEyes()
+{
+    sparkleFreddy();
+    delay(100);
+    return 1;
+}
+
+int staticHeartEyes()
+{
+    heartEyeFreddy(75, 0, 130);
+    delay(100);
+    return 1;
+}
+
+int rainbowEyes()
+{
+    rainbow(20);
+    delay(100);
+    return 1;
+}
+
+int wakeUpEyes()
+{
+    wakeUpFreddy();
+    delay(1000);
+    return 1;
+}
+
+int glowEyes()
+{
+    glowEyeFreddy(20);
+    delay(1000);
+    return 1;
 }
 
 int allOff()
 {
-    setAll(0,0,0);
-    return 1;
+    return setAll(0,0,0);
 }
 
-/*
-    This function handles the API requests to /run.  The params are a
-    comma separated list.
-    params format is <command>,<param0>,<param1>,...,<paramN>
-    where <command> is the action to be run and <paramN> are the parameters that an individual
-    action needs.
 
-    Actions can be divided into two categories: one where the loop() function is used to animate pixel
-    values and one where pixel values are set a single time.
-    Looped programs can be run using the loopRun variable.  If loopRun is set to STOP the loop will
-    run with no program selected.
-*/
-int run(String params)
-{
-    String* args = stringSplit(params, ',');
-    String command = args[0];
-    strcpy(parameters, params.c_str());
-    strcpy(action, command.c_str());
-
-    if(command.equals(ALLOFF))
-    {
-        loopRun = SHUTDOWN;
-    }
-    else if(command.equals(SETALL))
-    {
-        int r = stringToInt(args[1]);
-        int g = stringToInt(args[2]);
-        int b = stringToInt(args[3]);
-        return setAll(r, g, b);
-    }
-    else if(command.equals(ALTERNATE))
-    {
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        int r2 = stringToInt(args[4]);
-        int g2 = stringToInt(args[5]);
-        int b2 = stringToInt(args[6]);
-        return staticAlternate(r1, g1, b1, r2, g2, b2);
-    }
-    else if(command.equals(LOOPALTERNATE))
-    {
-        loopRun = ALTERNATE;
-        loopArgs[0] = args[1]; //r1
-        loopArgs[1] = args[2]; //g1
-        loopArgs[2] = args[3]; //b1
-        loopArgs[3] = args[4]; //r2
-        loopArgs[4] = args[5]; //g2
-        loopArgs[5] = args[6]; //b2
-        loopArgs[6] = args[7]; //delay
-        return 1;
-    }
-    else if(command.equals(LOOPBLOCKS))
-    {
-        loopRun = BLOCKS;
-        loopArgs[0] = args[1]; //r1
-        loopArgs[1] = args[2]; //g1
-        loopArgs[2] = args[3]; //b1
-        loopArgs[3] = args[4]; //r2
-        loopArgs[4] = args[5]; //g2
-        loopArgs[5] = args[6]; //b2
-        loopArgs[6] = args[7]; //delay
-        loopArgs[7] = args[8]; //block size
-        return 1;
-    }
-    else if(command.equals(BLOCKS))
-    {
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        int r2 = stringToInt(args[4]);
-        int g2 = stringToInt(args[5]);
-        int b2 = stringToInt(args[6]);
-        int blockSize = stringToInt(args[7]);
-        buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
-        return 1;
-    }
-    else if(command.equals(FADECOLOR))
-    {
-        //possible commands: stop, rainbow, alternate
-        loopRun = FADECOLOR;
-        loopArgs[0] = args[1]; //r1
-        loopArgs[1] = args[2]; //g1
-        loopArgs[2] = args[3]; //b1
-        loopArgs[3] = args[4]; //r2
-        loopArgs[4] = args[5]; //g2
-        loopArgs[5] = args[6]; //b2
-        loopArgs[6] = args[7]; //delay
-        loopArgs[7] = args[8]; //duration
-        return 1;
-    }
-    else if(command.equals(RAINBOW))
-    {
-        loopRun = RAINBOW;
-        return 1;
-    }
-    else if(command.equals(LATCHPIXEL))
-    {
-        int pixel = stringToInt(args[0]);
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
-        strip.show();
-        return 1;
-    }
-    else if(command.equals(SETPIXEL))
-    {
-        int pixel = stringToInt(args[0]);
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
-        return 1;
-    }
-    else if(command.equals(LATCH))
-    {
-        strip.show();
-        return 1;
-    }
-    else if(command.equals(STOP))
-    {
-        loopRun = STOP;
-        return 1;
-    }
-    else if(command.equals(SHUTDOWN))
-    {
-        loopRun = SHUTDOWN;
-        return 1;
-    }
-    else if(command.equals(ENDRUN))
-    {
-        loopRun = ENDRUN;
-        loopArgs[0] = args[1]; //r1
-        loopArgs[1] = args[2]; //g1
-        loopArgs[2] = args[3]; //b1
-        loopArgs[3] = args[4]; //r2
-        loopArgs[4] = args[5]; //g2
-        loopArgs[5] = args[6]; //b2
-        loopArgs[6] = args[7]; //delay
-        return 1;
-    }
-    else if(command.equals(SNOW))
-    {
-        loopRun = SNOW;
-        return 1;
-    }
-    else if(command.equals(SETBRIGHTNESS))
-    {
-        int brightness = stringToInt(args[1]);
-        strip.setBrightness(brightness);
-        strip.show();
-        return 1;
-    }
-    else if(command.equals(USA))
-    {
-        loopRun = USA;
-        return 1;
-    }
-    else if(command.equals(FREDDYMAD))
-    {
-        loopRun = FREDDYMAD;
-        return 1;
-    }
-    else
-    { //command not found
-        return 0;
-    }
-}
+///////////////////////////////////////IMP///////////////////////////////////////
 
 int setRow(int row, int eye, uint8_t r, uint8_t g, uint8_t b)
 {
@@ -777,199 +597,6 @@ int spiralFreddy(uint8_t r, uint8_t g, uint8_t b, uint8_t r1, uint8_t g1, uint8_
     }
     strip.show();
     delay(del);
-}
-
-int runFreddyMad()
-{
-    // drawHeartEye(35, 0, 60);
-    // strip.show();
-    // delay(5000);
-    
-    // for(int i=0; i<50; i++)
-    //     spiralFreddy(random(128), random(128), random(255), random(50), random(50), random(50));
-        
-    // blink(100);
-    // delay(1000);
-    
-    // drawHeartEye(75, 0, 130);
-    // strip.show();
-    // delay(5000);
-    
-    // sparkleFreddy();
-    // delay(1000);
-    
-    heartEyeFreddy(75, 0, 130);
-    delay(1000);
-    
-    // rainbow(20);
-    // delay(1000);
-    
-    // wakeUpFreddy();
-    // delay(1000);
-    
-    // glowEyeFreddy(20);
-    // delay(1000);
-    
-    return 1;
-}
-
-int runUSA()
-{
-    int blockSize = 5;
-
-    // for(int j=0; j<blockSize; j++)
-    int j = 0;
-    {
-        int count = -1;
-        for(int i=0; i<strip.numPixels(); i++) {
-            if(i % blockSize == 0)
-            {
-                count++;
-                if(count > 2)
-                    count = 0;
-            }
-
-
-            int pix = 0;
-            if( (i + j) >= strip.numPixels())
-            {
-                pix = (i + j) - strip.numPixels();
-            }
-            else
-            {
-                pix = i + j;
-            }
-
-            if(count == 0)
-            {
-                strip.setPixelColor(pix, strip.Color(255, 0, 0));
-            }
-            else if(count == 1)
-            {
-                strip.setPixelColor(pix, strip.Color(255, 255, 255));
-            }
-            else if(count == 2)
-            {
-                strip.setPixelColor(pix, strip.Color(0, 0, 255));
-            }
-
-        }
-        strip.show();
-        delay(500);
-    }
-    return 1;
-}
-
-int snow()
-{
-    for(int i=0; i<strip.numPixels() / 10; i++)
-    { //pick the random pixels
-        int pix = random(strip.numPixels());
-        strip.setPixelColor(pix, strip.Color(0, 0, 0));
-        strip.show();
-        delay(random(50));
-    }
-
-    for(int i=0; i<strip.numPixels() / 10; i++)
-    { //pick the random pixels
-        int pix = random(strip.numPixels());
-        int brightness = random(255);
-        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .20)); //poor mans white balance
-        strip.show();
-        delay(random(50));
-    }
-}
-
-int endRun(uint8_t r1, uint8_t g1, uint8_t b1,
-    uint8_t r2, uint8_t g2, uint8_t b2,
-    uint8_t d)
-{
-    for(int i=0; i<strip.numPixels(); i++)
-    {
-        strip.setPixelColor(i, strip.Color(r1, g1, b1));
-        strip.setPixelColor(strip.numPixels() - i, strip.Color(r2, g2, b2));
-        strip.show();
-        delay(d);
-    }
-}
-
-int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
-    uint8_t r2, uint8_t g2, uint8_t b2, uint8_t blockSize, int d, bool inBlock)
-{
-    for(int j=0; j<blockSize; j++)
-    {
-        for(int i=0; i<strip.numPixels(); i++) {
-            if(i % blockSize == 0)
-            {
-                inBlock = !inBlock;
-            }
-
-            int pix = 0;
-            if( (i + j) >= strip.numPixels())
-            {
-                pix = (i + j) - strip.numPixels();
-            }
-            else
-            {
-                pix = i + j;
-            }
-
-            if(inBlock)
-            {
-                strip.setPixelColor(pix, strip.Color(r1, g1, b1));
-            }
-            else
-            {
-                strip.setPixelColor(pix, strip.Color(r2, g2, b2));
-            }
-        }
-        strip.show();
-        delay(d);
-    }
-
-    return 1;
-}
-
-int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
-    uint8_t r2, uint8_t g2, uint8_t b2,
-    uint8_t blockSize)
-{
-    bool inBlock = true;
-
-    for(int i=0; i<strip.numPixels(); i++) {
-        if(i % blockSize == 0)
-        {
-            inBlock = !inBlock;
-        }
-
-        if(inBlock)
-        {
-            strip.setPixelColor(i, strip.Color(r1, g1, b1));
-        }
-        else
-        {
-            strip.setPixelColor(i, strip.Color(r2, g2, b2));
-        }
-    }
-    strip.show();
-    return 1;
-}
-
-int staticAlternate(uint8_t r1, uint8_t g1, uint8_t b1,
-    uint8_t r2, uint8_t g2, uint8_t b2)
-{
-    for(int i=0; i<strip.numPixels(); i++) {
-        if(i % 2 == 0)
-        {
-            strip.setPixelColor(i, strip.Color(r1, g1, b1));
-        }
-        else
-        {
-            strip.setPixelColor(i, strip.Color(r2, g2, b2));
-        }
-    }
-    strip.show();
-    return 1;
 }
 
 int setRGB(String rgb)
