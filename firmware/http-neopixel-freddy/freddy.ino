@@ -14,6 +14,8 @@
 #include "application.h"
 #include "neopixel/neopixel.h"
 
+// SYSTEM_MODE(MANUAL);
+
 #define ARRAYLEN(x)  (sizeof(x) / sizeof((x)[0]))
 
 //the pin your spark is using to control neopixels
@@ -38,7 +40,9 @@
 #define WAKEUPEYES "wakeupeyes"
 #define GLOWEYES "gloweyes"
 #define ALLOFF "alloff"
-#define FIRE "fire"
+#define FIRESPARKLE "firesparkle"
+#define FIREHEART "fireheart"
+#define FIRESPIRAL "firespiral"
 #define RANDOM "random"
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
@@ -59,20 +63,46 @@ String *strArr = new String[20];
 
 void setup()
 {
-//   Serial.begin(9600);
+  Serial.begin(9600);
+  WiFi.selectAntenna(ANT_EXTERNAL);
+//   WiFi.on();
+//   WiFi.connect();
+//   while(!WiFi.ready())
+//   {
+//      Serial.print("Wifi connecting...");
+//      delay(500);
+//   }
   server.begin();
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  
+  Serial.println("Serial begin");
+  
+  pinMode(D5, OUTPUT);
+  pinMode(D4, OUTPUT);
+  
   //register the action variable as a GET parameter
   Spark.variable("action", &action, STRING);
   Spark.variable("tcpstate", &tcpstate, STRING);
   Spark.variable("parameters", &parameters, STRING);
   Spark.variable("ip", &ip, STRING);
   (String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." +  String(WiFi.localIP()[2]) + "." +  String(WiFi.localIP()[3])).toCharArray(ip, 64);
+  strip.setPixelColor(0, strip.Color(0, 50, 0));
+  strip.show();
+  delay(100);
+  strip.setPixelColor(0, strip.Color(50, 0, 0));
+  strip.show();
+  delay(100);
+  strip.setPixelColor(0, strip.Color(0, 0, 50));
+  strip.show();
+  delay(100);
+  strip.setPixelColor(0, strip.Color(0, 0, 0));
+  strip.show();
 }
 
 void loop()
 {
+    // Serial.println("IP:" + String(ip));
     //TCPServer/Client connections
     if (client.connected()) {
         String("CONNECTED").toCharArray(tcpstate, 64);
@@ -137,9 +167,17 @@ void loop()
     {
         wakeUpEyes();
     }
-    else if(loopRun.equals(FIRE))
+    else if(loopRun.equals(FIRESPARKLE))
     {
-        fire();
+        fireSparkle();
+    }
+    else if(loopRun.equals(FIREHEART))
+    {
+        fireHeart();
+    }
+    else if(loopRun.equals(FIRESPIRAL))
+    {
+        fireSpiral();
     }
     else if(loopRun.equals(RANDOM))
     {
@@ -193,12 +231,93 @@ int random()
     }
 }
 
-int fire()
+void HSIOn()
 {
-    fadeColor(255, 0, 0, 0, 0, 0, 50, 5000);
-    //TODO: add code here to turn on relay
+    digitalWrite(D4, HIGH); //turn on hot surface igniter
+}
 
-    for(int j=0; j<50; j++)
+void HSIOff()
+{
+    digitalWrite(D4, LOW); //turn off hot surface igniter
+}
+
+void gasOn()
+{
+    digitalWrite(D5, HIGH);
+}
+
+void gasOff()
+{
+    digitalWrite(D5, LOW);
+}
+
+int fireHeart()
+{
+    allOff();
+    HSIOn();
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(500);
+    drawHeartEye(0, 255, 0);
+    strip.show();
+    delay(300);
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(300);
+    drawHeartEye(0, 255, 0);
+    strip.show();
+    delay(300);
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(300);
+    drawHeartEye(0, 255, 0);
+    strip.show();
+    delay(300);
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(500);
+    gasOn();
+    drawHeartEye(35, 0, 60);
+    strip.show();
+    delay(1000);
+    gasOff();
+    HSIOff();
+    loopRun = STOP;
+}
+
+int fireSpiral()
+{
+    HSIOn();
+    for(int i=0; i<10; i++)
+        spiralFreddy(random(128), random(128), random(255), random(50), random(50), random(50));
+        
+    gasOn();
+    delay(200);
+    gasOff();
+    delay(200);
+    gasOn();
+    delay(200);
+    gasOff();
+    delay(200);
+    gasOn();
+    delay(200);
+    gasOff();
+    HSIOff();
+    blink(50);
+    narrowEyes(50);
+    loopRun = STOP;
+}
+
+int fireSparkle()
+{
+    HSIOn();
+    
+    fadeColor(255, 0, 0, 0, 0, 0, 50, 3000);
+    
+    //turn on the gas
+    gasOn();
+    
+    for(int j=0; j<30; j++)
     {
         int cnt = 10;
         int pixNums[cnt];
@@ -218,12 +337,16 @@ int fire()
         strip.show();
         delay(30);
     }
-    //TODO: turn off relay
+    
+    HSIOff();
+    gasOff();
+    
     delay(100);
     blink(100);
     narrowEyes(100);
 
-    loopRun = RANDOM;
+    // loopRun = RANDOM;
+    loopRun = STOP;
 }
 
 int heartEyes()
@@ -483,7 +606,7 @@ int wakeUpFreddy()
 
 int glowEyeFreddy(int del)
 {
-    for(int j=0; j<25; j++)
+    for(int j=0; j<10; j++)
     {
         for(int i=30; i>0; i--)
         {
@@ -588,8 +711,6 @@ int heartEyeFreddy(uint8_t r, uint8_t g, uint8_t b)
     
     drawHeartEye(75, 0, 130);
     strip.show();
-    
-    delay(5000);
 }
 
 int sparkleFreddy()
