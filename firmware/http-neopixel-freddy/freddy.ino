@@ -12,7 +12,7 @@
 
 
 #include "application.h"
-#include "neopixel/neopixel.h"
+#include "neopixel.h"
 
 // SYSTEM_MODE(MANUAL);
 
