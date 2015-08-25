@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>El Casa Poder 2000</title>
+	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
+	<link rel="apple-touch-icon" href="./freddy.png" />
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="spectrum.js" type="text/javascript"></script>
+	<link rel="stylesheet" href="spectrum.css" type="text/css"/>
+	<meta name="viewport" content="width=250" />
+	<script>
+    $( document ).ready(function() {
+        $('#spinner').hide();
+    });
+ 
+    $( window ).load(function() {
+    });
+    </script>
+	<style>
+		body 
+		{
+			background-color: grey;
+			max-width: 220px;
+			margin: 0 auto;
+			float: none;
+		}
+		img.centered
+		{
+			display: block;
+		    margin-left: auto;
+		    margin-right: auto
+		}
+    </style>
+</head>
+<body>
+	<br/>
+	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
+	<a href="/"><img class="centered" src="freddy.png"/></a>
+	<h3 style="text-align:center">El Freddy Poder 2000</h3>
+
+	</div>
+	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
+
+		<br/>
+		<button id="puff1">Fire 1</button>
+		<button id="puff2">Fire 2</button>
+		<button id="puff3">Fire 3</button>
+		<button id="seq123">Sequence 123</button>
+		<button id="seq321">Sequence 321</button>
+		<button id="seqAll">Fire All</button>
+		<button id="randomOn">Random Firing On</button>
+		<button id="randomOff">Random Firing Off</button>
+		<br/>
+
+		<div id="status"></div>
+		<div id="result"></div>
+		<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
+	</div>
+
+	<script>
+		var paramState = null;
+
+		var puff1Button = document.querySelector("#puff1");
+		var puff2Button = document.querySelector("#puff2");
+		var puff3Button = document.querySelector("#puff3");
+		var seq123Button = document.querySelector("#seq123");
+		var seq321Button = document.querySelector("#seq321");
+		var seqAllButton = document.querySelector("#seqAll");
+		var randomOnButton = document.querySelector("#randomOn");
+		var randomOffButton = document.querySelector("#randomOff");
+
+		puff1Button.addEventListener("click", function(ev) {
+		    $.get("http://syncline.local:4000/puff/p1",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		puff2Button.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/puff/p2",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		puff3Button.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/puff/p3",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		seq123Button.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/puff/s123",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		seq321Button.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/puff/s321",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		seqAllButton.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/puff/sAll",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		randomOnButton.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/program/random/1",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+		randomOffButton.addEventListener("click", function(ev) {
+			$.get("http://syncline.local:4000/program/random/0",
+		    	function(data) {
+				      
+			});
+		}, false);
+
+	</script>
+
+</body>
+</html>
