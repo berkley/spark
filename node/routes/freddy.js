@@ -22,7 +22,7 @@ exports.action = function(req, res) {
 	console.log("connecting....");
 
 	// var HOST = '10.0.1.47';
-	var HOST = '10.0.1.31';
+	var HOST = '10.0.1.37';
 	var PORT = 7000;
 
 	var client = new net.Socket();
