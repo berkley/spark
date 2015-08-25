@@ -57,7 +57,7 @@ char parameters[64];
 char ip[64];
 char tcpstate[64];
 
-String loopRun = STOP;
+String loopRun = RAINBOWEYES;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
