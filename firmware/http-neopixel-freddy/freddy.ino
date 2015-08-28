@@ -12,7 +12,7 @@
 
 
 #include "application.h"
-#include "neopixel.h"
+#include "neopixel/neopixel.h"
 
 // SYSTEM_MODE(MANUAL);
 
@@ -22,8 +22,8 @@
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
 // #define PIXEL_COUNT 467 //giggle
-// #define PIXEL_COUNT 150 //colossus
-#define PIXEL_COUNT 104 //FREDDY
+#define PIXEL_COUNT 150 //colossus
+// #define PIXEL_COUNT 104 //FREDDY
 #define EYE_PIXEL_COUNT 52
 
 #define TCP_PORT 7000
@@ -44,6 +44,7 @@
 #define FIREHEART "fireheart"
 #define FIRESPIRAL "firespiral"
 #define RANDOM "random"
+#define KEITHEYES "keitheyes"
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -57,14 +58,14 @@ char parameters[64];
 char ip[64];
 char tcpstate[64];
 
-String loopRun = RAINBOWEYES;
+String loopRun = KEITHEYES;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
 void setup()
 {
   Serial.begin(9600);
-  WiFi.selectAntenna(ANT_EXTERNAL);
+//   WiFi.selectAntenna(ANT_EXTERNAL);
 //   WiFi.on();
 //   WiFi.connect();
 //   while(!WiFi.ready())
@@ -183,12 +184,470 @@ void loop()
     {
         random();
     }
+    else if(loopRun.equals(KEITHEYES))
+    {
+        keithEyes();
+    }
     else
     {
         String("INVALID_ACTION").toCharArray(action, 64);
         loopRun = STOP;
     }
 }
+
+int keithEyes()
+{
+    uint32_t c1 = strip.Color(160, 160, 160);
+    uint32_t c2 = strip.Color(250, 0, 0);
+    uint32_t c3 = strip.Color(0, 0, 0);
+    
+    int farLeftColor1[] = {1, 2, 3, 6, 5, 4, 12, 13, 14, 17, 16, 15, 26, 27, 28, 29, 32, 31, 30, 40, 41, 42, 45, 44, 43, 49, 50, 51};
+    int farLeftColor2[] = {0, 8, 7, 9, 11, 21, 18, 22, 25, 36, 33, 37, 39, 47, 46, 48};
+    int farLeftColor3[] = {10, 20, 19, 23, 24, 35, 34, 38};
+    
+    int leftColor1[] = {2, 3, 5, 4, 13, 14, 16, 15, 22, 27, 28, 29, 31, 30, 41, 42, 44, 43, 50, 51};
+    int leftColor2[] = {0, 1, 8, 7, 6, 9, 12, 21, 17, 23, 26, 36, 32, 37, 40, 47, 46, 45, 48, 49};
+    int leftColor3[] = {10, 11, 20, 19, 18, 24, 25, 35, 34, 33, 38, 39};
+    
+    int centerColor1[] = {0, 3, 8, 4, 9, 14, 21, 15, 22, 23, 28, 29, 36, 30, 37, 42, 47, 43, 48, 51};
+    int centerColor2[] = {1, 2, 7, 6, 5, 10, 13, 20, 16, 24, 27, 35, 31, 38, 41, 46, 45, 44, 49, 50};
+    int centerColor3[] = {11, 12, 19, 18, 17, 25, 26, 34, 33, 32, 39, 40};
+    
+    int rightColor1[] = {0, 1, 8, 7, 9, 10, 21, 20, 22, 23, 24, 29, 36, 35, 37, 38, 47, 46, 48, 49};
+    int rightColor2[] = {2, 3, 6, 5, 4, 11, 14, 19, 15, 25, 28, 34, 30, 39, 42, 45, 44, 43, 50, 51};
+    int rightColor3[] = {12, 13, 18, 17, 16, 26, 27, 33, 32, 31, 40, 41};
+
+    int farRightColor1[] = {0, 1, 2, 8, 7, 6, 9, 10, 11, 21, 20, 19, 22, 23, 24, 25, 36, 35, 34, 37, 38, 39, 47, 46, 45, 48, 49, 50};
+    int farRightColor2[] = {3, 5, 4, 12, 14, 18, 15, 26, 29, 33, 30, 40, 42, 44, 43, 51};
+    int farRightColor3[] = {13, 17, 16, 27, 28, 32, 31, 41};
+
+    int downRightColor1[] = {0, 1, 2, 3, 8, 7, 6, 9, 10, 11, 21, 20, 19, 22, 23, 24, 36, 35, 34, 37, 38, 47, 46, 48, 49};
+    int downRightColor2[] = {5, 4, 12, 13, 14, 18, 15, 25, 29, 33, 30, 39, 45, 50, 51};
+    int downRightColor3[] = {17, 16, 26, 27, 28, 32, 31, 40, 41, 42, 44, 43};
+
+    int downMidRightColor1[] = {0, 1, 2, 3, 8, 7, 4, 9, 10, 14, 21, 20, 15, 22, 23, 29, 36, 35, 30, 37, 47, 48};
+    int downMidRightColor2[] = {6, 5, 11, 12, 13, 19, 16, 24, 28, 34, 31, 38, 42, 46, 43, 49, 50, 51};
+    int downMidRightColor3[] = {18, 17, 25, 26, 27, 33, 32, 39, 40, 41, 45, 44};
+
+    int downMidLeftColor1[] = {0, 1, 2, 3, 8, 5, 4, 9, 13, 14, 21, 16, 15, 22, 28, 29, 36, 31, 30, 42, 43, 51};
+    int downMidLeftColor2[] = {7, 6, 10, 11, 12, 20, 17, 23, 27, 35, 32, 37, 41, 47, 44, 48, 49, 50};
+    int downMidLeftColor3[] = {19, 18, 24, 25, 26, 34, 33, 38, 39, 40, 46, 45};
+
+    int downLeftColor1[] = {0, 1, 2, 3, 6, 5, 4, 12, 13, 14, 17, 16, 15, 27, 28, 29, 32, 31, 30, 41, 42, 44, 43, 50, 51};
+    int downLeftColor2[] = {8, 7, 9, 10, 11, 21, 18, 22, 26, 36, 33, 40, 45, 48, 49};
+    int downLeftColor3[] = {20, 19, 23, 24, 25, 35, 34, 37, 38, 39, 47, 46};
+
+    int blink1Color1[] = {4, 4, 9, 14, 21, 15, 22, 23, 28, 29, 36, 30, 37, 42, 47, 43, 48, 51};
+    int blink1Color2[] = {5, 6, 5, 10, 13, 20, 16, 24, 27, 35, 31, 38, 41, 46, 45, 44, 49, 50};
+    int blink1Color3[] = {0, 1, 2, 3, 11, 12, 19, 18, 17, 25, 26, 34, 33, 32, 39, 40};
+
+    int blink2Color1[] = {9, 14, 21, 15, 22, 23, 28, 29, 36, 30, 37, 42, 47, 43, 48, 51};
+    int blink2Color2[] = {10, 13, 20, 16, 24, 27, 35, 31, 38, 41, 46, 45, 44, 49, 50};
+    int blink2Color3[] = {0, 1, 2, 3, 8, 7, 6, 5, 4, 11, 12, 19, 18, 17, 25, 26, 34, 33, 32, 39, 40};
+
+    int blink3Color1[] = {15, 15, 22, 23, 28, 29, 36, 30, 37, 42, 47, 43, 48, 51};
+    int blink3Color2[] = {16, 16, 24, 27, 35, 31, 38, 41, 46, 45, 44, 49, 50};
+    int blink3Color3[] = {0, 1, 2, 3, 8, 7, 6, 5, 4, 9, 10, 11, 12, 13, 14, 19, 18, 17, 25, 26, 34, 33, 32, 39, 40};
+
+    int blink4Color1[] = {22, 29, 36, 30, 37, 42, 47, 43, 48, 51};
+    int blink4Color2[] = {31, 31, 38, 41, 46, 45, 44, 49, 50};
+    int blink4Color3[] = {0, 1, 2, 3, 8, 7, 6, 5, 4, 9, 10, 11, 12, 13, 14, 21, 20, 19, 18, 17, 16, 15, 23, 24, 25, 26, 27, 28, 34, 33, 32, 39, 40};
+
+    int blink5Color1[] = {37, 42, 47, 43, 48, 51};
+    int blink5Color2[] = {49, 50};
+    int blink5Color3[] = {0, 1, 2, 3, 8, 7, 6, 5, 4, 9, 10, 11, 12, 13, 14, 21, 20, 19, 18, 17, 16, 15, 22, 23, 24, 25, 26, 27, 28, 29, 36, 35, 32};
+
+    int blink6Color1[] = {};
+    int blink6Color2[] = {};
+    int blink6Color3[] = {0, 1, 2, 3, 8, 7, 6, 5, 4, 9, 10, 11, 12, 13, 14, 21, 20, 19, 18, 17, 16, 15, 22, 23, 24, 25, 26, 27, 28, 29, 36, 35, 34, 33, 32, 31, 30, 37, 38, 39, 40, 41, 42, 47, 46, 45, 44, 43, 48, 49, 50, 51};
+
+    setPixels(leftColor1, c1, ARRAYLEN(leftColor1));
+    setPixels(leftColor2, c2, ARRAYLEN(leftColor2));
+    setPixels(leftColor3, c3, ARRAYLEN(leftColor3));
+    strip.show();
+    delay(250); //2
+    
+    setPixels(farLeftColor1, c1, ARRAYLEN(farLeftColor1));
+    setPixels(farLeftColor2, c2, ARRAYLEN(farLeftColor2));
+    setPixels(farLeftColor3, c3, ARRAYLEN(farLeftColor3));
+    strip.show();
+    delay(1000); //3
+    
+    setPixels(leftColor1, c1, ARRAYLEN(leftColor1));
+    setPixels(leftColor2, c2, ARRAYLEN(leftColor2));
+    setPixels(leftColor3, c3, ARRAYLEN(leftColor3));
+    strip.show();
+    delay(250); //4
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(250); //5
+    
+    setPixels(rightColor1, c1, ARRAYLEN(rightColor1));
+    setPixels(rightColor2, c2, ARRAYLEN(rightColor2));
+    setPixels(rightColor3, c3, ARRAYLEN(rightColor3));
+    strip.show();
+    delay(250); //6
+    
+    setPixels(farRightColor1, c1, ARRAYLEN(farRightColor1));
+    setPixels(farRightColor2, c2, ARRAYLEN(farRightColor2));
+    setPixels(farRightColor3, c3, ARRAYLEN(farRightColor3));
+    strip.show();
+    delay(1000); //7
+    
+    setPixels(rightColor2, c2, ARRAYLEN(rightColor2));
+    setPixels(rightColor1, c1, ARRAYLEN(rightColor1));
+    setPixels(rightColor3, c3, ARRAYLEN(rightColor3));
+    strip.show();
+    delay(250); //8
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(1000); //9
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //10
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //11
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //12
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show(); 
+    delay(50); //13
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //14
+    
+    setPixels(blink6Color1, c1, ARRAYLEN(blink6Color1));
+    setPixels(blink6Color2, c2, ARRAYLEN(blink6Color2));
+    setPixels(blink6Color3, c3, ARRAYLEN(blink6Color3));
+    strip.show();
+    delay(150); //15
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //16
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show();
+    delay(50); //17
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //18
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //19
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //20
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(1000); //21
+    
+    setPixels(rightColor1, c1, ARRAYLEN(rightColor1));
+    setPixels(rightColor2, c2, ARRAYLEN(rightColor2));
+    setPixels(rightColor3, c3, ARRAYLEN(rightColor3));
+    strip.show();
+    delay(250); //22
+    
+    setPixels(downRightColor1, c1, ARRAYLEN(downRightColor1));
+    setPixels(downRightColor2, c2, ARRAYLEN(downRightColor2));
+    setPixels(downRightColor3, c3, ARRAYLEN(downRightColor3));
+    strip.show();
+    delay(1000); //23
+    
+    setPixels(downMidRightColor1, c1, ARRAYLEN(downMidRightColor1));
+    setPixels(downMidRightColor2, c2, ARRAYLEN(downMidRightColor2));
+    setPixels(downMidRightColor3, c3, ARRAYLEN(downMidRightColor3));
+    strip.show();
+    delay(250); //24
+    
+    setPixels(downMidLeftColor1, c1, ARRAYLEN(downMidLeftColor1));
+    setPixels(downMidLeftColor2, c2, ARRAYLEN(downMidLeftColor2));
+    setPixels(downMidLeftColor3, c3, ARRAYLEN(downMidLeftColor3));
+    strip.show();
+    delay(250); //25
+    
+    setPixels(downLeftColor1, c1, ARRAYLEN(downLeftColor1));
+    setPixels(downLeftColor2, c2, ARRAYLEN(downLeftColor2));
+    setPixels(downLeftColor3, c3, ARRAYLEN(downLeftColor3));
+    strip.show();
+    delay(1000); //26
+    
+    setPixels(downMidLeftColor1, c1, ARRAYLEN(downMidLeftColor1));
+    setPixels(downMidLeftColor2, c2, ARRAYLEN(downMidLeftColor2));
+    setPixels(downMidLeftColor3, c3, ARRAYLEN(downMidLeftColor3));
+    strip.show();
+    delay(250); //27
+    
+    setPixels(downMidRightColor1, c1, ARRAYLEN(downMidRightColor1));
+    setPixels(downMidRightColor2, c2, ARRAYLEN(downMidRightColor2));
+    setPixels(downMidRightColor3, c3, ARRAYLEN(downMidRightColor3));
+    strip.show();
+    delay(250); //28
+    
+    setPixels(downRightColor1, c1, ARRAYLEN(downRightColor1));
+    setPixels(downRightColor2, c2, ARRAYLEN(downRightColor2));
+    setPixels(downRightColor3, c3, ARRAYLEN(downRightColor3));
+    strip.show();
+    delay(1000); //29
+    
+    setPixels(downMidLeftColor1, c1, ARRAYLEN(downMidLeftColor1));
+    setPixels(downMidLeftColor2, c2, ARRAYLEN(downMidLeftColor2));
+    setPixels(downMidLeftColor3, c3, ARRAYLEN(downMidLeftColor3));
+    strip.show();
+    delay(250); //30
+    
+    setPixels(downMidRightColor1, c1, ARRAYLEN(downMidRightColor1));
+    setPixels(downMidRightColor2, c2, ARRAYLEN(downMidRightColor2));
+    setPixels(downMidRightColor3, c3, ARRAYLEN(downMidRightColor3));
+    strip.show();
+    delay(250); //31
+    
+    setPixels(downMidLeftColor1, c1, ARRAYLEN(downMidLeftColor1));
+    setPixels(downMidLeftColor2, c2, ARRAYLEN(downMidLeftColor2));
+    setPixels(downMidLeftColor3, c3, ARRAYLEN(downMidLeftColor3));
+    strip.show();
+    delay(1000); //32
+    
+    setPixels(downMidRightColor1, c1, ARRAYLEN(downMidRightColor1));
+    setPixels(downMidRightColor2, c2, ARRAYLEN(downMidRightColor2));
+    setPixels(downMidRightColor3, c3, ARRAYLEN(downMidRightColor3));
+    strip.show();
+    delay(250); //33
+    
+    setPixels(downRightColor1, c1, ARRAYLEN(downRightColor1));
+    setPixels(downRightColor2, c2, ARRAYLEN(downRightColor2));
+    setPixels(downRightColor3, c3, ARRAYLEN(downRightColor3));
+    strip.show();
+    delay(250); //34
+    
+    setPixels(rightColor1, c1, ARRAYLEN(rightColor1));
+    setPixels(rightColor2, c2, ARRAYLEN(rightColor2));
+    setPixels(rightColor3, c3, ARRAYLEN(rightColor3));
+    strip.show();
+    delay(1000); //35
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(250); //36
+    
+    setPixels(downMidRightColor1, c1, ARRAYLEN(downMidRightColor1));
+    setPixels(downMidRightColor2, c2, ARRAYLEN(downMidRightColor2));
+    setPixels(downMidRightColor3, c3, ARRAYLEN(downMidRightColor3));
+    strip.show();
+    delay(1000); //37
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //38
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //39
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //40
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show();
+    delay(50); //41
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //42
+    
+    setPixels(blink6Color1, c1, ARRAYLEN(blink6Color1));
+    setPixels(blink6Color2, c2, ARRAYLEN(blink6Color2));
+    setPixels(blink6Color3, c3, ARRAYLEN(blink6Color3));
+    strip.show();
+    delay(50); //43
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //44
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show();
+    delay(50); //45
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //46
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //47
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //48
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(3000); //49
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //50
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //51
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //52
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show();
+    delay(50); //53
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //54
+    
+    setPixels(blink6Color1, c1, ARRAYLEN(blink6Color1));
+    setPixels(blink6Color2, c2, ARRAYLEN(blink6Color2));
+    setPixels(blink6Color3, c3, ARRAYLEN(blink6Color3));
+    strip.show();
+    delay(50); //55
+    
+    setPixels(blink5Color1, c1, ARRAYLEN(blink5Color1));
+    setPixels(blink5Color2, c2, ARRAYLEN(blink5Color2));
+    setPixels(blink5Color3, c3, ARRAYLEN(blink5Color3));
+    strip.show();
+    delay(50); //56
+    
+    setPixels(blink4Color1, c1, ARRAYLEN(blink4Color1));
+    setPixels(blink4Color2, c2, ARRAYLEN(blink4Color2));
+    setPixels(blink4Color3, c3, ARRAYLEN(blink4Color3));
+    strip.show();
+    delay(50); //57
+    
+    setPixels(blink3Color1, c1, ARRAYLEN(blink3Color1));
+    setPixels(blink3Color2, c2, ARRAYLEN(blink3Color2));
+    setPixels(blink3Color3, c3, ARRAYLEN(blink3Color3));
+    strip.show();
+    delay(50); //58
+    
+    setPixels(blink2Color1, c1, ARRAYLEN(blink2Color1));
+    setPixels(blink2Color2, c2, ARRAYLEN(blink2Color2));
+    setPixels(blink2Color3, c3, ARRAYLEN(blink2Color3));
+    strip.show();
+    delay(50); //59
+    
+    setPixels(blink1Color1, c1, ARRAYLEN(blink1Color1));
+    setPixels(blink1Color2, c2, ARRAYLEN(blink1Color2));
+    setPixels(blink1Color3, c3, ARRAYLEN(blink1Color3));
+    strip.show();
+    delay(50); //60
+    
+    setPixels(centerColor1, c1, ARRAYLEN(centerColor1));
+    setPixels(centerColor2, c2, ARRAYLEN(centerColor2));
+    setPixels(centerColor3, c3, ARRAYLEN(centerColor3));
+    strip.show();
+    delay(1000); //61
+}
+
+void setPixels(int pix[], uint32_t color, int arrlen)
+{
+    for(int i=0; i<arrlen; i++)
+    {
+        // bool rev = false;
+        // if(pix[i]>=4 && pix[i] <=8 ||
+        //   pix[i]>=15 && pix[i] <=21 ||
+        //   pix[i]>=30 && pix[i]<=36 ||
+        //   pix[i]>=43 && pix[i]<=47)
+        // {
+        //     rev = true;
+        // }
+        // if(rev)
+        // {
+            
+        // }
+        // else
+        // {
+        //     strip.setPixelColor(pix[i], color);
+        // }
+        
+        strip.setPixelColor(pix[i], color);
+        strip.setPixelColor(pix[i] + EYE_PIXEL_COUNT, color);
+    }
+}
+
 
 int random()
 {
