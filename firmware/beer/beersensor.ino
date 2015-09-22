@@ -1,3 +1,16 @@
+/*
+TODO
+  * Persist data to SVRAM
+  * track more than one tap (pin)
+  * change LED color over range of full -> empty
+  * calibration mode
+  * API endpoints:
+    * reset
+    * get data
+    * set tap name
+    * animation (beer) type
+
+*/
 // This #include statement was automatically added by the Particle IDE.
 #include "neopixel/neopixel.h"
 
