@@ -129,14 +129,11 @@ void loop()
 {
 //   pinVal(pin0, &pin0Value, pin0Name);
 //   pinVal(pin1, &pin1Value, pin1Name);
-//   analogVal(pin2, &pin2Value, pin2Name);
 //   pinVal(pin3, &pin3Value, pin3Name);
 //   pinVal(pin4, &pin4Value, pin4Name);
-//   analogVal(pin4, &pin4Value, pin4Name);
 //   pinVal(pin5, &pin5Value, pin5Name);
   pinVal(pin6, &pin6Value, pin6Name);
-    //  analogVal(pin6, &pin6Value, pin6Name);
-//   delay(100);
+
   EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
   float percent = (float)pulseCount / (float)maxPulseCount;
   percentFull = (int)(percent * 100.0f);
@@ -159,13 +156,6 @@ int setCalibration(int val)
 {
   maxPulseCount = val;
   EEPROM.update(EEPROM_ADDR_MAX_PULSE_COUNT, maxPulseCount);
-}
-
-void analogVal(int pin, int* pinValue, String pinName)
-{
-    *pinValue = analogRead(pin);  // read the input pin
-    // Serial.println(pinName + ":" + String(*pinValue));
-    digitalWrite(ledPin, *pinValue/16);
 }
 
 void pinVal(int pin, int* pinValue, String pinName)
@@ -200,6 +190,13 @@ void pinVal(int pin, int* pinValue, String pinName)
   }
   
 //   Serial.println(pinName + ":" + String(*pinValue));
+}
+
+void analogVal(int pin, int* pinValue, String pinName)
+{
+    *pinValue = analogRead(pin);  // read the input pin
+    // Serial.println(pinName + ":" + String(*pinValue));
+    digitalWrite(ledPin, *pinValue/16);
 }
 
 void setPixels(int instantPulseCount)
