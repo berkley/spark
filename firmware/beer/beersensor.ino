@@ -2,7 +2,8 @@
 TODO
   x Persist data to SVRAM
   * track more than one tap (pin)
-  * change LED color over range of full -> empty
+  x change LED color over range of full -> empty
+  x beer flowing animation
   * API endpoints:
     x reset
     x get data
@@ -46,6 +47,7 @@ int maxPulseCount = 10000; //bogus init value
 int percentFull = 0;
 int currentSecond = 1;
 int previousSecond = 0;
+int animationStep = 0;
 
 const char* pin0Name = "pin0Value";
 const char* pin1Name = "pin1Value";
@@ -115,14 +117,6 @@ int handlePost(String postData)
     //i.e. pulseCount / args[1] == percentFull
     setCalibration(args[1].toInt());
   }
-  else if(command.equals("setPinName"))
-  {
-
-  }
-  else if(command.equals("setPinAnimation"))
-  {
-
-  }
 }
 
 void loop()
@@ -134,10 +128,18 @@ void loop()
 //   pinVal(pin5, &pin5Value, pin5Name);
   pinVal(pin6, &pin6Value, pin6Name);
 
-  EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
-  float percent = (float)pulseCount / (float)maxPulseCount;
-  percentFull = (int)(percent * 100.0f);
-  EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
+  if(instantPulseCount > 0)
+  {
+    animateTap(animationStep);
+  }
+  else
+  {
+    EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
+    float percent = (float)pulseCount / (float)maxPulseCount;
+    percentFull = (int)(percent * 100.0f);
+    EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
+    recalculateTapColor();
+  }
 }
 
 int getPulseCount()
@@ -179,24 +181,70 @@ void pinVal(int pin, int* pinValue, String pinName)
     }
   }
   
-  
   currentSecond = Time.second();
-//   Serial.println("CurrentSecond: " + String(currentSecond));
   if(currentSecond != previousSecond)
   {
       setPixels(instantPulseCount);
       instantPulseCount = 0;
       previousSecond = currentSecond;
   }
-  
-//   Serial.println(pinName + ":" + String(*pinValue));
 }
 
 void analogVal(int pin, int* pinValue, String pinName)
 {
-    *pinValue = analogRead(pin);  // read the input pin
-    // Serial.println(pinName + ":" + String(*pinValue));
-    digitalWrite(ledPin, *pinValue/16);
+  *pinValue = analogRead(pin);  // read the input pin
+  // Serial.println(pinName + ":" + String(*pinValue));
+  digitalWrite(ledPin, *pinValue/16);
+}
+
+void recalculateTapColor()
+{ //change the color of the tap based on percentFull
+  //as percentFull goes from 100 to 0, gradiate 
+  //from green (0, 255, 0)
+  //to red     (255, 0, 0)
+  //the middle (yellow) is (255, 255, 0)
+
+  float multiplier = (255.0f + 255.0f) / 100.0f;
+  int value = multiplier * percentFull;
+  int red;
+  int green;
+  if(value > 255)
+  { //add to the red
+    red = value - 255;
+    green = 255;
+  }
+  else
+  { //subtract from green
+    red = 255;
+    green = value;
+  }
+
+  for(int i=0; i<PIXEL_COUNT; i++)
+  {
+    strip.setPixelColor(i, strip.Color(red, green, 0));
+  }
+  strip.show();
+}
+
+void animateTap(int animationStep)
+{ //do the flow animation
+  if(animationStep >= PIXEL_COUNT)
+    animationStep = 0;
+
+  setAllPixelsOff();
+  strip.setPixelColor(animationStep, strip.Color(random(255), random(255), random(255)));
+  strip.show();
+  delay(100);
+  animationStep++;
+}
+
+void setAllPixelsOff()
+{
+  for(int i=0; i<PIXEL_COUNT; i++)
+  {
+    strip.setPixelColor(i, strip.Color(0,0,0));
+  }
+  strip.show();
 }
 
 void setPixels(int instantPulseCount)
