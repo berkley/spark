@@ -184,7 +184,7 @@ void pinVal(int pin, int* pinValue, String pinName)
   currentSecond = Time.second();
   if(currentSecond != previousSecond)
   {
-      setPixels(instantPulseCount);
+      // setPixels(instantPulseCount);
       instantPulseCount = 0;
       previousSecond = currentSecond;
   }
