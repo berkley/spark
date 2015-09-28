@@ -48,6 +48,7 @@ int percentFull = 0;
 int currentSecond = 1;
 int previousSecond = 0;
 int animationStep = 0;
+String *strArr = new String[20];
 
 const char* pin0Name = "pin0Value";
 const char* pin1Name = "pin1Value";
