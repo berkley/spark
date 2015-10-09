@@ -2,6 +2,8 @@ var express = require('express');
 var lights = require('./routes/lights');
 var water = require('./routes/water');
 var index = require('./routes/index');
+var freddy = require('./routes/freddy');
+var camp = require('./routes/camp'); //control the camp fire puffers
 var security = require('./routes/security');
 var http = require('http');
 var path = require('path');
@@ -38,6 +40,9 @@ app.get('/security', security.index);
 app.get('/house/run/action', lights.action);
 app.get('/house/params/:coreId', lights.params); //get the current param state for the given coreId;
 app.get('/water/run/action', water.action);
+app.get('/freddy', freddy.index);
+app.get('/freddy/run/action', freddy.action);
+app.get('/camp', camp.index);
 
 var server = http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
