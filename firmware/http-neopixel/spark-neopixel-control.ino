@@ -46,7 +46,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
 
-String loopRun = STOP;
+String loopRun = RAINBOW;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
@@ -56,11 +56,11 @@ void setup()
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
   //register the run command as an API endpoint
-  Spark.function("run", run);
+  Particle.function("run", run);
   //register the action variable as a GET parameter
-  Spark.variable("action", &action, STRING);
+  Particle.variable("action", action, STRING);
   //retister the parameters variable as a GET parameter
-  Spark.variable("parameters", &parameters, STRING);
+  Particle.variable("parameters", parameters, STRING);
 }
 
 void loop() 
@@ -621,7 +621,7 @@ void particles() {
     for (int i=0; i < emitter.numParticles; i++) {
 
         // Update this particle's position
-        Particle prt = emitter.updateParticle(i);
+        LEDParticle prt = emitter.updateParticle(i);
 
         float zScale = (emitter.threed ? (1.0 - prt.coord.z) : 1.0);
         double tailLength = (1.0 + abs(prt.velocity.x * 15) * zScale);

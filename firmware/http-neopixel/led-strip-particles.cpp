@@ -28,8 +28,8 @@ ParticleEmitter::ParticleEmitter(uint16_t _numPixels, uint8_t _maxColor) {
     }
 }
 
-Particle ParticleEmitter::newParticle() {
-    Particle p;
+LEDParticle ParticleEmitter::newParticle() {
+    LEDParticle p;
     
     p.coord.x = (random(2) == 0 ? 0.0 : 1.0); //random(67) / 100.0 + 0.33;
     p.coord.y = 0.0;
@@ -55,8 +55,8 @@ Particle ParticleEmitter::newParticle() {
 void ParticleEmitter::begin(void) {
 }
 
-Particle ParticleEmitter::updateParticle(uint16_t i) {
-    Particle *p = &particles[i];
+LEDParticle ParticleEmitter::updateParticle(uint16_t i) {
+    LEDParticle *p = &particles[i];
     
     if (flicker) {
         p->dimmed = (random(3) == 0 ? 1 : 0);

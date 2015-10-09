@@ -24,7 +24,7 @@ typedef struct {
     uint8_t blueColor;
     bool dimmed;
     Coord3D coord;
-} Particle;
+} LEDParticle;
 
 class ParticleEmitter {
 
@@ -34,7 +34,7 @@ class ParticleEmitter {
   ParticleEmitter(void);
   void
     begin(void);
-  Particle
+  LEDParticle
     updateParticle(uint16_t i),
     newParticle();
   float
@@ -52,7 +52,7 @@ class ParticleEmitter {
 
  private:
 
-  Particle
+  LEDParticle
     particles[MAX_PARTICLES];
   float
     zDeltaDirection;
