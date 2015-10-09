@@ -7,11 +7,10 @@ TODO
   * API endpoints:
     x reset
     x get data
-    x set calibration
     * set tap name
     * animation (beer) type
-*/
 
+*/
 // This #include statement was automatically added by the Particle IDE.
 #include "neopixel/neopixel.h"
 
@@ -20,7 +19,7 @@ TODO
 #define EEPROM_ADDR_PERCENT_FULL 3
 #define PIXEL_PIN D2
 #define PIXEL_TYPE WS2812B
-#define PIXEL_COUNT 7
+#define PIXEL_COUNT 14
 
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
 
@@ -202,6 +201,11 @@ void pinVal(int pin, int* pinValue, String pinName)
   currentSecond = Time.second();
   if(currentSecond != previousSecond)
   {
+      Serial.println("pinVal Next second");
+      Serial.println(previousPulseCount);
+      Serial.println(pulseCount);
+      Serial.println(flowing);
+      Serial.println("-------------");
       // setPixels(instantPulseCount);
       instantPulseCount = 0;
       if(previousPulseCount != pulseCount)
@@ -210,6 +214,10 @@ void pinVal(int pin, int* pinValue, String pinName)
         flowing = false;
       previousPulseCount = pulseCount;
       previousSecond = currentSecond;
+      Serial.println(previousPulseCount);
+      Serial.println(pulseCount);
+      Serial.println(flowing);
+      Serial.println("================");
   }
 }
 
