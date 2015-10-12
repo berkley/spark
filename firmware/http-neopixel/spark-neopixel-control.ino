@@ -45,8 +45,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define WEBSOCKET "websocket" //<- finish this
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
+#define LIGHTNING "lightning"
 
-String loopRun = RAINBOW;
+String loopRun = STOP;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
@@ -150,6 +151,10 @@ void loop()
     else if(loopRun.equals(USA))
     {
         runUSA();
+    }
+    else if(loopRun.equals(LIGHTNING))
+    {
+        runLightning();
     }
 }
 
@@ -335,10 +340,37 @@ int run(String params)
         loopRun = USA;
         return 1;
     }
+    else if(command.equals(LIGHTNING))
+    {
+        loopRun = LIGHTNING;
+        return 1;
+    }
     else 
     { //command not found
         return 0;
     }
+}
+
+int runLightning()
+{
+    setAll(255,255,255);
+    delay(random(100));
+    setAll(0,0,0);
+    delay(random(100));
+    setAll(255,255,255);
+    delay(random(100));
+    setAll(0,0,0);
+    delay(random(100));
+    setAll(255,255,255);
+    delay(random(100));
+    setAll(0,0,0);
+    delay(random(100));
+    setAll(255,255,255);
+    delay(random(100));
+    setAll(0,0,0);
+    delay(random(10000));
+    
+    return 1;
 }
 
 int runUSA()
