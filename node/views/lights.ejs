@@ -66,6 +66,7 @@
 				<option value="endrun">End Run</option>
 				<option value="snow">Snow</option>
 				<option value="usa">USA</option>
+				<option value="lightning">lightning</option>
 			</select><br/>
 
 			<span id="colorSelector1">
@@ -450,7 +451,12 @@
 				$('#colorSelector2').hide();
 				$('#delayDiv').hide();
 			}
-
+			else if(ev.target.value == 'lightning')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+			}
 		});
 
 		stopButton.addEventListener("click", function(ev) {
