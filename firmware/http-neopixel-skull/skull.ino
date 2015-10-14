@@ -52,6 +52,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
 #define SKULL "skull"
+#define SKULLNOLIGHTNING "skullnolightning"
 
 String loopRun = SKULL;
 String *loopArgs = new String[20];
@@ -160,8 +161,13 @@ void loop()
     }
     else if(loopRun.equals(SKULL))
     {
-        runSkull();
+        runSkull(true);
     }
+    else if(loopRun.equals(SKULLNOLIGHTNING))
+    {
+        runSkull(false);
+    }
+
 }
 
 int allOff()
@@ -351,6 +357,11 @@ int run(String params)
         loopRun = SKULL;
         return 1;
     }
+    else if(command.equals(SKULLNOLIGHTNING))
+    {
+        loopRun = SKULLNOLIGHTNING;
+        return 1;
+    }
     else 
     { //command not found
         return 0;
@@ -383,7 +394,6 @@ void setStrip(int color)
     }
 }
 
-//pixels 0-6 = bottom, pixels 7-9 left eye, pixels 10-12 right eye
 void setBigEyes(int color)
 {
     for(int i=BIG_EYES_BEGIN; i<=BIG_EYES_END; i++)
@@ -434,39 +444,52 @@ void randomLightning()
     }
 }
 
-//pixels 0-3 = small skull 1
-//pixels 4-7 = small skull 2
-//pixels 8-12 = big skull bottom
-//pixels 13-15 = left eye
-//pixels 16-18 = right eye
-int runSkull()
+int runSkull(bool lightning)
 {
     allOff();
     
-    randomLightning();
-    randomLightning();
-    randomLightning();
+    if(lightning)
+    {
+        randomLightning();
+        randomLightning();
+        randomLightning();    
+    }
     
     fadeColor(255,255,255, 0, 0, 0, 20, 3000, BOTTOM_BEGIN, BOTTOM_END);
     delay(2000);
     
-    randomLightning();
-    randomLightning();
+    if(lightning)
+    {
+        randomLightning();
+        randomLightning();
+        randomLightning();    
+    }
     
     fadeColor(255,0,0, 0, 0, 0, 20, 3000, BIG_EYES_BEGIN, BIG_EYES_END);
     delay(1000);
     
-    randomLightning();
+    if(lightning)
+    {
+        randomLightning();
+    }
     
     fadeColor(255,0,255, 0, 0, 0, 20, 3000, SMALL_1_BEGIN, SMALL_1_END);
     
-    randomLightning();
-    randomLightning();
+    if(lightning)
+    {
+        randomLightning();
+        randomLightning();
+    }
     
     fadeColor(0,255,255, 0, 0, 0, 20, 3000, SMALL_2_BEGIN, SMALL_2_END);
     delay(3000);
     
-    randomLightning();
+    if(lightning)
+    {
+        randomLightning();
+        randomLightning();
+        randomLightning();    
+    }
     
     fadeColor(0,0,0, 255, 255, 255, 20, 1000, BOTTOM_BEGIN, BOTTOM_END);
     fadeColor(0,0,0, 255, 0, 0, 20, 1000, BIG_EYES_BEGIN, BIG_EYES_END);
