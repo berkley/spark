@@ -9,13 +9,13 @@
             "name": "Core1",
             "id": "PUT THE DEVICE ID HERE",
             "description": "This is my Spark MCU.",
-            "light-display":true
+            "lightDisplay":true
         },
         {
             "name": "Core2",
             "id": "PUT THE DEVICE ID HERE",
             "description": "This is my Photon MCU.",
-            "light-display":false
+            "lightDisplay":false
         }
     ],
     "screen":[{"name":"Core1", "vColStart":0, "vColEnd":31, "colStart":0, "colEnd":31},
