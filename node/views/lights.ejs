@@ -44,9 +44,10 @@
 
 		Core:
 		<select id="coreIdSelect" name="core">
-			<% for(var i=0; i<cores.length; i++) {%>
+			<% for(var i=0; i<cores.length; i++) {
+				if(cores[i].lightDisplay == true) {%>
 			   <option value="<%= cores[i].id %>"><%= cores[i].name %> - <%= cores[i].description %></option>
-			<% } %>
+			<% }} %>
 			<option value="all">All</option>
 		</select>
 
