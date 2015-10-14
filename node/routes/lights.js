@@ -91,6 +91,10 @@ exports.action = function(req, res) {
 	{
 		data = "lightning,";
 	}
+	else if(action == "skull")
+	{
+		data = "skull,";
+	}
 	else if(action == "setBrightness")
 	{ //brightness: uint8_t 0-255
 		data = "setBrightness," + req.query.brightness;
