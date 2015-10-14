@@ -5,13 +5,14 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 19
+#define PIXEL_COUNT 168
 
-//pixels 0-4 = small skull 1
-//pixels 5-8 = small skull 2
-//pixels 9-12 = big skull bottom
-//pixels 13-15 = left eye
-//pixels 16-18 = right eye
+//0-149 - strip
+//pixels 150-154 = small skull 1
+//pixels 155-158 = small skull 2
+//pixels 159-162 = big skull bottom
+//pixels 163-165 = left eye
+//pixels 166-168 = right eye
 
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
@@ -356,14 +357,31 @@ int run(String params)
     }
 }
 
-#define SMALL_1_BEGIN 0
-#define SMALL_1_END 3
-#define SMALL_2_BEGIN 4
-#define SMALL_2_END 8
-#define BOTTOM_BEGIN 8
-#define BOTTOM_END 12
-#define BIG_EYES_BEGIN 13
-#define BIG_EYES_END 19
+//0-149 - strip
+//pixels 150-154 = small skull 1
+//pixels 155-158 = small skull 2
+//pixels 159-162 = big skull bottom
+//pixels 163-165 = left eye
+//pixels 166-168 = right eye
+
+#define STRIP_BEGIN 0
+#define STRIP_END 149
+#define SMALL_1_BEGIN 150
+#define SMALL_1_END 153
+#define SMALL_2_BEGIN 154
+#define SMALL_2_END 158
+#define BOTTOM_BEGIN 158
+#define BOTTOM_END 162
+#define BIG_EYES_BEGIN 163
+#define BIG_EYES_END 169
+
+void setStrip(int color)
+{
+    for(int i=STRIP_BEGIN; i<=STRIP_END; i++)
+    {
+        strip.setPixelColor(i, color);
+    }
+}
 
 //pixels 0-6 = bottom, pixels 7-9 left eye, pixels 10-12 right eye
 void setBigEyes(int color)
@@ -398,6 +416,24 @@ void setSmallSkull2(int color)
     }
 }
 
+void lightning()
+{
+    setStrip(strip.Color(255,255,255));
+    strip.show();
+    delay(random(100));
+    setStrip(strip.Color(0,0,0));
+    strip.show();
+}
+
+void randomLightning()
+{
+    for(int i=0; i<random(10); i++)
+    {
+        lightning();
+        delay(random(200));
+    }
+}
+
 //pixels 0-3 = small skull 1
 //pixels 4-7 = small skull 2
 //pixels 8-12 = big skull bottom
@@ -407,19 +443,66 @@ int runSkull()
 {
     allOff();
     
-    fadeColor(255,255,255, 0, 0, 0, 20, 5000, BOTTOM_BEGIN, BOTTOM_END);
-    delay(5000);
+    randomLightning();
+    randomLightning();
+    randomLightning();
     
-    fadeColor(255,0,0, 0, 0, 0, 20, 5000, BIG_EYES_BEGIN, BIG_EYES_END);
+    fadeColor(255,255,255, 0, 0, 0, 20, 3000, BOTTOM_BEGIN, BOTTOM_END);
+    delay(2000);
+    
+    randomLightning();
+    randomLightning();
+    
+    fadeColor(255,0,0, 0, 0, 0, 20, 3000, BIG_EYES_BEGIN, BIG_EYES_END);
     delay(1000);
     
-    fadeColor(255,0,255, 0, 0, 0, 20, 5000, SMALL_1_BEGIN, SMALL_1_END);
-    fadeColor(0,255,255, 0, 0, 0, 20, 5000, SMALL_2_BEGIN, SMALL_2_END);
-    delay(4000);
+    randomLightning();
     
+    fadeColor(255,0,255, 0, 0, 0, 20, 3000, SMALL_1_BEGIN, SMALL_1_END);
+    
+    randomLightning();
+    randomLightning();
+    
+    fadeColor(0,255,255, 0, 0, 0, 20, 3000, SMALL_2_BEGIN, SMALL_2_END);
+    delay(3000);
+    
+    randomLightning();
+    
+    fadeColor(0,0,0, 255, 255, 255, 20, 1000, BOTTOM_BEGIN, BOTTOM_END);
+    fadeColor(0,0,0, 255, 0, 0, 20, 1000, BIG_EYES_BEGIN, BIG_EYES_END);
+    fadeColor(0,0,0, 255, 0, 255, 20, 1000, SMALL_1_BEGIN, SMALL_1_END);
+    fadeColor(0,0,0, 0, 255, 255, 20, 1000, SMALL_2_BEGIN, SMALL_2_END);
+    delay(3000);
+    
+    
+    /*
     setBottom(strip.Color(0,0,0));
     setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(255,0,255));
+    // setSmallSkull1(strip.Color(255,0,255));
+    // setSmallSkull2(strip.Color(0,255,255));
+    strip.show();
+    delay(100);
+    setBigEyes(strip.Color(0,0,0));
+    setSmallSkull1(strip.Color(0,0,0));
+    setSmallSkull2(strip.Color(0,0,0));
+    strip.show();
+    delay(100);
+    
+    setBottom(strip.Color(0,0,0));
+    // setBigEyes(strip.Color(255,0,0));
+    setSmallSkull1(strip.Color(0,255,255));
+    // setSmallSkull2(strip.Color(255,0,255));
+    strip.show();
+    delay(100);
+    setBigEyes(strip.Color(0,0,0));
+    setSmallSkull1(strip.Color(0,0,0));
+    setSmallSkull2(strip.Color(0,0,0));
+    strip.show();
+    delay(100);
+    
+    setBottom(strip.Color(0,0,0));
+    // setBigEyes(strip.Color(255,0,0));
+    // setSmallSkull1(strip.Color(255,0,255));
     setSmallSkull2(strip.Color(0,255,255));
     strip.show();
     delay(100);
@@ -431,7 +514,31 @@ int runSkull()
     
     setBottom(strip.Color(0,0,0));
     setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(0,255,255));
+    // setSmallSkull1(strip.Color(0,255,255));
+    // setSmallSkull2(strip.Color(255,0,255));
+    strip.show();
+    delay(100);
+    setBigEyes(strip.Color(0,0,0));
+    setSmallSkull1(strip.Color(0,0,0));
+    setSmallSkull2(strip.Color(0,0,0));
+    strip.show();
+    delay(100);
+    
+    setBottom(strip.Color(0,0,0));
+    // setBigEyes(strip.Color(255,0,0));
+    setSmallSkull1(strip.Color(255,0,255));
+    // setSmallSkull2(strip.Color(0,255,255));
+    strip.show();
+    delay(100);
+    setBigEyes(strip.Color(0,0,0));
+    setSmallSkull1(strip.Color(0,0,0));
+    setSmallSkull2(strip.Color(0,0,0));
+    strip.show();
+    delay(100);
+    
+    setBottom(strip.Color(0,0,0));
+    // setBigEyes(strip.Color(255,0,0));
+    // setSmallSkull1(strip.Color(0,255,255));
     setSmallSkull2(strip.Color(255,0,255));
     strip.show();
     delay(100);
@@ -443,20 +550,8 @@ int runSkull()
     
     setBottom(strip.Color(0,0,0));
     setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(255,0,255));
-    setSmallSkull2(strip.Color(0,255,255));
-    strip.show();
-    delay(100);
-    setBigEyes(strip.Color(0,0,0));
-    setSmallSkull1(strip.Color(0,0,0));
-    setSmallSkull2(strip.Color(0,0,0));
-    strip.show();
-    delay(100);
-    
-    setBottom(strip.Color(0,0,0));
-    setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(0,255,255));
-    setSmallSkull2(strip.Color(255,0,255));
+    // setSmallSkull1(strip.Color(255,0,255));
+    // setSmallSkull2(strip.Color(0,255,255));
     strip.show();
     delay(100);
     setBigEyes(strip.Color(0,0,0));
@@ -470,71 +565,8 @@ int runSkull()
     setSmallSkull1(strip.Color(255,0,255));
     setSmallSkull2(strip.Color(0,255,255));
     strip.show();
-    delay(100);
-    setBigEyes(strip.Color(0,0,0));
-    setSmallSkull1(strip.Color(0,0,0));
-    setSmallSkull2(strip.Color(0,0,0));
-    strip.show();
-    delay(100);
-    
-    setBottom(strip.Color(0,0,0));
-    setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(0,255,255));
-    setSmallSkull2(strip.Color(255,0,255));
-    strip.show();
-    delay(100);
-    setBigEyes(strip.Color(0,0,0));
-    setSmallSkull1(strip.Color(0,0,0));
-    setSmallSkull2(strip.Color(0,0,0));
-    strip.show();
-    delay(100);
-    
-    setBottom(strip.Color(0,0,0));
-    setBigEyes(strip.Color(255,0,0));
-    setSmallSkull1(strip.Color(255,0,255));
-    setSmallSkull2(strip.Color(0,255,255));
-    strip.show();
-    delay(100);
-    setBigEyes(strip.Color(0,0,0));
-    setSmallSkull1(strip.Color(0,0,0));
-    setSmallSkull2(strip.Color(0,0,0));
-    strip.show();
-    delay(100);
-    
-    // setBottom(strip.Color(255,255,255));
-    // strip.show();
-    // delay(1000);
-    
-    // fadeColor(255, 0, 255, 0, 0, 0, 20, 5000);
-    
-    // setEyes(strip.Color(255,255,255));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(0,0,0));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(255,0,0));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(0,0,0));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(255,255,255));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(0,0,0));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(255,0,0));
-    // strip.show();
-    // delay(random(100));
-    // setEyes(strip.Color(0,0,0));
-    // strip.show();
-    // delay(random(100));
-    
-    // setEyes(strip.Color(255,0,0));
-    // strip.show();
-    // delay(5000);
+    delay(10000);
+    */
 }
 
 int runUSA()

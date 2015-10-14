@@ -67,6 +67,7 @@
 				<option value="snow">Snow</option>
 				<option value="usa">USA</option>
 				<option value="lightning">lightning</option>
+				<option value="skull">skull</option>
 			</select><br/>
 
 			<span id="colorSelector1">
@@ -452,6 +453,12 @@
 				$('#delayDiv').hide();
 			}
 			else if(ev.target.value == 'lightning')
+			{
+				$('#colorSelector1').hide();
+				$('#colorSelector2').hide();
+				$('#delayDiv').hide();
+			}
+			else if(ev.target.value == 'skull')
 			{
 				$('#colorSelector1').hide();
 				$('#colorSelector2').hide();
