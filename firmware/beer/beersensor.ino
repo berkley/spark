@@ -1,7 +1,7 @@
 /*
 TODO
   x Persist data to SVRAM
-  * track more than one tap (pin)
+  x track more than one tap (pin)
   x change LED color over range of full -> empty
   x beer flowing animation
   * API endpoints:
@@ -64,9 +64,16 @@ int percentFullT0 = 100;
 int percentFullT1 = 100;
 int percentFullT2 = 100;
 
-int currentSecond = 1;
-int previousSecond = 0;
-int animationStep = 0;
+int currentSecondT0 = 1;
+int previousSecondT0 = 0;
+int animationStepT0 = 0;
+int currentSecondT1 = 1;
+int previousSecondT1 = 0;
+int animationStepT1 = 0;
+int currentSecondT2 = 1;
+int previousSecondT2 = 0;
+int animationStepT2 = 0;
+
 String *strArr = new String[20];
 
 const char* flowTapPin0Name = "flowTapPin0Val";
@@ -196,6 +203,10 @@ void loop()
     percentFullT2 = 100;
   // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);  
 
+  Serial.println("flowingT0: " + String(flowingT0));
+  Serial.println("flowingT1: " + String(flowingT1));
+  Serial.println("flowingT2: " + String(flowingT2));
+
   if(flowingT0)
   {
     animateTap(0);
@@ -270,8 +281,8 @@ void pinValT0(int pin)
     }
   }
   
-  currentSecond = Time.second();
-  if(currentSecond != previousSecond)
+  currentSecondT0 = Time.second();
+  if(currentSecondT0 != previousSecondT0)
   {
       instantPulseCountT0 = 0;
       if(previousPulseCountT0 != pulseCountT0)
@@ -279,7 +290,7 @@ void pinValT0(int pin)
       else
         flowingT0 = 0;
       previousPulseCountT0 = pulseCountT0;
-      previousSecond = currentSecond;
+      previousSecondT0 = currentSecondT0;
   }
 }
 
@@ -306,16 +317,16 @@ void pinValT1(int pin)
     }
   }
   
-  currentSecond = Time.second();
-  if(currentSecond != previousSecond)
+  currentSecondT1 = Time.second();
+  if(currentSecondT1 != previousSecondT1)
   {
       instantPulseCountT1 = 0;
       if(previousPulseCountT1 != pulseCountT1)
         flowingT1 = 1;
       else
         flowingT1 = 0;
-      previousPulseCountT1 = pulseCountT0;
-      previousSecond = currentSecond;
+      previousPulseCountT1 = pulseCountT1;
+      previousSecondT1 = currentSecondT1;
   }
 }
 
@@ -342,8 +353,8 @@ void pinValT2(int pin)
     }
   }
   
-  currentSecond = Time.second();
-  if(currentSecond != previousSecond)
+  currentSecondT2 = Time.second();
+  if(currentSecondT2 != previousSecondT2)
   {
       instantPulseCountT2 = 0;
       if(previousPulseCountT2 != pulseCountT2)
@@ -351,48 +362,9 @@ void pinValT2(int pin)
       else
         flowingT2 = 0;
       previousPulseCountT2 = pulseCountT2;
-      previousSecond = currentSecond;
+      previousSecondT2 = currentSecondT2;
   }
 }
-
-// void pinVal(int pin, int* pinValue, int* pulseCount, 
-//             int* previousPulseCount, int* instantPulseCount, int* flowing)
-// {
-//   if(digitalRead(pin) == HIGH)
-//   {
-//     if(*pinValue == 0)
-//     {
-//       *pinValue = 1; 
-//       digitalWrite(ledPin, LOW);
-//     }
-//   }
-//   else
-//   {
-//     if(*pinValue == 1)
-//     {
-//       *pinValue = 0;
-//       instantPulseCount++;
-//       pulseCount--;
-//       Serial.println("pulseCount: " + String(*pulseCount));
-//       if(*pulseCount < 0) //never go below 0
-//         *pulseCount = 0;
-
-//       digitalWrite(ledPin, HIGH);
-//     }
-//   }
-  
-//   currentSecond = Time.second();
-//   if(currentSecond != previousSecond)
-//   {
-//       *instantPulseCount = 0;
-//       if(*previousPulseCount != *pulseCount)
-//         *flowing = 1;
-//       else
-//         *flowing = 0;
-//       *previousPulseCount = *pulseCount;
-//       previousSecond = currentSecond;
-//   }
-// }
 
 void recalculateTapColor(int stripNum)
 { 
@@ -443,30 +415,36 @@ int getTapColor(int *percentFull)
 
 void animateTap(int stripNum)
 { //do the flow animation
-  if(animationStep >= PIXEL_COUNT)
-    animationStep = 0;
+  if(animationStepT0 >= PIXEL_COUNT)
+    animationStepT0 = 0;
+  if(animationStepT1 >= PIXEL_COUNT)
+    animationStepT1 = 0;
+  if(animationStepT2 >= PIXEL_COUNT)
+    animationStepT2 = 0;
 
   if(stripNum == 0)
   {
     setAllPixelsOff(0);
-    stripT0.setPixelColor((PIXEL_COUNT - 1) - animationStep, getTapColor(&percentFullT0));
+    stripT0.setPixelColor((PIXEL_COUNT - 1) - animationStepT0, getTapColor(&percentFullT0));
     stripT0.show();
+    animationStepT0++;
   }
   else if(stripNum == 1)
   {
     setAllPixelsOff(1);
-    stripT1.setPixelColor((PIXEL_COUNT - 1) - animationStep, getTapColor(&percentFullT1));
+    stripT1.setPixelColor((PIXEL_COUNT - 1) - animationStepT1, getTapColor(&percentFullT1));
     stripT1.show();
+    animationStepT1++;
   }
   else if(stripNum == 2)
   {
     setAllPixelsOff(2);
-    stripT2.setPixelColor((PIXEL_COUNT - 1) - animationStep, getTapColor(&percentFullT2));
+    stripT2.setPixelColor((PIXEL_COUNT - 1) - animationStepT2, getTapColor(&percentFullT2));
     stripT2.show();
+    animationStepT2++;
   }
   
   delay(100);
-  animationStep++;
 }
 
 void setAllPixelsOff(int stripNum)
