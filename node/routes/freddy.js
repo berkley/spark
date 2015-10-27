@@ -2,6 +2,7 @@ var request = require('request');
 var nconf = require('nconf');
 var util = require('./util.js');
 var net = require('net');
+var async = require('async');
 
 var config;
 
@@ -22,7 +23,7 @@ exports.action = function(req, res) {
 	console.log("connecting....");
 
 	// var HOST = '10.0.1.47';
-	var HOST = '10.0.1.10';
+	var HOST = '10.0.1.42';
 	var PORT = 7000;
 
 	var client = new net.Socket();
@@ -31,8 +32,46 @@ exports.action = function(req, res) {
 	    console.log('CONNECTED TO: ' + HOST + ':' + PORT);
 	    // Write a message to the socket as soon as the client is connected, 
 	    // the server will receive it as message from the client 
-	    console.log("req.query", req.query);
-	    client.write(req.query.action);
+	    // console.log("req.query", req.query);
+	    // client.write(req.query.action);
+	    var count = 0;
+
+	    async.series([
+		    function(callback){
+		        async.whilst(
+				    function () { return count < 24; },
+				    function (cb) {
+				        console.log("setRow: " + count);
+				    	client.write("setRow," + count + "," + 255 + "," + 0 + "," + 0);
+				    	count++;
+				    	setTimeout(cb, 200);
+				    },
+				    function (err) {
+				        callback(null, 'one');
+				    }
+				);
+		    },
+		    function(callback){
+		        async.whilst(
+				    function () { return count >= 0 ; },
+				    function (cb) {
+				        console.log("setRow: " + count);
+				    	client.write("setRow," + count + ",0,0,0");
+				    	count--;
+				    	setTimeout(cb, 200);
+				    },
+				    function (err) {
+				        callback(null, 'two');
+				    }
+				);
+		    }
+		],
+		// optional callback
+		function(err, results){
+		    // results is now equal to ['one', 'two']
+		});
+
+		
 
 	});
 
@@ -42,7 +81,7 @@ exports.action = function(req, res) {
 	    
 	    console.log('DATA: ' + data);
 	    // Close the client socket completely
-	    client.destroy();
+	    // client.destroy();
 	    
 	});
 
