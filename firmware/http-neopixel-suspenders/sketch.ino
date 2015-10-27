@@ -71,53 +71,112 @@ void setup()
   delay(100);
   strip.setPixelColor(0, strip.Color(0, 0, 0));
   strip.show();
+
+
 }
 
-void loop()
+
+const int maxScale = 24;
+const int redZone = 5;
+
+const int sampleWindow = 100; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+
+void loop() 
 {
-    // Serial.println("IP:" + String(ip));
-    //TCPServer/Client connections
-    if (client.connected()) {
-        String("CONNECTED").toCharArray(tcpstate, 64);
-        String dStr = "";
-        char data;
-        while (client.available()) 
-        {
-            data = client.read();
-            dStr += String(data);
-        }
-        // client.println("OK:" + dStr);
-        // client.flush();
-        // Serial.println("dStr: " + String(dStr));
-        loopArgs = stringSplit(dStr, ',');
-        action = loopArgs[0];
-        // dStr.toCharArray(action, 64);
-        // loopRun = action;
-        // client.stop();
-    } 
-    else 
-    {
-        // if no client is yet connected, check for a new connection
-        // Serial.println("DISCONNECT");
-        String("DISCONNECTED").toCharArray(tcpstate, 64);
-        client = server.available();
-        if(client.connected())
-            return;
-    }
+   unsigned long startMillis= millis();  // Start of sample window
+   unsigned int peakToPeak = 0;   // peak-to-peak level
 
-    if(action == SETROW)
-    {
-      setRow(stringToInt(loopArgs[1]), strip.Color(stringToInt(loopArgs[0]),
-                                                   stringToInt(loopArgs[1]),
-                                                   stringToInt(loopArgs[2])));
-      strip.show();
-      action = STOP;
-    }
+   unsigned int signalMax = 0;
+   unsigned int signalMin = 1024;
+
+   while (millis() - startMillis < sampleWindow)
+   {
+      sample = analogRead(A0) / 4;
+      Serial.println("sample: " + String(sample));
+      if (sample < 1024)  // toss out spurious readings
+      {
+         if (sample > signalMax)
+         {
+            signalMax = sample;  // save just the max levels
+         }
+         else if (sample < signalMin)
+         {
+            signalMin = sample;  // save just the min levels
+         }
+      }
+   }
+   peakToPeak = signalMax - signalMin;
+   Serial.println("peakToPeak: " + String(peakToPeak));
+
+   // map 1v p-p level to the max scale of the display
+   int displayPeak = map(peakToPeak, 0, 1023, 0, maxScale);
+   Serial.println("displayPeak: " + String(displayPeak));
+
+   // draw the new sample
+   for (int i = 0; i < maxScale; i++)
+   {
+      if (i >= displayPeak)  
+      {
+         setRow(i, strip.Color(0,0,0));
+      }
+      else if (i < redZone) 
+      {
+        setRow(i, strip.Color(0,255,0));
+      }
+      else
+      {
+        setRow(i, strip.Color(255,0,0));
+      }
+   }
+   strip.show();
 }
+
+// void loop()
+// {
+//     // Serial.println("IP:" + String(ip));
+//     //TCPServer/Client connections
+//     if (client.connected()) {
+//         String("CONNECTED").toCharArray(tcpstate, 64);
+//         String dStr = "";
+//         char data;
+//         while (client.available()) 
+//         {
+//             data = client.read();
+//             dStr += String(data);
+//         }
+//         // client.println("OK:" + dStr);
+//         // client.flush();
+//         // Serial.println("dStr: " + String(dStr));
+//         loopArgs = stringSplit(dStr, ',');
+//         action = loopArgs[0];
+//         // dStr.toCharArray(action, 64);
+//         // loopRun = action;
+//         // client.stop();
+//     } 
+//     else 
+//     {
+//         // if no client is yet connected, check for a new connection
+//         // Serial.println("DISCONNECT");
+//         String("DISCONNECTED").toCharArray(tcpstate, 64);
+//         client = server.available();
+//         if(client.connected())
+//             return;
+//     }
+
+//     if(action == SETROW)
+//     {
+//       setRow(stringToInt(loopArgs[1]), strip.Color(stringToInt(loopArgs[0]),
+//                                                    stringToInt(loopArgs[1]),
+//                                                    stringToInt(loopArgs[2])));
+//       strip.show();
+//       action = STOP;
+//     }
+// }
 
 void setRow(int row, int color)
 {
-  Serial.println("setRow: " + String(row));
+  // Serial.println("setRow: " + String(row));
   strip.setPixelColor(row, color);
   strip.setPixelColor(row + COL_LEN, color);
 }
