@@ -1385,4 +1385,3 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
 
     return 1;
 }
-
