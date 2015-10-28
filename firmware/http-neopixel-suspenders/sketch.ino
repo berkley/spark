@@ -39,8 +39,17 @@ String loopRun = STOP;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
+//audio variables
+const int maxScale = 24;
+const int orangeZone = 10;
+const int redZone = 5;
+const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
+unsigned int sample;
+unsigned int colorCount = 0;
+
 void setup()
 {
+  pinMode(A0, INPUT);
   Serial.begin(9600);
 //   WiFi.selectAntenna(ANT_EXTERNAL);
 //   WiFi.on();
@@ -75,13 +84,6 @@ void setup()
 
 }
 
-
-const int maxScale = 24;
-const int redZone = 5;
-
-const int sampleWindow = 100; // Sample window width in mS (50 mS = 20Hz)
-unsigned int sample;
-
 void loop() 
 {
    unsigned long startMillis= millis();  // Start of sample window
@@ -93,7 +95,7 @@ void loop()
    while (millis() - startMillis < sampleWindow)
    {
       sample = analogRead(A0) / 4;
-      Serial.println("sample: " + String(sample));
+      // Serial.println("sample: " + String(sample));
       if (sample < 1024)  // toss out spurious readings
       {
          if (sample > signalMax)
@@ -107,72 +109,45 @@ void loop()
       }
    }
    peakToPeak = signalMax - signalMin;
-   Serial.println("peakToPeak: " + String(peakToPeak));
+   // Serial.println("peakToPeak: " + String(peakToPeak));
+   if(peakToPeak < 0)
+      peakToPeak = 0;
 
    // map 1v p-p level to the max scale of the display
    int displayPeak = map(peakToPeak, 0, 1023, 0, maxScale);
-   Serial.println("displayPeak: " + String(displayPeak));
+   if(displayPeak < 0)
+    displayPeak = 0;
+   Serial.println("peakToPeak: " + String(peakToPeak) + "   displayPeak: " + String(displayPeak));
 
-   // draw the new sample
-   for (int i = 0; i < maxScale; i++)
+   //upside down now
+   displayPeak = maxScale - displayPeak;
+   for (int i = maxScale; i >= 0; i--)
    {
-      if (i >= displayPeak)  
+      if (i < displayPeak)  
       {
          setRow(i, strip.Color(0,0,0));
       }
-      else if (i < redZone) 
+      else if (i >= orangeZone) //green
       {
-        setRow(i, strip.Color(0,255,0));
+        setRow(i, Wheel(colorCount));
       }
-      else
+      else if (i <= orangeZone + redZone && i > redZone) //orange
+      {
+        setRow(i, strip.Color(255,128,0));
+      }
+      else //red
       {
         setRow(i, strip.Color(255,0,0));
       }
    }
+
+   if(colorCount >= MAX_COLOR)
+    colorCount = 0;
+   else
+    colorCount++;
+
    strip.show();
 }
-
-// void loop()
-// {
-//     // Serial.println("IP:" + String(ip));
-//     //TCPServer/Client connections
-//     if (client.connected()) {
-//         String("CONNECTED").toCharArray(tcpstate, 64);
-//         String dStr = "";
-//         char data;
-//         while (client.available()) 
-//         {
-//             data = client.read();
-//             dStr += String(data);
-//         }
-//         // client.println("OK:" + dStr);
-//         // client.flush();
-//         // Serial.println("dStr: " + String(dStr));
-//         loopArgs = stringSplit(dStr, ',');
-//         action = loopArgs[0];
-//         // dStr.toCharArray(action, 64);
-//         // loopRun = action;
-//         // client.stop();
-//     } 
-//     else 
-//     {
-//         // if no client is yet connected, check for a new connection
-//         // Serial.println("DISCONNECT");
-//         String("DISCONNECTED").toCharArray(tcpstate, 64);
-//         client = server.available();
-//         if(client.connected())
-//             return;
-//     }
-
-//     if(action == SETROW)
-//     {
-//       setRow(stringToInt(loopArgs[1]), strip.Color(stringToInt(loopArgs[0]),
-//                                                    stringToInt(loopArgs[1]),
-//                                                    stringToInt(loopArgs[2])));
-//       strip.show();
-//       action = STOP;
-//     }
-// }
 
 void setRow(int row, int color)
 {
@@ -241,5 +216,20 @@ String* stringSplit(String s, char delim)
     }
     strArr[arrcnt] = token;
     return strArr;
+}
+
+// Input a value 0 to MAX_COLOR to get a color value.
+// The colours are a transition r - g - b - back to r.
+uint32_t Wheel(byte WheelPos) {
+  int maxVal = MAX_COLOR;
+  if(WheelPos < 85) {
+     return strip.Color(WheelPos * 3, maxVal - WheelPos * 3, 0);
+ } else if(WheelPos < 170) {
+     WheelPos -= 85;
+     return strip.Color(maxVal - WheelPos * 3, 0, WheelPos * 3);
+ } else {
+     WheelPos -= 170;
+     return strip.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
+ }
 }
 
