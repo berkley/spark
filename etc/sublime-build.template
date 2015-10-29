@@ -1,0 +1,5 @@
+{
+	"cmd": ["bash", "build.sh"],
+	"path":"/opt/local/bin:/opt/local/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin",
+	"working_dir":"/Users/cberkley/project/spark/firmware/beer"
+}
