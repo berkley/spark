@@ -12,9 +12,9 @@
 
 
 #include "application.h"
-#include "neopixel/neopixel.h"
+#include "neopixel.h"
 
-// SYSTEM_MODE(MANUAL);
+ SYSTEM_MODE(MANUAL);
 
 #define ARRAYLEN(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -58,7 +58,7 @@ char parameters[64];
 char ip[64];
 char tcpstate[64];
 
-String loopRun = KEITHEYES;
+String loopRun = RAINBOWEYES;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
@@ -83,10 +83,10 @@ void setup()
   pinMode(D4, OUTPUT);
   
   //register the action variable as a GET parameter
-  Spark.variable("action", &action, STRING);
-  Spark.variable("tcpstate", &tcpstate, STRING);
-  Spark.variable("parameters", &parameters, STRING);
-  Spark.variable("ip", &ip, STRING);
+  Spark.variable("action", action, STRING);
+  Spark.variable("tcpstate", tcpstate, STRING);
+  Spark.variable("parameters", parameters, STRING);
+  Spark.variable("ip", ip, STRING);
   (String(WiFi.localIP()[0]) + "." + String(WiFi.localIP()[1]) + "." +  String(WiFi.localIP()[2]) + "." +  String(WiFi.localIP()[3])).toCharArray(ip, 64);
   strip.setPixelColor(0, strip.Color(0, 50, 0));
   strip.show();
