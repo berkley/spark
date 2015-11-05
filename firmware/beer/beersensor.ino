@@ -17,6 +17,7 @@ struct TapObject
   int instantPulseCount;
   int previousPulseCount;
   int flowing;
+  int previousFlowing;
   int percentFull;
   int currentSecond;
   int previousSecond;
@@ -26,9 +27,9 @@ struct TapObject
 };
 
 //initialize taps
-TapObject T0 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D6, D3};
-TapObject T1 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D5, D2};
-TapObject T2 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D4, D1};
+TapObject T0 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D6, D3};
+TapObject T1 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D5, D2};
+TapObject T2 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D4, D1};
 
 int ledPin = D7;
 
@@ -132,30 +133,39 @@ void loop()
   pinValT0();
   pinValT1();
   pinValT2();
+  calculatePercentFull();
+  publishFlowingEvents();
+  handleAnimation();
+  writeToEEPROM();
+}
 
-  // Serial.println("pulseCountT0: " + String(T0.pulseCount));
-  // Serial.println("pulseCountT1: " + String(T1.pulseCount));
-  // Serial.println("pulseCountT2: " + String(T2.pulseCount));
-  
-  
+void writeToEEPROM()
+{
+  EEPROM.put(EEPROM_ADDR_T0, T0);
+  EEPROM.put(EEPROM_ADDR_T1, T1);
+  EEPROM.put(EEPROM_ADDR_T2, T2);
+}
+
+void calculatePercentFull()
+{
   float percentT0 = (float)T0.pulseCount / (float)T0.maxPulseCount;
   T0.percentFull = (int)(percentT0 * 100.0f);
   if(T0.percentFull > 100)
     T0.percentFull = 100;
-  EEPROM.put(EEPROM_ADDR_T0, T0);
 
   float percentT1 = (float)T1.pulseCount / (float)T1.maxPulseCount;
   T1.percentFull = (int)(percentT1 * 100.0f);
   if(T1.percentFull > 100)
     T1.percentFull = 100;
-  EEPROM.put(EEPROM_ADDR_T1, T1);
-
+  
   float percentT2 = (float)T2.pulseCount / (float)T2.maxPulseCount;
   T2.percentFull = (int)(percentT2 * 100.0f);
   if(T2.percentFull > 100)
     T2.percentFull = 100;
-  EEPROM.put(EEPROM_ADDR_T2, T2);
+}
 
+void handleAnimation()
+{
   if(T0.flowing)
   {
     Serial.println("flowingT0: " + String(T0.flowing));
@@ -165,7 +175,6 @@ void loop()
   {
     if(T0.pulseCount > T0.maxPulseCount)
       T0.pulseCount = T0.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T0, T0);
     recalculateTapColor(0);
   }
 
@@ -178,7 +187,6 @@ void loop()
   {
     if(T1.pulseCount > T1.maxPulseCount)
       T1.pulseCount = T1.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T1, T1);
     recalculateTapColor(1);
   }
 
@@ -191,8 +199,58 @@ void loop()
   {
     if(T2.pulseCount > T2.maxPulseCount)
       T2.pulseCount = T2.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T1, T1);
     recalculateTapColor(2);
+  }
+}
+
+void publishFlowingEvents()
+{
+  if(T0.flowing != T0.previousFlowing)
+  {
+    if(T0.flowing)
+    {
+      //publish a start event
+      Particle.publish("start-flow-T0", String(T0.maxPulseCount) + 
+                       "," + String(T0.pulseCount) + "," + String(T0.percentFull));
+    }
+    else
+    {
+      //publish a stop event
+      Particle.publish("stop-flow-T0", String(T0.maxPulseCount) + 
+                       "," + String(T0.pulseCount) + "," + String(T0.percentFull));
+    }
+  }
+
+  if(T1.flowing != T1.previousFlowing)
+  {
+    if(T1.flowing)
+    {
+      //publish a start event
+      Particle.publish("start-flow-T1", String(T1.maxPulseCount) + 
+                       "," + String(T1.pulseCount) + "," + String(T1.percentFull));
+    }
+    else
+    {
+      //publish a stop event
+      Particle.publish("stop-flow-T1", String(T1.maxPulseCount) + 
+                       "," + String(T1.pulseCount) + "," + String(T1.percentFull));
+    }
+  }
+
+  if(T2.flowing != T2.previousFlowing)
+  {
+    if(T2.flowing)
+    {
+      //publish a start event
+      Particle.publish("start-flow-T2", String(T2.maxPulseCount) + 
+                       "," + String(T2.pulseCount) + "," + String(T2.percentFull));
+    }
+    else
+    {
+      //publish a stop event
+      Particle.publish("stop-flow-T2", String(T2.maxPulseCount) + 
+                       "," + String(T2.pulseCount) + "," + String(T2.percentFull));
+    }
   }
 }
 
@@ -201,19 +259,16 @@ int resetPulseCount(int tap)
   if(tap == 0)
   {
     T0.pulseCount = T0.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T0, T0);
   }
   else if(tap == 1)
   {
     T1.pulseCount = T1.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T1, T1);
   }
   else if(tap == 2)
   {
     T2.pulseCount = T2.maxPulseCount;
-    EEPROM.put(EEPROM_ADDR_T2, T2); 
   }
-  
+  writeToEEPROM();
   return 1;
 }
 
@@ -222,23 +277,22 @@ int setCalibration(int tap, int val)
   if(tap == 0)
   {
     T0.maxPulseCount = val;
-    EEPROM.put(EEPROM_ADDR_T0, T0);
   }
   else if(tap == 1)
   {
     T1.maxPulseCount = val;
-    EEPROM.put(EEPROM_ADDR_T1, T1);
   }
   else if(tap == 2)
   {
     T2.maxPulseCount = val;
-    EEPROM.put(EEPROM_ADDR_T2, T2);
   }
+  writeToEEPROM();
   return 1;
 }
 
 void pinValT0()
 {
+  T0.previousFlowing = T0.flowing;
   if(digitalRead(T0.flowPin) == HIGH)
   {
     if(flowTapPin0Value == 0)
@@ -267,12 +321,10 @@ void pinValT0()
       if(T0.previousPulseCount != T0.pulseCount)
       {
         T0.flowing = 1;
-        Particle.publish("start-flow-T0", String(T0.maxPulseCount) + "," + String(T0.pulseCount) + "," + String(T0.percentFull));
       }
       else
       {
         T0.flowing = 0;
-        // Particle.publish("stop-flow-T0", String(T0.maxPulseCount) + "," + String(T0.pulseCount) + "," + String(T0.percentFull));
       }
       T0.previousPulseCount = T0.pulseCount;
       T0.previousSecond = T0.currentSecond;
@@ -280,7 +332,8 @@ void pinValT0()
 }
 
 void pinValT1()
-{
+{ 
+  T1.previousFlowing = T1.flowing;
   if(digitalRead(T1.flowPin) == HIGH)
   {
     if(flowTapPin1Value == 0)
@@ -309,12 +362,10 @@ void pinValT1()
       if(T1.previousPulseCount != T1.pulseCount)
       {
         T1.flowing = 1;
-        Particle.publish("start-flow-T1", String(T1.maxPulseCount) + "," + String(T1.pulseCount) + "," + String(T1.percentFull));
       }
       else
       {
         T1.flowing = 0;
-        // Particle.publish("stop-flow-T1", String(T1.maxPulseCount) + "," + String(T1.pulseCount) + "," + String(T1.percentFull));
       }
       T1.previousPulseCount = T1.pulseCount;
       T1.previousSecond = T1.currentSecond;
@@ -323,6 +374,7 @@ void pinValT1()
 
 void pinValT2()
 {
+  T2.previousFlowing = T2.flowing;
   if(digitalRead(T2.flowPin) == HIGH)
   {
     if(flowTapPin2Value == 0)
@@ -351,12 +403,10 @@ void pinValT2()
       if(T2.previousPulseCount != T2.pulseCount)
       {
         T2.flowing = 1;
-        Particle.publish("start-flow-T2", String(T2.maxPulseCount) + "," + String(T2.pulseCount) + "," + String(T2.percentFull));
       }
       else
       {
         T2.flowing = 0;
-        // Particle.publish("stop-flow-T2", String(T2.maxPulseCount) + "," + String(T2.pulseCount) + "," + String(T2.percentFull));
       }
       T2.previousPulseCount = T2.pulseCount;
       T2.previousSecond = T2.currentSecond;
