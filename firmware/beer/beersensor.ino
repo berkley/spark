@@ -15,9 +15,10 @@ TODO
 // #include "neopixel/neopixel.h"
 #include "neopixel.h"
 
-#define EEPROM_ADDR_T0 0
-#define EEPROM_ADDR_T1 20
-#define EEPROM_ADDR_T2 40
+//photon has 2048 bytes of emulated EEPROM
+#define EEPROM_ADDR_T0 0 //400 bytes per tap
+#define EEPROM_ADDR_T1 400
+#define EEPROM_ADDR_T2 800
 
 #define PIXEL_TYPE WS2812B
 #define PIXEL_COUNT 14
@@ -78,10 +79,10 @@ void setup()
   
   pinMode(ledPin, OUTPUT);
   
-  //read any values set in the EEPROM
-  // maxPulseCount = EEPROM.read(EEPROM_ADDR_MAX_PULSE_COUNT);
-  // pulseCount = EEPROM.read(EEPROM_ADDR_PULSE_COUNT);
-  // percentFull = EEPROM.read(EEPROM_ADDR_PERCENT_FULL);
+  //read any objects set in the EEPROM
+  EEPROM.get(EEPROM_ADDR_T0, T0);
+  EEPROM.get(EEPROM_ADDR_T1, T1);
+  EEPROM.get(EEPROM_ADDR_T2, T2);
 
   //https://api.particle.io/v1/devices/<device_id>/<variable_name>?access_token=<access_token>
   Particle.variable("maxPCntT0", &T0.maxPulseCount, INT);
@@ -89,15 +90,15 @@ void setup()
   Particle.variable("pulseCntT0", &T0.pulseCount, INT);
   Particle.variable("perFullT0", &T0.percentFull, INT);
 
-  // Particle.variable("maxPCntT1", &maxPulseCountT1, INT);
-  // Particle.variable("instPCntT1", &instantPulseCountT1, INT);
-  // Particle.variable("pulseCntT1", &pulseCountT1, INT);
-  // Particle.variable("perFullT1", &percentFullT1, INT);
+  Particle.variable("maxPCntT1", &T1.maxPulseCount, INT);
+  Particle.variable("instPCntT1", &T1.instantPulseCount, INT);
+  Particle.variable("pulseCntT1", &T1.pulseCount, INT);
+  Particle.variable("perFullT1", &T0.percentFull, INT);
 
-  // Particle.variable("maxPCntT2", &maxPulseCountT2, INT);
-  // Particle.variable("instPCntT2", &instantPulseCountT2, INT);
-  // Particle.variable("pulseCntT2", &pulseCountT2, INT);
-  // Particle.variable("perFullT2", &percentFullT2, INT);
+  Particle.variable("maxPCntT2", &T2.maxPulseCount, INT);
+  Particle.variable("instPCntT2", &T2.instantPulseCount, INT);
+  Particle.variable("pulseCntT2", &T2.pulseCount, INT);
+  Particle.variable("perFullT2", &T2.percentFull, INT);
 
   //cloud functions - handle a cloud POST(data)
   //curl https://api.particle.io/v1/devices/<device_id>/post \
@@ -116,7 +117,6 @@ void setup()
   Serial.println("SETUP DONE");
 }
 
-//TODO: make this work for 3 taps
 int handlePost(String postData)
 {
   String* args = stringSplit(postData, ',');
@@ -126,14 +126,15 @@ int handlePost(String postData)
   
   if(command.equals("reset"))
   { //reset data
-    Serial.println("reset pulse count");
-    return resetPulseCount();
+    //args[1] == tap number to reset (0-3)
+    //this function resets pulseCount to maxPulseCount and writes the EEPROM
+    return resetPulseCount(args[1].toInt());
   }
   else if(command.equals("setCalibration"))
   {
-    //takes an int as an argument.  args[1] should be the total number of pulses in a given keg.
-    //i.e. pulseCount / args[1] == percentFull
-    setCalibration(args[1].toInt());
+    //args[1] == tap you want to set (0-3)
+    //args[2] == calibration value (total number of pulses in a keg)
+    setCalibration(args[1].toInt(), args[2].toInt());
   }
 
   return 1;
@@ -154,19 +155,19 @@ void loop()
   T0.percentFull = (int)(percentT0 * 100.0f);
   if(T0.percentFull > 100)
     T0.percentFull = 100;
-  // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
+  EEPROM.put(EEPROM_ADDR_T0, T0);
 
   float percentT1 = (float)T1.pulseCount / (float)T1.maxPulseCount;
   T1.percentFull = (int)(percentT1 * 100.0f);
   if(T1.percentFull > 100)
     T1.percentFull = 100;
-  // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);  
+  EEPROM.put(EEPROM_ADDR_T1, T1);
 
   float percentT2 = (float)T2.pulseCount / (float)T2.maxPulseCount;
   T2.percentFull = (int)(percentT2 * 100.0f);
   if(T2.percentFull > 100)
     T2.percentFull = 100;
-  // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
+  EEPROM.put(EEPROM_ADDR_T2, T2);
 
   Serial.println("flowingT0: " + String(T0.flowing));
   Serial.println("flowingT1: " + String(T1.flowing));
@@ -180,7 +181,7 @@ void loop()
   {
     if(T0.pulseCount > T0.maxPulseCount)
       T0.pulseCount = T0.maxPulseCount;
-    // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
+    EEPROM.put(EEPROM_ADDR_T0, T0);
     recalculateTapColor(0);
   }
 
@@ -192,7 +193,7 @@ void loop()
   {
     if(T1.pulseCount > T1.maxPulseCount)
       T1.pulseCount = T1.maxPulseCount;
-    // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
+    EEPROM.put(EEPROM_ADDR_T1, T1);
     recalculateTapColor(1);
   }
 
@@ -204,22 +205,49 @@ void loop()
   {
     if(T2.pulseCount > T2.maxPulseCount)
       T2.pulseCount = T2.maxPulseCount;
-    // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
+    EEPROM.put(EEPROM_ADDR_T1, T1);
     recalculateTapColor(2);
   }
 }
 
-int resetPulseCount()
+int resetPulseCount(int tap)
 {
-  // pulseCount = maxPulseCount;
-  // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
+  if(tap == 0)
+  {
+    T0.pulseCount = T0.maxPulseCount;
+    EEPROM.put(EEPROM_ADDR_T0, T0);
+  }
+  else if(tap == 1)
+  {
+    T1.pulseCount = T1.maxPulseCount;
+    EEPROM.put(EEPROM_ADDR_T1, T1);
+  }
+  else if(tap == 2)
+  {
+    T2.pulseCount = T2.maxPulseCount;
+    EEPROM.put(EEPROM_ADDR_T2, T2); 
+  }
+  
   return 1;
 }
 
-int setCalibration(int val)
+int setCalibration(int tap, int val)
 {
-  // maxPulseCount = val;
-  // EEPROM.update(EEPROM_ADDR_MAX_PULSE_COUNT, maxPulseCount);
+  if(tap == 0)
+  {
+    T0.maxPulseCount = val;
+    EEPROM.put(EEPROM_ADDR_T0, T0);
+  }
+  else if(tap == 1)
+  {
+    T1.maxPulseCount = val;
+    EEPROM.put(EEPROM_ADDR_T1, T1);
+  }
+  else if(tap == 2)
+  {
+    T2.maxPulseCount = val;
+    EEPROM.put(EEPROM_ADDR_T2, T2);
+  }
   return 1;
 }
 
