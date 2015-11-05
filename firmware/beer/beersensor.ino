@@ -15,70 +15,44 @@ TODO
 // #include "neopixel/neopixel.h"
 #include "neopixel.h"
 
-#define EEPROM_ADDR_PULSE_COUNT 1
-#define EEPROM_ADDR_MAX_PULSE_COUNT 2
-#define EEPROM_ADDR_PERCENT_FULL 3
+#define EEPROM_ADDR_T0 0
+#define EEPROM_ADDR_T1 20
+#define EEPROM_ADDR_T2 40
+
 #define PIXEL_TYPE WS2812B
 #define PIXEL_COUNT 14
 
+struct TapObject
+{
+  int pulseCount;
+  int maxPulseCount;
+  int instantPulseCount;
+  int previousPulseCount;
+  int flowing;
+  int percentFull;
+  int currentSecond;
+  int previousSecond;
+  int animationStep;
+  int flowPin;
+  int ledPin;
+};
+
+//initialize taps
+TapObject T0 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D6, D3};
+TapObject T1 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D5, D2};
+TapObject T2 = {1000, 1000, 0, 0, 0, 100, 1, 0, 0, D4, D1};
+
 int ledPin = D7;
 
-int flowTapPin0 = D6;
-int flowTapPin1 = D5;
-int flowTapPin2 = D4;
-
-int ledTapPin0 = D3;
-int ledTapPin1 = D2;
-int ledTapPin2 = D1;
-
-Adafruit_NeoPixel stripT0 = Adafruit_NeoPixel(PIXEL_COUNT, ledTapPin0, PIXEL_TYPE);
-Adafruit_NeoPixel stripT1 = Adafruit_NeoPixel(PIXEL_COUNT, ledTapPin1, PIXEL_TYPE);
-Adafruit_NeoPixel stripT2 = Adafruit_NeoPixel(PIXEL_COUNT, ledTapPin2, PIXEL_TYPE);
+Adafruit_NeoPixel stripT0 = Adafruit_NeoPixel(PIXEL_COUNT, T0.ledPin, PIXEL_TYPE);
+Adafruit_NeoPixel stripT1 = Adafruit_NeoPixel(PIXEL_COUNT, T1.ledPin, PIXEL_TYPE);
+Adafruit_NeoPixel stripT2 = Adafruit_NeoPixel(PIXEL_COUNT, T2.ledPin, PIXEL_TYPE);
 
 int flowTapPin0Value = 0;
 int flowTapPin1Value = 0;
 int flowTapPin2Value = 0; 
 
-//tap 0 values
-int instantPulseCountT0 = 0;
-int previousPulseCountT0 = 0;
-int flowingT0 = 0;
-int pulseCountT0 = 200;
-int maxPulseCountT0 = 200; //calibration value
-
-//tap 1 values
-int instantPulseCountT1 = 0;
-int previousPulseCountT1 = 0;
-int flowingT1 = 0;
-int pulseCountT1 = 200;
-int maxPulseCountT1 = 200; //calibration value
-
-//tap 3 values
-int instantPulseCountT2 = 0;
-int previousPulseCountT2 = 0;
-int flowingT2 = 0;
-int pulseCountT2 = 200;
-int maxPulseCountT2 = 200; //calibration value
-
-int percentFullT0 = 100;
-int percentFullT1 = 100;
-int percentFullT2 = 100;
-
-int currentSecondT0 = 1;
-int previousSecondT0 = 0;
-int animationStepT0 = 0;
-int currentSecondT1 = 1;
-int previousSecondT1 = 0;
-int animationStepT1 = 0;
-int currentSecondT2 = 1;
-int previousSecondT2 = 0;
-int animationStepT2 = 0;
-
 String *strArr = new String[20];
-
-const char* flowTapPin0Name = "flowTapPin0Val";
-const char* flowTapPin1Name = "flowTapPin1Val";
-const char* flowTapPin2Name = "flowTapPin2Val";
 
 int handlePost(String command);
 
@@ -98,9 +72,9 @@ void setup()
   stripT2.show();
 
   //pin modes
-  pinMode(flowTapPin0, INPUT_PULLDOWN);
-  pinMode(flowTapPin1, INPUT_PULLDOWN);
-  pinMode(flowTapPin2, INPUT_PULLDOWN);
+  pinMode(T0.flowPin, INPUT_PULLDOWN);
+  pinMode(T1.flowPin, INPUT_PULLDOWN);
+  pinMode(T2.flowPin, INPUT_PULLDOWN);
   
   pinMode(ledPin, OUTPUT);
   
@@ -110,15 +84,15 @@ void setup()
   // percentFull = EEPROM.read(EEPROM_ADDR_PERCENT_FULL);
 
   //https://api.particle.io/v1/devices/<device_id>/<variable_name>?access_token=<access_token>
-  Particle.variable("maxPCntT0", &maxPulseCountT0, INT);
-  Particle.variable("instPCntT0", &instantPulseCountT0, INT);
-  Particle.variable("pulseCntT0", &pulseCountT0, INT);
-  Particle.variable("perFullT0", &percentFullT0, INT);
+  Particle.variable("maxPCntT0", &T0.maxPulseCount, INT);
+  Particle.variable("instPCntT0", &T0.instantPulseCount, INT);
+  Particle.variable("pulseCntT0", &T0.pulseCount, INT);
+  Particle.variable("perFullT0", &T0.percentFull, INT);
 
-  Particle.variable("maxPCntT1", &maxPulseCountT1, INT);
-  Particle.variable("instPCntT1", &instantPulseCountT1, INT);
-  Particle.variable("pulseCntT1", &pulseCountT1, INT);
-  Particle.variable("perFullT1", &percentFullT1, INT);
+  // Particle.variable("maxPCntT1", &maxPulseCountT1, INT);
+  // Particle.variable("instPCntT1", &instantPulseCountT1, INT);
+  // Particle.variable("pulseCntT1", &pulseCountT1, INT);
+  // Particle.variable("perFullT1", &percentFullT1, INT);
 
   // Particle.variable("maxPCntT2", &maxPulseCountT2, INT);
   // Particle.variable("instPCntT2", &instantPulseCountT2, INT);
@@ -167,78 +141,69 @@ int handlePost(String postData)
 
 void loop()
 {
-  //void pinVal(int pin, int* pinValue, String pinName, int* pulseCount, 
-            // int* previousPulseCount, int* instantPulseCount, int* flowing)
-  // pinVal(flowTapPin0, &flowTapPin0Value, &pulseCountT0, 
-  //        &previousPulseCountT0, &instantPulseCountT0, &flowingT0);
-  // pinVal(flowTapPin1, &flowTapPin1Value, &pulseCountT1, 
-  //        &previousPulseCountT1, &instantPulseCountT1, &flowingT1);
-  // pinVal(flowTapPin2, &flowTapPin2Value, &pulseCountT2, 
-  //        &previousPulseCountT2, &instantPulseCountT2, &flowingT2);
+  pinValT0();
+  pinValT1();
+  pinValT2();
 
-  pinValT0(flowTapPin0);
-  pinValT1(flowTapPin1);
-  pinValT2(flowTapPin2);
-
-  Serial.println("pulseCountT0: " + String(pulseCountT0));
-  Serial.println("pulseCountT1: " + String(pulseCountT1));
-  Serial.println("pulseCountT2: " + String(pulseCountT2));
+  Serial.println("pulseCountT0: " + String(T0.pulseCount));
+  Serial.println("pulseCountT1: " + String(T1.pulseCount));
+  Serial.println("pulseCountT2: " + String(T2.pulseCount));
   
   
-  float percentT0 = (float)pulseCountT0 / (float)maxPulseCountT0;
-  percentFullT0 = (int)(percentT0 * 100.0f);
-  if(percentFullT0 > 100)
-    percentFullT0 = 100;
+  float percentT0 = (float)T0.pulseCount / (float)T0.maxPulseCount;
+  T0.percentFull = (int)(percentT0 * 100.0f);
+  if(T0.percentFull > 100)
+    T0.percentFull = 100;
   // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
 
-  float percentT1 = (float)pulseCountT1 / (float)maxPulseCountT1;
-  percentFullT1 = (int)(percentT1 * 100.0f);
-  if(percentFullT1 > 100)
-    percentFullT1 = 100;
-  // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
-
-  float percentT2 = (float)pulseCountT2 / (float)maxPulseCountT2;
-  percentFullT2 = (int)(percentT2 * 100.0f);
-  if(percentFullT2 > 100)
-    percentFullT2 = 100;
+  float percentT1 = (float)T1.pulseCount / (float)T1.maxPulseCount;
+  T1.percentFull = (int)(percentT1 * 100.0f);
+  if(T1.percentFull > 100)
+    T1.percentFull = 100;
   // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);  
 
-  Serial.println("flowingT0: " + String(flowingT0));
-  Serial.println("flowingT1: " + String(flowingT1));
-  Serial.println("flowingT2: " + String(flowingT2));
+  float percentT2 = (float)T2.pulseCount / (float)T2.maxPulseCount;
+  T2.percentFull = (int)(percentT2 * 100.0f);
+  if(T2.percentFull > 100)
+    T2.percentFull = 100;
+  // EEPROM.update(EEPROM_ADDR_PERCENT_FULL, percentFull);
 
-  if(flowingT0)
+  Serial.println("flowingT0: " + String(T0.flowing));
+  Serial.println("flowingT1: " + String(T1.flowing));
+  Serial.println("flowingT2: " + String(T2.flowing));
+
+  if(T0.flowing)
   {
     animateTap(0);
   }
   else
   {
-    if(pulseCountT0 > maxPulseCountT0)
-      pulseCountT0 = maxPulseCountT0;
+    if(T0.pulseCount > T0.maxPulseCount)
+      T0.pulseCount = T0.maxPulseCount;
     // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
     recalculateTapColor(0);
   }
 
-  if(flowingT1)
+  if(T1.flowing)
   {
     animateTap(1);
   }
   else
   {
-    if(pulseCountT1 > maxPulseCountT1)
-      pulseCountT1 = maxPulseCountT1;
+    if(T1.pulseCount > T1.maxPulseCount)
+      T1.pulseCount = T1.maxPulseCount;
     // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
     recalculateTapColor(1);
   }
 
-  if(flowingT2)
+  if(T2.flowing)
   {
     animateTap(2);
   }
   else
   {
-    if(pulseCountT2 > maxPulseCountT2)
-      pulseCountT2 = maxPulseCountT2;
+    if(T2.pulseCount > T2.maxPulseCount)
+      T2.pulseCount = T2.maxPulseCount;
     // EEPROM.update(EEPROM_ADDR_PULSE_COUNT, pulseCount);
     recalculateTapColor(2);
   }
@@ -258,9 +223,9 @@ int setCalibration(int val)
   return 1;
 }
 
-void pinValT0(int pin)
+void pinValT0()
 {
-  if(digitalRead(pin) == HIGH)
+  if(digitalRead(T0.flowPin) == HIGH)
   {
     if(flowTapPin0Value == 0)
     {
@@ -274,29 +239,29 @@ void pinValT0(int pin)
     {
       flowTapPin0Value = 0;
       digitalWrite(ledPin, HIGH);
-      instantPulseCountT0++;
-      pulseCountT0--;
-      if(pulseCountT0 < 0) //never go below 0
-        pulseCountT0 = 0;
+      T0.instantPulseCount++;
+      T0.pulseCount--;
+      if(T0.pulseCount < 0) //never go below 0
+        T0.pulseCount = 0;
     }
   }
   
-  currentSecondT0 = Time.second();
-  if(currentSecondT0 != previousSecondT0)
+  T0.currentSecond = Time.second();
+  if(T0.currentSecond != T0.previousSecond)
   {
-      instantPulseCountT0 = 0;
-      if(previousPulseCountT0 != pulseCountT0)
-        flowingT0 = 1;
+      T0.instantPulseCount = 0;
+      if(T0.previousPulseCount != T0.pulseCount)
+        T0.flowing = 1;
       else
-        flowingT0 = 0;
-      previousPulseCountT0 = pulseCountT0;
-      previousSecondT0 = currentSecondT0;
+        T0.flowing = 0;
+      T0.previousPulseCount = T0.pulseCount;
+      T0.previousSecond = T0.currentSecond;
   }
 }
 
-void pinValT1(int pin)
+void pinValT1()
 {
-  if(digitalRead(pin) == HIGH)
+  if(digitalRead(T1.flowPin) == HIGH)
   {
     if(flowTapPin1Value == 0)
     {
@@ -310,29 +275,29 @@ void pinValT1(int pin)
     {
       flowTapPin1Value = 0;
       digitalWrite(ledPin, HIGH);
-      instantPulseCountT1++;
-      pulseCountT1--;
-      if(pulseCountT1 < 0) //never go below 0
-        pulseCountT1 = 0;
+      T1.instantPulseCount++;
+      T1.pulseCount--;
+      if(T1.pulseCount < 0) //never go below 0
+        T1.pulseCount = 0;
     }
   }
   
-  currentSecondT1 = Time.second();
-  if(currentSecondT1 != previousSecondT1)
+  T1.currentSecond = Time.second();
+  if(T1.currentSecond != T1.previousSecond)
   {
-      instantPulseCountT1 = 0;
-      if(previousPulseCountT1 != pulseCountT1)
-        flowingT1 = 1;
+      T1.instantPulseCount = 0;
+      if(T1.previousPulseCount != T1.pulseCount)
+        T1.flowing = 1;
       else
-        flowingT1 = 0;
-      previousPulseCountT1 = pulseCountT1;
-      previousSecondT1 = currentSecondT1;
+        T1.flowing = 0;
+      T1.previousPulseCount = T1.pulseCount;
+      T1.previousSecond = T1.currentSecond;
   }
 }
 
-void pinValT2(int pin)
+void pinValT2()
 {
-  if(digitalRead(pin) == HIGH)
+  if(digitalRead(T2.flowPin) == HIGH)
   {
     if(flowTapPin2Value == 0)
     {
@@ -346,23 +311,23 @@ void pinValT2(int pin)
     {
       flowTapPin2Value = 0;
       digitalWrite(ledPin, HIGH);
-      instantPulseCountT2++;
-      pulseCountT2--;
-      if(pulseCountT2 < 0) //never go below 0
-        pulseCountT2 = 0;
+      T2.instantPulseCount++;
+      T2.pulseCount--;
+      if(T2.pulseCount < 0) //never go below 0
+        T2.pulseCount = 0;
     }
   }
   
-  currentSecondT2 = Time.second();
-  if(currentSecondT2 != previousSecondT2)
+  T2.currentSecond = Time.second();
+  if(T2.currentSecond != T2.previousSecond)
   {
-      instantPulseCountT2 = 0;
-      if(previousPulseCountT2 != pulseCountT2)
-        flowingT2 = 1;
+      T2.instantPulseCount = 0;
+      if(T2.previousPulseCount != T2.pulseCount)
+        T2.flowing = 1;
       else
-        flowingT2 = 0;
-      previousPulseCountT2 = pulseCountT2;
-      previousSecondT2 = currentSecondT2;
+        T2.flowing = 0;
+      T2.previousPulseCount = T2.pulseCount;
+      T2.previousSecond = T2.currentSecond;
   }
 }
 
@@ -371,11 +336,11 @@ void recalculateTapColor(int stripNum)
   for(int i=0; i<PIXEL_COUNT; i++)
   {
     if(stripNum == 0)
-      stripT0.setPixelColor(i, getTapColor(&percentFullT0));
+      stripT0.setPixelColor(i, getTapColor(&T0.percentFull));
     else if(stripNum == 1)
-      stripT1.setPixelColor(i, getTapColor(&percentFullT1));
+      stripT1.setPixelColor(i, getTapColor(&T1.percentFull));
     else if(stripNum == 2)
-      stripT2.setPixelColor(i, getTapColor(&percentFullT2));
+      stripT2.setPixelColor(i, getTapColor(&T2.percentFull));
   }
 
   if(stripNum == 0)
@@ -415,33 +380,33 @@ int getTapColor(int *percentFull)
 
 void animateTap(int stripNum)
 { //do the flow animation
-  if(animationStepT0 >= PIXEL_COUNT)
-    animationStepT0 = 0;
-  if(animationStepT1 >= PIXEL_COUNT)
-    animationStepT1 = 0;
-  if(animationStepT2 >= PIXEL_COUNT)
-    animationStepT2 = 0;
+  if(T0.animationStep >= PIXEL_COUNT)
+    T0.animationStep = 0;
+  if(T1.animationStep >= PIXEL_COUNT)
+    T1.animationStep = 0;
+  if(T2.animationStep >= PIXEL_COUNT)
+    T2.animationStep = 0;
 
   if(stripNum == 0)
   {
     setAllPixelsOff(0);
-    stripT0.setPixelColor((PIXEL_COUNT - 1) - animationStepT0, getTapColor(&percentFullT0));
+    stripT0.setPixelColor((PIXEL_COUNT - 1) - T0.animationStep, getTapColor(&T0.percentFull));
     stripT0.show();
-    animationStepT0++;
+    T0.animationStep++;
   }
   else if(stripNum == 1)
   {
     setAllPixelsOff(1);
-    stripT1.setPixelColor((PIXEL_COUNT - 1) - animationStepT1, getTapColor(&percentFullT1));
+    stripT1.setPixelColor((PIXEL_COUNT - 1) - T1.animationStep, getTapColor(&T1.percentFull));
     stripT1.show();
-    animationStepT1++;
+    T1.animationStep++;
   }
   else if(stripNum == 2)
   {
     setAllPixelsOff(2);
-    stripT2.setPixelColor((PIXEL_COUNT - 1) - animationStepT2, getTapColor(&percentFullT2));
+    stripT2.setPixelColor((PIXEL_COUNT - 1) - T2.animationStep, getTapColor(&T2.percentFull));
     stripT2.show();
-    animationStepT2++;
+    T2.animationStep++;
   }
   
   delay(100);
