@@ -1,18 +1,38 @@
 /*
-TODO
-  x Persist data to SVRAM
-  x track more than one tap (pin)
-  x change LED color over range of full -> empty
-  x beer flowing animation
-  * API endpoints:
-    x reset
-    x get data
-    * set tap name
-    * animation (beer) type
+  Fun volumetric facts about beer kegs:
+    * 1/2 barrel = 15.5 gallons = 124 pints = 165 12oz bottles - (Full Size Keg)
+    * 50 Liter = 13.2 gallons = 105 pints = 140 12oz bottles
+    * 1/4 barrel (30 Ltr) = 7.75-8.1 gallons = 62-66 pints = 83-88 12oz bottles (Pony Keg)
+    * 1/6 barrel (20 Ltr) = 5.2 gallons = 41 pints = 55 12oz bottles (Sixtel)
 
+  Note: At FlightStats, we use 6th barrels!  
+        Approx 16 pulses per pint = 656 pulses per 6th barrel
+
+  Published Events:
+  Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?access_token=XXX
+    * stop-flow-TX where X is the tap number
+    * data is maxPulseCount,pulseCount,percentFull
+
+  Published Variables:
+  Full list: https://api.particle.io/v1/devices/3b0021000447343337373739?access_token=XXX
+  Example: https://api.particle.io/v1/devices/3b0021000447343337373739/pulseCntT0?access_token=XXX
+    * maxPCntTX - the calibrated maximum pulse count
+    * instPCntTX - the instantateous pulse count (if a tap is flowing)
+    * pulseCntTX - the current pulse count from the sensor (maxPCnt - usage)
+    * perFullTX - the percent full (pulseCnt / maxPCnt)
+
+  Published Functions:
+    * post
+      curl https://api.particle.io/v1/devices/3b0021000447343337373739/post \
+       -d access_token=XXX \
+       -d "args=<command>,<arg0>,<arg1>...<argN>" 
+    * commands are: 
+      * reset(int tapNum) 
+        curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=reset,2"
+      * setCalibration(int tapNum, int calibrationValue)
+        curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setCalibration,2,2400"
 */
-// This #include statement was automatically added by the Particle IDE.
-// #include "neopixel/neopixel.h"
+
 #include "neopixel.h"
 
 //photon has 2048 bytes of emulated EEPROM
@@ -146,9 +166,9 @@ void loop()
   pinValT1();
   pinValT2();
 
-  Serial.println("pulseCountT0: " + String(T0.pulseCount));
-  Serial.println("pulseCountT1: " + String(T1.pulseCount));
-  Serial.println("pulseCountT2: " + String(T2.pulseCount));
+  // Serial.println("pulseCountT0: " + String(T0.pulseCount));
+  // Serial.println("pulseCountT1: " + String(T1.pulseCount));
+  // Serial.println("pulseCountT2: " + String(T2.pulseCount));
   
   
   float percentT0 = (float)T0.pulseCount / (float)T0.maxPulseCount;
@@ -169,12 +189,9 @@ void loop()
     T2.percentFull = 100;
   EEPROM.put(EEPROM_ADDR_T2, T2);
 
-  Serial.println("flowingT0: " + String(T0.flowing));
-  Serial.println("flowingT1: " + String(T1.flowing));
-  Serial.println("flowingT2: " + String(T2.flowing));
-
   if(T0.flowing)
   {
+    Serial.println("flowingT0: " + String(T0.flowing));
     animateTap(0);
   }
   else
@@ -188,6 +205,7 @@ void loop()
   if(T1.flowing)
   {
     animateTap(1);
+    Serial.println("flowingT1: " + String(T1.flowing));
   }
   else
   {
@@ -200,6 +218,7 @@ void loop()
   if(T2.flowing)
   {
     animateTap(2);
+    Serial.println("flowingT2: " + String(T2.flowing));
   }
   else
   {
@@ -279,9 +298,15 @@ void pinValT0()
   {
       T0.instantPulseCount = 0;
       if(T0.previousPulseCount != T0.pulseCount)
+      {
         T0.flowing = 1;
+        Particle.publish("start-flow-T0", String(T0.maxPulseCount) + "," + String(T0.pulseCount) + "," + String(T0.percentFull));
+      }
       else
+      {
         T0.flowing = 0;
+        // Particle.publish("stop-flow-T0", String(T0.maxPulseCount) + "," + String(T0.pulseCount) + "," + String(T0.percentFull));
+      }
       T0.previousPulseCount = T0.pulseCount;
       T0.previousSecond = T0.currentSecond;
   }
@@ -315,9 +340,15 @@ void pinValT1()
   {
       T1.instantPulseCount = 0;
       if(T1.previousPulseCount != T1.pulseCount)
+      {
         T1.flowing = 1;
+        Particle.publish("start-flow-T1", String(T1.maxPulseCount) + "," + String(T1.pulseCount) + "," + String(T1.percentFull));
+      }
       else
+      {
         T1.flowing = 0;
+        // Particle.publish("stop-flow-T1", String(T1.maxPulseCount) + "," + String(T1.pulseCount) + "," + String(T1.percentFull));
+      }
       T1.previousPulseCount = T1.pulseCount;
       T1.previousSecond = T1.currentSecond;
   }
@@ -351,9 +382,15 @@ void pinValT2()
   {
       T2.instantPulseCount = 0;
       if(T2.previousPulseCount != T2.pulseCount)
+      {
         T2.flowing = 1;
+        Particle.publish("start-flow-T2", String(T2.maxPulseCount) + "," + String(T2.pulseCount) + "," + String(T2.percentFull));
+      }
       else
+      {
         T2.flowing = 0;
+        // Particle.publish("stop-flow-T2", String(T2.maxPulseCount) + "," + String(T2.pulseCount) + "," + String(T2.percentFull));
+      }
       T2.previousPulseCount = T2.pulseCount;
       T2.previousSecond = T2.currentSecond;
   }
