@@ -3,18 +3,26 @@
 #include "neopixel.h"
 
 //photon has 2048 bytes of emulated EEPROM
-#define EEPROM_ADDR_T0 0 //400 bytes per tap
-#define EEPROM_ADDR_T1 400
-#define EEPROM_ADDR_T2 800
+#define EEPROM_ADDR_T0 0 //600 bytes per tap
+#define EEPROM_ADDR_T1 600
+#define EEPROM_ADDR_T2 1200
 
 #define PIXEL_TYPE WS2812B
 #define PIXEL_COUNT 14
+
+#define FLOW_PIN_T0 D6
+#define FLOW_PIN_T1 D5
+#define FLOW_PIN_T2 D4
+#define LED_PIN_T0 D3
+#define LED_PIN_T1 D2
+#define LED_PIN_T2 D1
 
 struct TapObject
 {
   int pulseCount;
   int maxPulseCount;
   int instantPulseCount;
+  int flowStartPulseCount;
   int previousPulseCount;
   int flowing;
   int previousFlowing;
@@ -27,15 +35,15 @@ struct TapObject
 };
 
 //initialize taps
-TapObject T0 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D6, D3};
-TapObject T1 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D5, D2};
-TapObject T2 = {1000, 1000, 0, 0, 0, 0, 100, 1, 0, 0, D4, D1};
+TapObject T0 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T0, LED_PIN_T0};
+TapObject T1 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T1, LED_PIN_T1};
+TapObject T2 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T2, LED_PIN_T2};
 
 int ledPin = D7;
 
-Adafruit_NeoPixel stripT0 = Adafruit_NeoPixel(PIXEL_COUNT, T0.ledPin, PIXEL_TYPE);
-Adafruit_NeoPixel stripT1 = Adafruit_NeoPixel(PIXEL_COUNT, T1.ledPin, PIXEL_TYPE);
-Adafruit_NeoPixel stripT2 = Adafruit_NeoPixel(PIXEL_COUNT, T2.ledPin, PIXEL_TYPE);
+Adafruit_NeoPixel stripT0 = Adafruit_NeoPixel(PIXEL_COUNT, LED_PIN_T0, PIXEL_TYPE);
+Adafruit_NeoPixel stripT1 = Adafruit_NeoPixel(PIXEL_COUNT, LED_PIN_T1, PIXEL_TYPE);
+Adafruit_NeoPixel stripT2 = Adafruit_NeoPixel(PIXEL_COUNT, LED_PIN_T2, PIXEL_TYPE);
 
 int flowTapPin0Value = 0;
 int flowTapPin1Value = 0;
@@ -120,9 +128,17 @@ int handlePost(String postData)
   }
   else if(command.equals("setCalibration"))
   {
+    //set the calibration value (maxPulseCount)
     //args[1] == tap you want to set (0-3)
     //args[2] == calibration value (total number of pulses in a keg)
     setCalibration(args[1].toInt(), args[2].toInt());
+  }
+  else if(command.equals("setPulseCount"))
+  {
+    //set the pulseCount for a tap manually
+    //args[1] == tap you want to set (0-3)
+    //args[2] == calibration value (total number of pulses in a keg)
+    setPulseCount(args[1].toInt(), args[2].toInt());
   }
 
   return 1;
@@ -209,6 +225,7 @@ void publishFlowingEvents()
   {
     if(T0.flowing)
     {
+      T0.flowStartPulseCount = T0.pulseCount;
       //publish a start event
       Particle.publish("start-flow-T0", String(T0.maxPulseCount) + 
                        "," + String(T0.pulseCount) + "," + String(T0.percentFull));
@@ -216,8 +233,11 @@ void publishFlowingEvents()
     else
     {
       //publish a stop event
-      Particle.publish("stop-flow-T0", String(T0.maxPulseCount) + 
-                       "," + String(T0.pulseCount) + "," + String(T0.percentFull));
+      String data = String(T0.maxPulseCount) + 
+                       "," + String(T0.pulseCount) + "," + String(T0.percentFull) +
+                       "," + String(T0.flowStartPulseCount - T0.pulseCount);
+      Serial.println("stop-flow-T0 Data: " + data);
+      Particle.publish("stop-flow-T0", data);
     }
   }
 
@@ -225,6 +245,7 @@ void publishFlowingEvents()
   {
     if(T1.flowing)
     {
+      T1.flowStartPulseCount = T1.pulseCount;
       //publish a start event
       Particle.publish("start-flow-T1", String(T1.maxPulseCount) + 
                        "," + String(T1.pulseCount) + "," + String(T1.percentFull));
@@ -232,8 +253,11 @@ void publishFlowingEvents()
     else
     {
       //publish a stop event
-      Particle.publish("stop-flow-T1", String(T1.maxPulseCount) + 
-                       "," + String(T1.pulseCount) + "," + String(T1.percentFull));
+      String data = String(T1.maxPulseCount) + 
+                       "," + String(T1.pulseCount) + "," + String(T1.percentFull) +
+                       "," + String(T1.flowStartPulseCount - T1.pulseCount);
+      Serial.println("stop-flow-T1 Data: " + data);
+      Particle.publish("stop-flow-T1", data);
     }
   }
 
@@ -241,15 +265,18 @@ void publishFlowingEvents()
   {
     if(T2.flowing)
     {
+      T2.flowStartPulseCount = T2.pulseCount;
       //publish a start event
       Particle.publish("start-flow-T2", String(T2.maxPulseCount) + 
                        "," + String(T2.pulseCount) + "," + String(T2.percentFull));
     }
     else
     {
-      //publish a stop event
-      Particle.publish("stop-flow-T2", String(T2.maxPulseCount) + 
-                       "," + String(T2.pulseCount) + "," + String(T2.percentFull));
+      String data = String(T2.maxPulseCount) + 
+                       "," + String(T2.pulseCount) + "," + String(T2.percentFull) +
+                       "," + String(T2.flowStartPulseCount - T2.pulseCount);
+      Serial.println("stop-flow-T2 Data: " + data);
+      Particle.publish("stop-flow-T2", data);
     }
   }
 }
@@ -267,6 +294,24 @@ int resetPulseCount(int tap)
   else if(tap == 2)
   {
     T2.pulseCount = T2.maxPulseCount;
+  }
+  writeToEEPROM();
+  return 1;
+}
+
+int setPulseCount(int tap, int val)
+{
+  if(tap == 0)
+  {
+    T0.pulseCount = val;
+  }
+  else if(tap == 1)
+  {
+    T1.pulseCount = val;
+  }
+  else if(tap == 2)
+  {
+    T2.pulseCount = val;
   }
   writeToEEPROM();
   return 1;
@@ -293,7 +338,7 @@ int setCalibration(int tap, int val)
 void pinValT0()
 {
   T0.previousFlowing = T0.flowing;
-  if(digitalRead(T0.flowPin) == HIGH)
+  if(digitalRead(FLOW_PIN_T0) == HIGH)
   {
     if(flowTapPin0Value == 0)
     {
@@ -334,7 +379,7 @@ void pinValT0()
 void pinValT1()
 { 
   T1.previousFlowing = T1.flowing;
-  if(digitalRead(T1.flowPin) == HIGH)
+  if(digitalRead(FLOW_PIN_T1) == HIGH)
   {
     if(flowTapPin1Value == 0)
     {
@@ -375,7 +420,7 @@ void pinValT1()
 void pinValT2()
 {
   T2.previousFlowing = T2.flowing;
-  if(digitalRead(T2.flowPin) == HIGH)
+  if(digitalRead(FLOW_PIN_T2) == HIGH)
   {
     if(flowTapPin2Value == 0)
     {
@@ -399,6 +444,7 @@ void pinValT2()
   T2.currentSecond = Time.second();
   if(T2.currentSecond != T2.previousSecond)
   {
+
       T2.instantPulseCount = 0;
       if(T2.previousPulseCount != T2.pulseCount)
       {
