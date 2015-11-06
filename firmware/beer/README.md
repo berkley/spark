@@ -14,7 +14,9 @@ Note: At FlightStats, we use 6th barrels!
 Published Events:
 Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?access_token=XXX
   * stop-flow-TX where X is the tap number
-  * data is maxPulseCount,pulseCount,percentFull
+    * data is maxPulseCount,pulseCount,percentFull,pulsesConsumed
+  * start-flow-TX where X is the tap number
+    * data is maxPulseCount,pulseCount,percentFull
 
 Published Variables:
 Full list: https://api.particle.io/v1/devices/3b0021000447343337373739?access_token=XXX
