@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "eventsource": "^0.1.6",
+    "node-insights": "^1.0.15"
+  }
+}

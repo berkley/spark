@@ -1,4 +1,3 @@
-var spark = require('spark');
 var Insights = require('node-insights');
 var insights = new Insights({
   appId: "999999998",
@@ -10,10 +9,6 @@ var insights = new Insights({
 var EventSource = require('eventsource');
 var esInitDict = {rejectUnauthorized: false};
 
-var deviceID = process.env.deviceID;	// string, your device ID
-var accessToken = process.env.accessToken; // string, your access token
-
-// Spark URL - must use es.addEventListener and specify the event name
 var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=70922c71ad426b276056078ade75cc156fab9c81";
 var es = new EventSource(url);
 
@@ -39,9 +34,8 @@ es.onerror = function(err){
 handleData = function(name, data)
 {
 	data = JSON.parse(data);
-	console.log("data: ", data);
+	console.log("data", data);
 	var str = data.data;
-	console.log("str: ", str);
 	arr = str.split(',');
 	var obj = {"tap":name, "max":arr[0], "count":arr[1], "percent":arr[2]};
 	console.log("obj: ", obj);

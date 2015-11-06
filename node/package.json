@@ -10,6 +10,7 @@
     "ejs": "*",
     "express": "3.4.4",
     "nconf": "^0.6.9",
+    "node-insights": "^1.0.15",
     "request": "*",
     "spark": "^0.2.3",
     "ws": "^0.6.0"
