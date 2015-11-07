@@ -30,7 +30,7 @@ Published Functions:
   * post
     curl https://api.particle.io/v1/devices/3b0021000447343337373739/post \
      -d access_token=XXX \
-     -d "args=<command>,<arg0>,<arg1>...<argN>" 
+     -d "args=command,arg0,arg1...argN" 
   * commands are: 
     * reset(int tapNum) 
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=reset,2"
