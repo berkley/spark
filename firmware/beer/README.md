@@ -1,3 +1,5 @@
+![LED Beer Taps](https://c1.staticflickr.com/1/575/22510564369_e563be6be2_b.jpg "LED tap handles showing current volume by color.")
+
 This firmware runs on a particle photon connected to neopixel LED strips and pulsing flow meters
 to generate metrics on beer (or other liquid) usage and display it visually.  This
 system is tended for a 3 tap beer system but could be expanded.
