@@ -1,15 +1,15 @@
 var Insights = require('node-insights');
 var insights = new Insights({
   appId: "999999998",
-  insertKey: "tMcXZLm2hNZ4cCaWpG_DHzxEIadMqQoF",
+  insertKey: "XXXX",
   queryKey: '<YOUR_QUERY_KEY>',
-  accountId: '565031'
+  accountId: 'XXXX'
 });
 
 var EventSource = require('eventsource');
 var esInitDict = {rejectUnauthorized: false};
 
-var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=70922c71ad426b276056078ade75cc156fab9c81";
+var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=XXX";
 var es = new EventSource(url);
 
 es.addEventListener('stop-flow-T0', function(e){
