@@ -1,8 +1,10 @@
-![LED Beer Taps](https://c1.staticflickr.com/1/575/22510564369_e563be6be2_b.jpg "LED tap handles showing current volume by color.")
+![#include beer.h](https://c1.staticflickr.com/1/712/22913838471_53f38de2da.jpg "Beer Nerds")
 
 This firmware runs on a particle photon connected to neopixel LED strips and pulsing flow meters
 to generate metrics on beer (or other liquid) usage and display it visually.  This
 system is tended for a 3 tap beer system but could be expanded.
+
+![LED Beer Taps](https://c1.staticflickr.com/1/575/22510564369_e563be6be2.jpg "LED tap handles showing current volume by color.")
 
 Fun volumetric facts about beer kegs:
   * 1/2 barrel = 15.5 gallons = 124 pints = 165 12oz bottles - (Full Size Keg)
@@ -42,3 +44,10 @@ Published Functions:
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setPulseCount,2,783"
 
   Note: Don't call reset unless you really want to reset the pulseCount.  There is no way to undo this!
+  
+![Kegerator installation](https://c2.staticflickr.com/6/5650/22876727816_e9e6af7a0b.jpg "Flow meters, kegs and Particle Photon controller.")
+![Particle Photon](https://c2.staticflickr.com/6/5681/22281557383_d42163feef.jpg "Particle Photon")
+![Flow meters](https://c1.staticflickr.com/1/700/22484342377_5b42a3f49a.jpg "Flow meters")
+
+[Hi Res Photos](https://www.flickr.com/photos/offhegoes/albums/72157660955639056)
+
