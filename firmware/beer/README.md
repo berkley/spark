@@ -19,14 +19,7 @@ Note: At @FlightStats, we use 6th barrels!
       
 ![Kegerator installation](https://c2.staticflickr.com/6/5650/22876727816_e9e6af7a0b.jpg "Flow meters, kegs and Particle Photon controller.")
 
-Published Events:
-Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?access_token=XXX
-  * stop-flow-TX where X is the tap number
-    * data is maxPulseCount,pulseCount,percentFull,pulsesConsumed
-  * start-flow-TX where X is the tap number
-    * data is maxPulseCount,pulseCount,percentFull
-
-Published Variables:
+Cloud Variables:
 Full list: https://api.particle.io/v1/devices/3b0021000447343337373739?access_token=XXX
 Example: https://api.particle.io/v1/devices/3b0021000447343337373739/pulseCntT0?access_token=XXX
   * maxPCntTX - the calibrated maximum pulse count
@@ -34,7 +27,7 @@ Example: https://api.particle.io/v1/devices/3b0021000447343337373739/pulseCntT0?
   * pulseCntTX - the current pulse count from the sensor (maxPCnt - usage)
   * perFullTX - the percent full (pulseCnt / maxPCnt)
 
-Published Functions:
+Cloud Functions:
   * post
     curl https://api.particle.io/v1/devices/3b0021000447343337373739/post \
      -d access_token=XXX \
@@ -46,6 +39,48 @@ Published Functions:
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setCalibration,2,2400"
     * setPulseCount(int tapNum, int pulseCount) - Used to manually set the pulseCount
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setPulseCount,2,783"
+
+Cloud Published Events:
+Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?access_token=XXX
+  * stop-flow-TX where X is the tap number
+    * data is maxPulseCount,pulseCount,percentFull,pulsesConsumed
+  * start-flow-TX where X is the tap number
+    * data is maxPulseCount,pulseCount,percentFull
+
+Published events can be handled in node.js like this:
+
+  var EventSource = require('eventsource');
+  var esInitDict = {rejectUnauthorized: false};
+
+  var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=XXX";
+  var es = new EventSource(url);
+
+  es.addEventListener('stop-flow-T0', function(e){
+    console.log( 'listener0: ', JSON.parse(e.data) );
+    handleData("T0", e.data);
+  }, false);
+
+  es.addEventListener('stop-flow-T1', function(e){
+    console.log( 'listener1: ', JSON.parse(e.data) );
+    handleData("T1", e.data);
+  }, false);
+
+  es.addEventListener('stop-flow-T2', function(e){
+    console.log( 'listener2: ', JSON.parse(e.data) );
+    handleData("T2", e.data);
+  }, false);
+
+  es.onerror = function(err){
+    console.log('ES Error: ', err);
+  };
+
+  handleData = function(name, data)
+  {
+    data = JSON.parse(data);
+    console.log("data", data);
+    //do something with the data here
+  }
+ 
 
 ![Particle Photon](https://c2.staticflickr.com/6/5681/22281557383_d42163feef.jpg "Particle Photon")
 ![Flow meters](https://c1.staticflickr.com/1/700/22484342377_5b42a3f49a.jpg "Flow meters")
