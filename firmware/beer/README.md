@@ -49,37 +49,37 @@ Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?acce
 
 Published events can be handled in node.js like this:
 
-  var EventSource = require('eventsource');
-  var esInitDict = {rejectUnauthorized: false};
+      var EventSource = require('eventsource');
+      var esInitDict = {rejectUnauthorized: false};
 
-  var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=XXX";
-  var es = new EventSource(url);
+      var url = "https://api.particle.io/v1/devices/3b0021000447343337373739/events/?access_token=XXX";
+      var es = new EventSource(url);
 
-  es.addEventListener('stop-flow-T0', function(e){
-    console.log( 'listener0: ', JSON.parse(e.data) );
-    handleData("T0", e.data);
-  }, false);
+      es.addEventListener('stop-flow-T0', function(e){
+        console.log( 'listener0: ', JSON.parse(e.data) );
+        handleData("T0", e.data);
+      }, false);
 
-  es.addEventListener('stop-flow-T1', function(e){
-    console.log( 'listener1: ', JSON.parse(e.data) );
-    handleData("T1", e.data);
-  }, false);
+      es.addEventListener('stop-flow-T1', function(e){
+        console.log( 'listener1: ', JSON.parse(e.data) );
+        handleData("T1", e.data);
+      }, false);
 
-  es.addEventListener('stop-flow-T2', function(e){
-    console.log( 'listener2: ', JSON.parse(e.data) );
-    handleData("T2", e.data);
-  }, false);
+      es.addEventListener('stop-flow-T2', function(e){
+        console.log( 'listener2: ', JSON.parse(e.data) );
+        handleData("T2", e.data);
+      }, false);
 
-  es.onerror = function(err){
-    console.log('ES Error: ', err);
-  };
+      es.onerror = function(err){
+        console.log('ES Error: ', err);
+      };
 
-  handleData = function(name, data)
-  {
-    data = JSON.parse(data);
-    console.log("data", data);
-    //do something with the data here
-  }
+      handleData = function(name, data)
+      {
+        data = JSON.parse(data);
+        console.log("data", data);
+        //do something with the data here
+      }
  
 
 ![Particle Photon](https://c2.staticflickr.com/6/5681/22281557383_d42163feef.jpg "Particle Photon")
