@@ -1,9 +1,9 @@
 var Insights = require('node-insights');
 var insights = new Insights({
   appId: "999999998",
-  insertKey: "tMcXZLm2hNZ4cCaWpG_DHzxEIadMqQoF",
+  insertKey: "XXXX",
   queryKey: '<YOUR_QUERY_KEY>',
-  accountId: '565031'
+  accountId: 'XXXX'
 });
 
 var EventSource = require('eventsource');
