@@ -1,10 +1,12 @@
 ![#include beer.h](https://c1.staticflickr.com/1/712/22913838471_53f38de2da.jpg "Beer Nerds")
 
+@alexwitherspoon and I created this system to monitor and publish beer usage stats from our kegs at @FlightStats.  The kegerator has one flow meter installed per tap.  The @spark Particle Photon development board collects the stats and publishes them via the cloud API's listed below.  It also displays the current volume of the keg in LED lights on the tap handle.  Green means the keg is full and the color slowly changes to red as the volume drops over time.  
+
+![LED Beer Taps](https://c1.staticflickr.com/1/575/22510564369_e563be6be2.jpg "LED tap handles showing current volume by color.")
+
 This firmware runs on a particle photon connected to neopixel LED strips and pulsing flow meters
 to generate metrics on beer (or other liquid) usage and display it visually.  This
 system is tended for a 3 tap beer system but could be expanded.
-
-![LED Beer Taps](https://c1.staticflickr.com/1/575/22510564369_e563be6be2.jpg "LED tap handles showing current volume by color.")
 
 Fun volumetric facts about beer kegs:
   * 1/2 barrel = 15.5 gallons = 124 pints = 165 12oz bottles - (Full Size Keg)
@@ -14,6 +16,8 @@ Fun volumetric facts about beer kegs:
 
 Note: At FlightStats, we use 6th barrels!  
       Approx 16 pulses per pint = 656 pulses per 6th barrel
+      
+![Kegerator installation](https://c2.staticflickr.com/6/5650/22876727816_e9e6af7a0b.jpg "Flow meters, kegs and Particle Photon controller.")
 
 Published Events:
 Example: https://api.particle.io/v1/devices/3b0021000447343337373739/events?access_token=XXX
@@ -45,7 +49,6 @@ Published Functions:
 
   Note: Don't call reset unless you really want to reset the pulseCount.  There is no way to undo this!
   
-![Kegerator installation](https://c2.staticflickr.com/6/5650/22876727816_e9e6af7a0b.jpg "Flow meters, kegs and Particle Photon controller.")
 ![Particle Photon](https://c2.staticflickr.com/6/5681/22281557383_d42163feef.jpg "Particle Photon")
 ![Flow meters](https://c1.staticflickr.com/1/700/22484342377_5b42a3f49a.jpg "Flow meters")
 
