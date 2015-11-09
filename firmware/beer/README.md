@@ -32,9 +32,11 @@ Published Functions:
      -d access_token=XXX \
      -d "args=command,arg0,arg1...argN" 
   * commands are: 
-    * reset(int tapNum) 
+    * reset(int tapNum) - Used to reset the pulseCount to the calibration value. Usually used when changing kegs.
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=reset,2"
-    * setCalibration(int tapNum, int calibrationValue)
+    * setCalibration(int tapNum, int calibrationValue) - Used to manually set the calibration value
       curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setCalibration,2,2400"
+    * setPulseCount(int tapNum, int pulseCount) - Used to manually set the pulseCount
+      curl https://api.particle.io/v1/devices/3b0021000447343337373739/post -d access_token=XXX -d "args=setPulseCount,2,783"
 
   Note: Don't call reset unless you really want to reset the pulseCount.  There is no way to undo this!
