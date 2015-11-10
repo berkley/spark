@@ -46,10 +46,12 @@ const int redZone = 5;
 const int sampleWindow = 50; // Sample window width in mS (50 mS = 20Hz)
 unsigned int sample;
 unsigned int colorCount = 0;
+unsigned int gain;
 
 void setup()
 {
   pinMode(A0, INPUT);
+  pinMode(A1, INPUT);
   Serial.begin(9600);
 //   WiFi.selectAntenna(ANT_EXTERNAL);
 //   WiFi.on();
@@ -94,9 +96,17 @@ void loop()
 
    while (millis() - startMillis < sampleWindow)
    {
-      sample = analogRead(A0) / 4;
+      gain = analogRead(A0) / 256;
+      if(gain == 0)
+        gain = 1; 
+      // sample = analogRead(A1) / 4;
+      sample = analogRead(A1) / gain;
+      signalMin = 4096 / gain;
+
+      
       // Serial.println("sample: " + String(sample));
-      if (sample < 1024)  // toss out spurious readings
+
+      if (sample < signalMin)  // toss out spurious readings
       {
          if (sample > signalMax)
          {
@@ -114,10 +124,10 @@ void loop()
       peakToPeak = 0;
 
    // map 1v p-p level to the max scale of the display
-   int displayPeak = map(peakToPeak, 0, 1023, 0, maxScale);
+   int displayPeak = map(peakToPeak, 0, signalMin - 1, 0, maxScale);
    if(displayPeak < 0)
     displayPeak = 0;
-   Serial.println("peakToPeak: " + String(peakToPeak) + "   displayPeak: " + String(displayPeak));
+   Serial.println("peakToPeak: " + String(peakToPeak) + "   displayPeak: " + String(displayPeak) + " gain: " + String(gain));
 
    //upside down now
    displayPeak = maxScale - displayPeak;
