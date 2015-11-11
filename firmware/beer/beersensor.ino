@@ -35,9 +35,9 @@ struct TapObject
 };
 
 //initialize taps
-TapObject T0 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T0, LED_PIN_T0};
-TapObject T1 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T1, LED_PIN_T1};
-TapObject T2 = {1000, 1000, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T2, LED_PIN_T2};
+TapObject T0 = {650, 650, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T0, LED_PIN_T0};
+TapObject T1 = {650, 650, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T1, LED_PIN_T1};
+TapObject T2 = {650, 650, 0, 0, 0, 0, 0, 100, 1, 0, 0, FLOW_PIN_T2, LED_PIN_T2};
 
 int ledPin = D7;
 
@@ -75,10 +75,10 @@ void setup()
   
   pinMode(ledPin, OUTPUT);
   
-  //read any objects set in the EEPROM
-  EEPROM.get(EEPROM_ADDR_T0, T0);
-  EEPROM.get(EEPROM_ADDR_T1, T1);
-  EEPROM.get(EEPROM_ADDR_T2, T2);
+  // //read any objects set in the EEPROM
+  // EEPROM.get(EEPROM_ADDR_T0, T0);
+  // EEPROM.get(EEPROM_ADDR_T1, T1);
+  // EEPROM.get(EEPROM_ADDR_T2, T2);
 
   //https://api.particle.io/v1/devices/<device_id>/<variable_name>?access_token=<access_token>
   Particle.variable("maxPCntT0", &T0.maxPulseCount, INT);
