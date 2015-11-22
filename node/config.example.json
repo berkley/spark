@@ -22,5 +22,7 @@
               {"name":"Core2", "vColStart":32, "vColEnd":63, "colStart":0, "colEnd":31}],
     "water":{"valves":[{"valveId":"1", "name":"Front Yard", "core":"Photon1"},
                        {"valveId":"0", "name":"Garden","core":"Freddy"},
-                       {"valveId":"3", "name":"Side Yard", "core":"Photon1"}]}
+                       {"valveId":"3", "name":"Side Yard", "core":"Photon1"}]},
+    "chickens":{"switches":[{"lightId":"2", "name":"Heat Lamp", "core":"Robot"},
+                          {"lightId":"1", "name":"Daylight Lamp","core":"Robot"}]}
 }

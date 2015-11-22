@@ -8,6 +8,7 @@ var security = require('./routes/security');
 var http = require('http');
 var path = require('path');
 var nconf = require('nconf');
+var chickens = require('./routes/chickens');
 var fs = require('fs');
 var sockets = require('./websocket/sockets');
 sockets.setConfig(nconf);
@@ -21,6 +22,7 @@ nconf.argv()
 lights.setConfig(nconf);
 water.setConfig(nconf);
 security.setConfig(nconf);
+chickens.setConfig(nconf);
 
 app.set('port', process.env.PORT || nconf.get("port") || 3000);
 app.set('views', path.join(__dirname, 'views'));
@@ -40,6 +42,8 @@ app.get('/security', security.index);
 app.get('/house/run/action', lights.action);
 app.get('/house/params/:coreId', lights.params); //get the current param state for the given coreId;
 app.get('/water/run/action', water.action);
+app.get('/chickens/run/action', chickens.action);
+app.get('/chickens', chickens.index);
 app.get('/freddy', freddy.index);
 app.get('/freddy/run/action', freddy.action);
 app.get('/camp', camp.index);
