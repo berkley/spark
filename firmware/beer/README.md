@@ -83,6 +83,8 @@ Published events can be handled in node.js like this:
  
 If you use New Relic, you can publish this data to Insights with this script: https://github.com/berkley/spark/blob/master/node/beer-insights-writer/beer-insights-writer.js
 
+There is now a GUI to control the tap variables.   Code is here: https://github.com/berkley/spark/tree/master/node/beer-control
+
 ![Particle Photon](https://c2.staticflickr.com/6/5681/22281557383_d42163feef.jpg "Particle Photon")
 ![Flow meters](https://c1.staticflickr.com/1/700/22484342377_5b42a3f49a.jpg "Flow meters")
 
