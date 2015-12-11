@@ -62,9 +62,7 @@ router.get('/status/:tap', function(req, res) {
 	    
 	  }).on('data', function(data) {
 	    // decompressed data as it is received 
-	    console.log('decoded chunk: ' + data);
 	    var jsonD = JSON.parse(data);
-	    console.log("val: ", jsonD.result);
 	    if(jsonD.result != undefined)
 	    {
 	    	res.send("" + jsonD.result + "").end();
@@ -85,9 +83,7 @@ router.get('/cal/:tap', function(req, res) {
 	    
 	  }).on('data', function(data) {
 	    // decompressed data as it is received 
-	    console.log('decoded chunk: ' + data);
 	    var jsonD = JSON.parse(data);
-	    console.log("val: ", jsonD.result);
 	    if(jsonD.result)
 	    {
 	    	res.send("" + jsonD.result + "").end();
