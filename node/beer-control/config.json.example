@@ -1,0 +1,11 @@
+{
+	"beer":{
+		"particleUrl":"https://api.particle.io/v1/devices",
+		"deviceId":"XXXX",
+		"particlePost":"post",
+		"particlePulseCnt":"pulseCntT",
+		"maxPCnt":"maxPCntT",
+		"percent":"perFullT",
+		"access_token":"XXXX"
+	}
+}

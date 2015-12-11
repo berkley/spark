@@ -1,14 +1,20 @@
 var express = require('express');
 var router = express.Router();
 var request = require('request');
+var nconf = require('nconf');
 
-var particleUrl = 'https://api.particle.io/v1/devices';
-var deviceId = '3b0021000447343337373739';
-var particlePost = 'post';
-var particlePulseCnt = 'pulseCntT';
-var maxPCnt = 'maxPCntT';
-var percent = 'perFullT'
-var access_token = '70922c71ad426b276056078ade75cc156fab9c81';
+nconf.argv()
+   .env()
+   .file({ file: 'config.json' });
+var conf = nconf.get('beer');
+
+var particleUrl = conf.particleUrl;
+var deviceId = conf.deviceId;
+var particlePost = conf.particlePost;
+var particlePulseCnt = conf.particlePulseCnt;
+var maxPCnt = conf.maxPCnt;
+var percent = conf.percent;
+var access_token = conf.access_token;
 
 /* GET home page. */
 router.get('/', function(req, res) {
