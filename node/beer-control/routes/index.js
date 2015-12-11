@@ -6,6 +6,7 @@ var particleUrl = 'https://api.particle.io/v1/devices';
 var deviceId = '3b0021000447343337373739';
 var particlePost = 'post';
 var particlePulseCnt = 'pulseCntT';
+var maxPCnt = 'maxPCntT';
 var access_token = '70922c71ad426b276056078ade75cc156fab9c81';
 
 /* GET home page. */
@@ -53,6 +54,29 @@ router.get('/set/:tap/:value', function(req, res) {
 router.get('/status/:tap', function(req, res) {
   	var tap = req.params.tap;
   	var url = particleUrl + "/" + deviceId + "/" + particlePulseCnt + tap + "?access_token=" + access_token;
+  	console.log("url: ", url);
+	request
+	  .get(url)
+	  .on('response', function(resp) {
+	    // console.log(response.statusCode) 
+	    
+	  }).on('data', function(data) {
+	    // decompressed data as it is received 
+	    console.log('decoded chunk: ' + data);
+	    var jsonD = JSON.parse(data);
+	    console.log("val: ", jsonD.result);
+	    if(jsonD.result != undefined)
+	    {
+	    	res.send("" + jsonD.result + "").end();
+	    }
+	    else
+	    	res.sendStatus(500).end();
+  	  })
+});
+
+router.get('/cal/:tap', function(req, res) {
+  	var tap = req.params.tap;
+  	var url = particleUrl + "/" + deviceId + "/" + maxPCnt + tap + "?access_token=" + access_token;
   	console.log("url: ", url);
 	request
 	  .get(url)

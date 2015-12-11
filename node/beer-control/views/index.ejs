@@ -7,16 +7,24 @@
     <link rel="shortcut icon" href="/favicon-flightstats.ico">
     <script>
     $( document ).ready(function() {
-        console.log( "document loaded" );
-		    $.get( "status/0", function( data ) {
-			  $( "#status0" ).html( data );
-			});
-			$.get( "status/1", function( data ) {
-			  $( "#status1" ).html( data );
-			});
-			$.get( "status/2", function( data ) {
-			  $( "#status2" ).html( data );
-			});
+	    $.get( "status/0", function( data ) {
+		  $( "#status0" ).html( data );
+		});
+		$.get( "status/1", function( data ) {
+		  $( "#status1" ).html( data );
+		});
+		$.get( "status/2", function( data ) {
+		  $( "#status2" ).html( data );
+		});
+		$.get( "cal/0", function( data ) {
+		  $( "#cal0" ).html( data );
+		});
+		$.get( "cal/1", function( data ) {
+		  $( "#cal1" ).html( data );
+		});
+		$.get( "cal/2", function( data ) {
+		  $( "#cal2" ).html( data );
+		});
     });
  
     $( window ).load(function() {
@@ -28,30 +36,45 @@
     </script>
   </head>
   <body>
-    <div class="bar" style="padding-top:5px;padding-bottom:5px;margin-bottom:2px">
-      <div class="fslogo"></div>
+    <div class="bar" style="padding:10px;margin-bottom:5px">
+      <div class="fslogo" style="color:white;"> &#127866; &#127866; &#127866; &#127866; &#127866; &#127866; &#127866; &#127866; &#127866; </div>
     </div>
 
-    <div>
-    	<!-- <div><a href="status/0" >Current Status: Tap 0 (left)</a></div>
-	    <div><a href="status/1" >Current Status: Tap 1 (middle)</a></div>
-	    <div><a href="status/2" >Current Status: Tap 2 (right)</a></div> -->
-	    <div>Tap 0 (left) status: <span id="status0"></span></div>
-	    <div>Tap 1 (middle) status: <span id="status1"></span></div>
-	    <div>Tap 2 (right) status: <span id="status2"></span></div>
-	</div>
-	<hr/>
-    <div>
-    	<div><a href="reset/0">Reset Tap 0 (left)</a></div>
-	    <div><a href="reset/1">Reset Tap 1 (middle)</a></div>
-	    <div><a href="reset/2">Reset Tap 2 (right)</a></div>
-	</div>
-	<hr/>
-	<div>
-		Value: <input onchange="$('#set0').attr('href', 'set/0/' + $(this).val()); $('#set1').attr('href', 'set/1/' + $(this).val()); $('#set2').attr('href', 'set/2/' + $(this).val()); " id="val"></input>
-    	<div><a href="set/0" id="set0">Set Tap 0 (left)</a></div>
-	    <div><a href="set/1" id="set1">Set Tap 1 (middle)</a></div>
-	    <div><a href="set/2" id="set2">Set Tap 2 (right)</a></div>
-	</div>
+    <table>
+  		<tr>
+  			<td>Tap 0 (Downstairs Left)</td>
+  			<td><div>Status: <span id="status0"></span> of <span id="cal0"></span></div></td>
+  			<td><div><a href="reset/0">Reset</a></div></td>
+	    	<td>
+	    		<input onchange="$('#set0').attr('href', 'set/0/' + $(this).val());" id="val"></input>
+	    		<a href="set/0" id="set0">Set</a>
+	    	<td>
+  		</tr>
+  		<tr>
+  			<td>Tap 1 (Downstairs Center)</td>
+  			<td><div>Status: <span id="status1"></span> of <span id="cal1"></span></div></td>
+  			<td><div><a href="reset/1">Reset</a></div></td>
+  			<td>
+	    		<input onchange="$('#set1').attr('href', 'set/1/' + $(this).val());" id="val"></input>
+	    		<a href="set/1" id="set1">Set</a>
+	    	<td>
+  		</tr>
+  		<tr>
+  			<td>Tap 2 (Downstairs Right)</td>
+  			<td><div>Status: <span id="status2"></span> of <span id="cal2"></span></div></td>
+  			<td><div><a href="reset/2">Reset</a></div></td>
+  			<td>
+	    		<input onchange="$('#set2').attr('href', 'set/2/' + $(this).val());" id="val"></input>
+	    		<a href="set/2" id="set2">Set</a>
+	    	<td>
+  		</tr>
+  	</table>
+
+    <div class="bar" style="margin-top:5px;padding:10px;">
+    	<div><a href="https://insights.newrelic.com/accounts/565031/dashboards/99841">FSBeer Insights Dashboard</a></div>
+    	<div><a href="http://wiki.office/wiki/Beer">FSBeer Wiki Docs</a></div>
+    	<div><a href="https://github.com/berkley/spark/blob/master/firmware/beer/README.md">FSBeer Code</a></div>
+    </div>
+
   </body>
 </html>
