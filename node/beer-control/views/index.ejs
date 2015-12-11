@@ -4,10 +4,43 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+    <link rel="shortcut icon" href="/favicon-flightstats.ico">
+    <script>
+    $( document ).ready(function() {
+        console.log( "document loaded" );
+		    $.get( "status/0", function( data ) {
+			  $( "#status0" ).html( data );
+			});
+			$.get( "status/1", function( data ) {
+			  $( "#status1" ).html( data );
+			});
+			$.get( "status/2", function( data ) {
+			  $( "#status2" ).html( data );
+			});
+    });
+ 
+    $( window ).load(function() {
+        console.log( "window loaded" );
+    });
+    </script>
+    <script>
+    	
+    </script>
   </head>
   <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
+    <div class="bar" style="padding-top:5px;padding-bottom:5px;margin-bottom:2px">
+      <div class="fslogo"></div>
+    </div>
+
+    <div>
+    	<!-- <div><a href="status/0" >Current Status: Tap 0 (left)</a></div>
+	    <div><a href="status/1" >Current Status: Tap 1 (middle)</a></div>
+	    <div><a href="status/2" >Current Status: Tap 2 (right)</a></div> -->
+	    <div>Tap 0 (left) status: <span id="status0"></span></div>
+	    <div>Tap 1 (middle) status: <span id="status1"></span></div>
+	    <div>Tap 2 (right) status: <span id="status2"></span></div>
+	</div>
+	<hr/>
     <div>
     	<div><a href="reset/0">Reset Tap 0 (left)</a></div>
 	    <div><a href="reset/1">Reset Tap 1 (middle)</a></div>
@@ -19,12 +52,6 @@
     	<div><a href="set/0" id="set0">Set Tap 0 (left)</a></div>
 	    <div><a href="set/1" id="set1">Set Tap 1 (middle)</a></div>
 	    <div><a href="set/2" id="set2">Set Tap 2 (right)</a></div>
-	</div>
-	<hr/>
-	<div>
-    	<div><a href="status/0" >Current Status: Tap 0 (left)</a></div>
-	    <div><a href="status/1" >Current Status: Tap 1 (middle)</a></div>
-	    <div><a href="status/2" >Current Status: Tap 2 (right)</a></div>
 	</div>
   </body>
 </html>

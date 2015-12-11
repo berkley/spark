@@ -6,3 +6,139 @@ body {
 a {
   color: #00B7FF;
 }
+
+table {
+   border: 1px solid black;
+   padding: 10px;
+   width: 100%;
+}
+
+tr:hover {
+	background-color: grey;
+}
+
+th {
+	background-color: black;
+	color: white;
+	height: 30px;
+}
+
+td {
+	text-align: center;
+}
+
+.baritem {
+	color:gray;
+	border:1px;
+	padding:2px;
+	display: inline-block;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 40px;
+	font-size: 2em;
+	margin-left: 10px;
+}
+
+.bardivider {
+	color:white;
+	border:1px;
+	padding:2px;
+	display: inline-block;
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	height: 40px;
+	font-size: 1.5em;
+	margin-right: -10px;
+	margin-left: 20px;
+}
+
+.bar {
+	width: 100%;
+	background-color: #071C35;
+	height: 50px;
+	vertical-align: center;
+}
+
+.fslogo {
+	display: inline-block;
+	background-image:url(http://dem5xqcn61lj8.cloudfront.net/FlightStats2/Common/fs_common.png);
+	background-position:-9px -9px;
+	width: 254px;
+    height: 50px;
+    position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+	right:-35%;
+}
+
+.cancelled {
+	background-color: red;
+}
+
+.actual {
+	background-color: #071C35;
+	color:white;
+}
+
+a:link {
+	text-decoration: none;
+	color: orange;
+}
+
+a:visited {
+	color: orange;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+.fornav {
+	color: orange;
+}
+
+.backnav {
+	color: orange;
+}
+
+.circle
+{
+    width: 30px;
+    height: 30px;
+    background-color: green;
+    text-align: center;
+    vertical-align: middle;
+
+    -webkit-border-radius: 50px; /* Safari, Chrome */
+       -moz-border-radius: 50px; /* Firefox */
+            border-radius: 50px; /* CSS3 */
+}
+
+.red
+{
+	background-color: red;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.green
+{
+	background-color: green;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.orange
+{
+	background-color: orange;
+	padding-left:5px;
+	padding-right:5px;
+}
+
+.prediction-cell 
+{
+	text-align: center;
+	vertical-align: middle;
+}
