@@ -25,6 +25,15 @@
 		$.get( "cal/2", function( data ) {
 		  $( "#cal2" ).html( data );
 		});
+		$.get( "percent/0", function( data ) {
+		  $( "#per0" ).html( data );
+		});
+		$.get( "percent/1", function( data ) {
+		  $( "#per1" ).html( data );
+		});
+		$.get( "percent/2", function( data ) {
+		  $( "#per2" ).html( data );
+		});
     });
  
     $( window ).load(function() {
@@ -49,7 +58,7 @@
     	</tr>
   		<tr>
   			<td>Downstairs Left (0)</td>
-  			<td><div><span id="status0"></span> of <span id="cal0"></span></div></td>
+  			<td><div><span id="status0"></span> of <span id="cal0"></span> (<span id="per0"/></span>%)</div></td>
   			<td><div><a href="reset/0">Reset</a></div></td>
 	    	<td>
 	    		<input onchange="$('#set0').attr('href', 'set/0/' + $(this).val());" id="val"></input>
@@ -58,7 +67,7 @@
   		</tr>
   		<tr>
   			<td>Downstairs Center (1)</td>
-  			<td><div><span id="status1"></span> of <span id="cal1"></span></div></td>
+  			<td><div><span id="status1"></span> of <span id="cal1"></span> (<span id="per1"/></span>%)</div></td>
   			<td><div><a href="reset/1">Reset</a></div></td>
   			<td>
 	    		<input onchange="$('#set1').attr('href', 'set/1/' + $(this).val());" id="val"></input>
@@ -67,7 +76,7 @@
   		</tr>
   		<tr>
   			<td>Downstairs Right (2)</td>
-  			<td><div><span id="status2"></span> of <span id="cal2"></span></div></td>
+  			<td><div><span id="status2"></span> of <span id="cal2"></span> (<span id="per2"/></span>%)</div></td>
   			<td><div><a href="reset/2">Reset</a></div></td>
   			<td>
 	    		<input onchange="$('#set2').attr('href', 'set/2/' + $(this).val());" id="val"></input>

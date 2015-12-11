@@ -27,6 +27,7 @@ app.use('/reset/:tap', routes);
 app.use('/set/:tap/:value', routes);
 app.use('/status/:tap', routes);
 app.use('/cal/:tap', routes);
+app.use('/percent/:tap', routes);
 app.use('/users', users);
 
 // catch 404 and forward to error handler

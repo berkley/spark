@@ -89,7 +89,7 @@ void setup()
   Particle.variable("maxPCntT1", &T1.maxPulseCount, INT);
   Particle.variable("instPCntT1", &T1.instantPulseCount, INT);
   Particle.variable("pulseCntT1", &T1.pulseCount, INT);
-  Particle.variable("perFullT1", &T0.percentFull, INT);
+  Particle.variable("perFullT1", &T1.percentFull, INT);
 
   Particle.variable("maxPCntT2", &T2.maxPulseCount, INT);
   Particle.variable("instPCntT2", &T2.instantPulseCount, INT);
