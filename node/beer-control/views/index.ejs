@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="//code.jquery.com/jquery-2.1.4.min.js"></script>
+  </head>
+  <body>
+    <h1><%= title %></h1>
+    <p>Welcome to <%= title %></p>
+    <div>
+    	<div><a href="reset/0">Reset Tap 0 (left)</a></div>
+	    <div><a href="reset/1">Reset Tap 1 (middle)</a></div>
+	    <div><a href="reset/2">Reset Tap 2 (right)</a></div>
+	</div>
+	<hr/>
+	<div>
+		Value: <input onchange="$('#set0').attr('href', 'set/0/' + $(this).val()); $('#set1').attr('href', 'set/1/' + $(this).val()); $('#set2').attr('href', 'set/2/' + $(this).val()); " id="val"></input>
+    	<div><a href="set/0" id="set0">Set Tap 0 (left)</a></div>
+	    <div><a href="set/1" id="set1">Set Tap 1 (middle)</a></div>
+	    <div><a href="set/2" id="set2">Set Tap 2 (right)</a></div>
+	</div>
+	<hr/>
+	<div>
+    	<div><a href="status/0" >Current Status: Tap 0 (left)</a></div>
+	    <div><a href="status/1" >Current Status: Tap 1 (middle)</a></div>
+	    <div><a href="status/2" >Current Status: Tap 2 (right)</a></div>
+	</div>
+  </body>
+</html>
