@@ -1,14 +1,22 @@
 #include "application.h"
-#include "neopixel/neopixel.h"
+#include "neopixel.h"
 #include "led-strip-particles.h"
 
-//the pin your spark is using to control neopixels
-#define PIXEL_PIN D2
-//the number of pixels you are controlling
-#define PIXEL_COUNT 467 //giggle
-// #define PIXEL_COUNT 150 //colossus
+//pins that control on/off functions
+#define PIN_0 A0
+#define PIN_1 A1
+#define PIN_2 A2
+#define PIN_3 A3
+#define PIN_4 A4
+#define PIN_5 A5
 
-//the neopixel chip type
+//pins for neopixel strips = D0, D1, D2
+#define PIXEL_PIN_0 D0
+#define PIXEL_PIN_1 D1
+#define PIXEL_PIN_2 D2
+#define PIXEL_COUNT_0 5 
+#define PIXEL_COUNT_1 5
+#define PIXEL_COUNT_2 467 
 #define PIXEL_TYPE WS2812B
 
 //particle params
@@ -17,8 +25,10 @@
 #define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
 
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(PIXEL_COUNT, PIXEL_PIN, PIXEL_TYPE);
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT, MAX_COLOR);
+Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(PIXEL_COUNT_0, PIXEL_PIN_0, PIXEL_TYPE);
+Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(PIXEL_COUNT_1, PIXEL_PIN_1, PIXEL_TYPE);
+Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(PIXEL_COUNT_2, PIXEL_PIN_2, PIXEL_TYPE);
+ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT_2, MAX_COLOR);
 char action[64];
 char parameters[64];
 
@@ -54,8 +64,8 @@ String *strArr = new String[20];
 void setup() 
 {
 //   Serial.begin(9600);
-  strip.begin();
-  strip.show(); // Initialize all pixels to 'off'
+  strip2.begin();
+  strip2.show(); // Initialize all pixels to 'off'
   //register the run command as an API endpoint
   Particle.function("run", run);
   //register the action variable as a GET parameter
@@ -189,6 +199,7 @@ int run(String params)
     }
     else if(command.equals(SETALL))
     {
+        loopRun = STOP;
         int r = stringToInt(args[1]);
         int g = stringToInt(args[2]);
         int b = stringToInt(args[3]);
@@ -196,6 +207,7 @@ int run(String params)
     }
     else if(command.equals(ALTERNATE))
     {
+        loopRun = STOP;
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
         int b1 = stringToInt(args[3]);
@@ -231,6 +243,7 @@ int run(String params)
     }
     else if(command.equals(BLOCKS))
     {
+        loopRun = STOP;
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
         int b1 = stringToInt(args[3]);
@@ -266,8 +279,8 @@ int run(String params)
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
         int b1 = stringToInt(args[3]);
-        strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
-        strip.show();
+        strip2.setPixelColor(pixel, strip2.Color(r1, g1, b1));
+        strip2.show();
         return 1;
     }
     else if(command.equals(SETPIXEL))
@@ -276,12 +289,12 @@ int run(String params)
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
         int b1 = stringToInt(args[3]);
-        strip.setPixelColor(pixel, strip.Color(r1, g1, b1));
+        strip2.setPixelColor(pixel, strip2.Color(r1, g1, b1));
         return 1;
     }
     else if(command.equals(LATCH))
     {
-        strip.show();
+        strip2.show();
         return 1;
     }
     else if(command.equals(STOP))
@@ -331,8 +344,8 @@ int run(String params)
     else if(command.equals(SETBRIGHTNESS))
     {
         int brightness = stringToInt(args[1]);
-        strip.setBrightness(brightness);
-        strip.show();
+        strip2.setBrightness(brightness);
+        strip2.show();
         return 1;
     }
     else if(command.equals(USA))
@@ -381,7 +394,7 @@ int runUSA()
     int j = 0;
     {
         int count = -1;
-        for(int i=0; i<strip.numPixels(); i++) {
+        for(int i=0; i<strip2.numPixels(); i++) {
             if(i % blockSize == 0)
             {
                 count++;
@@ -391,9 +404,9 @@ int runUSA()
             
             
             int pix = 0;
-            if( (i + j) >= strip.numPixels())
+            if( (i + j) >= strip2.numPixels())
             {
-                pix = (i + j) - strip.numPixels();
+                pix = (i + j) - strip2.numPixels();
             }
             else 
             {
@@ -402,19 +415,19 @@ int runUSA()
             
             if(count == 0)
             {
-                strip.setPixelColor(pix, strip.Color(255, 0, 0));
+                strip2.setPixelColor(pix, strip2.Color(255, 0, 0));
             }
             else if(count == 1)
             {
-                strip.setPixelColor(pix, strip.Color(255, 255, 255));
+                strip2.setPixelColor(pix, strip2.Color(255, 255, 255));
             }
             else if(count == 2)
             {
-                strip.setPixelColor(pix, strip.Color(0, 0, 255));
+                strip2.setPixelColor(pix, strip2.Color(0, 0, 255));
             }
             
         }
-        strip.show();
+        strip2.show();
         delay(500);
     }
     return 1;
@@ -422,20 +435,20 @@ int runUSA()
 
 int snow()
 {
-    for(int i=0; i<strip.numPixels() / 10; i++)
+    for(int i=0; i<strip2.numPixels() / 10; i++)
     { //pick the random pixels
-        int pix = random(strip.numPixels());
-        strip.setPixelColor(pix, strip.Color(0, 0, 0));
-        strip.show();
+        int pix = random(strip2.numPixels());
+        strip2.setPixelColor(pix, strip2.Color(0, 0, 0));
+        strip2.show();
         delay(random(50));
     }
     
-    for(int i=0; i<strip.numPixels() / 10; i++)
+    for(int i=0; i<strip2.numPixels() / 10; i++)
     { //pick the random pixels
-        int pix = random(strip.numPixels());
+        int pix = random(strip2.numPixels());
         int brightness = random(255);
-        strip.setPixelColor(pix, strip.Color(brightness, brightness, brightness * .20)); //poor mans white balance
-        strip.show();
+        strip2.setPixelColor(pix, strip2.Color(brightness, brightness, brightness * .20)); //poor mans white balance
+        strip2.show();
         delay(random(50));
     }
 }
@@ -444,11 +457,11 @@ int endRun(uint8_t r1, uint8_t g1, uint8_t b1,
     uint8_t r2, uint8_t g2, uint8_t b2,
     uint8_t d)
 {
-    for(int i=0; i<strip.numPixels(); i++)
+    for(int i=0; i<strip2.numPixels(); i++)
     {
-        strip.setPixelColor(i, strip.Color(r1, g1, b1));
-        strip.setPixelColor(strip.numPixels() - i, strip.Color(r2, g2, b2));
-        strip.show();
+        strip2.setPixelColor(i, strip2.Color(r1, g1, b1));
+        strip2.setPixelColor(strip2.numPixels() - i, strip2.Color(r2, g2, b2));
+        strip2.show();
         delay(d);
     }
 }
@@ -458,16 +471,16 @@ int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
 {
     for(int j=0; j<blockSize; j++)
     {
-        for(int i=0; i<strip.numPixels(); i++) {
+        for(int i=0; i<strip2.numPixels(); i++) {
             if(i % blockSize == 0)
             {
                 inBlock = !inBlock;
             }
             
             int pix = 0;
-            if( (i + j) >= strip.numPixels())
+            if( (i + j) >= strip2.numPixels())
             {
-                pix = (i + j) - strip.numPixels();
+                pix = (i + j) - strip2.numPixels();
             }
             else 
             {
@@ -476,14 +489,14 @@ int animateBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
             
             if(inBlock)
             {
-                strip.setPixelColor(pix, strip.Color(r1, g1, b1));
+                strip2.setPixelColor(pix, strip2.Color(r1, g1, b1));
             }
             else
             {
-                strip.setPixelColor(pix, strip.Color(r2, g2, b2));
+                strip2.setPixelColor(pix, strip2.Color(r2, g2, b2));
             }
         }
-        strip.show();
+        strip2.show();
         delay(d);
     }
     
@@ -496,7 +509,7 @@ int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
 {               
     bool inBlock = true;
     
-    for(int i=0; i<strip.numPixels(); i++) {
+    for(int i=0; i<strip2.numPixels(); i++) {
         if(i % blockSize == 0)
         {
             inBlock = !inBlock;
@@ -504,31 +517,31 @@ int buildBlocks(uint8_t r1, uint8_t g1, uint8_t b1,
         
         if(inBlock)
         {
-            strip.setPixelColor(i, strip.Color(r1, g1, b1));
+            strip2.setPixelColor(i, strip2.Color(r1, g1, b1));
         }
         else
         {
-            strip.setPixelColor(i, strip.Color(r2, g2, b2));
+            strip2.setPixelColor(i, strip2.Color(r2, g2, b2));
         }
     }
-    strip.show();
+    strip2.show();
     return 1;
 }
 
 int staticAlternate(uint8_t r1, uint8_t g1, uint8_t b1, 
     uint8_t r2, uint8_t g2, uint8_t b2)
 {
-    for(int i=0; i<strip.numPixels(); i++) {
+    for(int i=0; i<strip2.numPixels(); i++) {
         if(i % 2 == 0)
         {
-            strip.setPixelColor(i, strip.Color(r1, g1, b1));
+            strip2.setPixelColor(i, strip2.Color(r1, g1, b1));
         }
         else
         {
-            strip.setPixelColor(i, strip.Color(r2, g2, b2));
+            strip2.setPixelColor(i, strip2.Color(r2, g2, b2));
         }
     }
-    strip.show();
+    strip2.show();
     return 1;
 }
 
@@ -544,10 +557,10 @@ int setRGB(String rgb)
 
 int setAll(uint8_t r, uint8_t g, uint8_t b)
 {
-    for(int i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, strip.Color(r, g, b));
+    for(int i=0; i<strip2.numPixels(); i++) {
+      strip2.setPixelColor(i, strip2.Color(r, g, b));
   }
-  strip.show();
+  strip2.show();
   return 1;
 }
 
@@ -555,10 +568,10 @@ int rainbow(int d) {
   uint16_t i, j;
 
   for(j=0; j<256; j++) {
-    for(i=0; i<strip.numPixels(); i++) {
-      strip.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
+    for(i=0; i<strip2.numPixels(); i++) {
+      strip2.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
   }
-  strip.show();
+  strip2.show();
   delay(d);
 }
 return 1;
@@ -569,13 +582,13 @@ return 1;
 uint32_t Wheel(byte WheelPos) {
   int maxVal = MAX_COLOR;
   if(WheelPos < 85) {
-     return strip.Color(WheelPos * 3, maxVal - WheelPos * 3, 0);
+     return strip2.Color(WheelPos * 3, maxVal - WheelPos * 3, 0);
  } else if(WheelPos < 170) {
      WheelPos -= 85;
-     return strip.Color(maxVal - WheelPos * 3, 0, WheelPos * 3);
+     return strip2.Color(maxVal - WheelPos * 3, 0, WheelPos * 3);
  } else {
      WheelPos -= 170;
-     return strip.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
+     return strip2.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
  }
 }
 
@@ -635,10 +648,10 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
         greenValue = g1 + (greenDiff * i / steps);
         blueValue = b1 + (blueDiff * i / steps);
 
-        for (uint16_t i = 0; i < strip.numPixels(); i++) {
-            strip.setPixelColor(i, strip.Color(redValue, greenValue, blueValue));
+        for (uint16_t i = 0; i < strip2.numPixels(); i++) {
+            strip2.setPixelColor(i, strip2.Color(redValue, greenValue, blueValue));
         }
-        strip.show();
+        strip2.show();
         delay(del);
     }
 
@@ -682,8 +695,8 @@ void particles() {
             }
 
             // Draw particle
-            strip.setPixelColor(currentSlot, 
-                                strip.Color(prt.redColor * colorScale, 
+            strip2.setPixelColor(currentSlot, 
+                                strip2.Color(prt.redColor * colorScale, 
                                             prt.greenColor * colorScale, 
                                             prt.blueColor * colorScale));
 
@@ -692,7 +705,7 @@ void particles() {
         }
 
         //Terminate the tail
-        strip.setPixelColor(oldSlot, strip.Color(0, 0, 0));
+        strip2.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
     }
 
     uint16_t frameElapsedMillis = millis() - frameStartMillis;
@@ -701,11 +714,11 @@ void particles() {
     if (frameDelayMillis > 0.0) {
         Serial.println(frameDelayMillis);
         delay(frameDelayMillis);
-        strip.show();
+        strip2.show();
     }
 }
 
 void setCoordColor(Coord3D coord, uint32_t color) {
-    strip.setPixelColor(coord.x * emitter.numPixels, color); 
+    strip2.setPixelColor(coord.x * emitter.numPixels, color); 
 }
 
