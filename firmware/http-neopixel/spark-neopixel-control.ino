@@ -56,6 +56,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
 #define LIGHTNING "lightning"
+#define ON "on" 
+#define OFF "off"
+
 
 String loopRun = STOP;
 String *loopArgs = new String[20];
@@ -72,6 +75,13 @@ void setup()
   Particle.variable("action", action, STRING);
   //retister the parameters variable as a GET parameter
   Particle.variable("parameters", parameters, STRING);
+
+  pinMode(PIN_0, OUTPUT);
+  pinMode(PIN_1, OUTPUT);
+  pinMode(PIN_2, OUTPUT);
+  pinMode(PIN_3, OUTPUT);
+  pinMode(PIN_4, OUTPUT);
+  pinMode(PIN_5, OUTPUT);
 }
 
 void loop() 
@@ -358,11 +368,61 @@ int run(String params)
         loopRun = LIGHTNING;
         return 1;
     }
+    else if(command.equals(ON))
+    {
+        setPinState(ON, args);
+    }
+    else if(command.equals(OFF))
+    {
+        setPinState(OFF, args);
+    }
     else 
     { //command not found
         return 0;
     }
 }
+
+void setPinState(String command, String* args)
+{
+    Serial.println("setPinState: " + String(command) + String(" ") + String(args[1]));
+    int pinState = LOW;
+    if(command.equals(ON))
+    {
+        pinState = HIGH;
+    }
+
+    if(args[1].equals("all"))
+    {
+        for(int i=0; i<6; i++)
+        {
+            int pin = pinForId(i);
+            digitalWrite(pin, pinState);         
+        }
+    }
+    else
+    {
+        
+        int pinNum = stringToInt(args[1]);
+        int pin = pinForId(pinNum);
+        Serial.println("setPinState: " + String(command) + String(" ") + String(args[1]));
+        digitalWrite(pin, pinState);    
+    }
+}
+
+int pinForId(int id)
+{
+    switch(id)
+    {
+        case 0 : return PIN_0;
+        case 1 : return PIN_1;
+        case 2 : return PIN_2;
+        case 3 : return PIN_3;
+        case 4 : return PIN_4;
+        case 5 : return PIN_5;
+        default : return -1;
+    }
+}
+
 
 int runLightning()
 {

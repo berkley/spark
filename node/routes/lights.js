@@ -103,6 +103,14 @@ exports.action = function(req, res) {
 	{ //brightness: uint8_t 0-255
 		data = "setBrightness," + req.query.brightness;
 	}
+	else if(action == "on")
+	{ //brightness: uint8_t 0-255
+		data = "on," + req.query.pin;
+	}
+	else if(action == "off")
+	{ //brightness: uint8_t 0-255
+		data = "off," + req.query.pin;
+	}
 
 	util.runPost(data, action, coreId, res);
 };
