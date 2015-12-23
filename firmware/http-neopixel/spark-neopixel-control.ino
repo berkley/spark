@@ -46,6 +46,7 @@ struct PINObject
 };
 
 uint8_t brightness = 255;
+int _brightness = 255;
 
 Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(PIXEL_COUNT_0, PIXEL_PIN_0, PIXEL_TYPE);
 LEDObject stripObj0 = {{'I', 'N', 'I', 'T'}};
@@ -77,12 +78,8 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SETALL "setAll"
 #define LOOPALTERNATE "loopAlternate"
 #define LOOPBLOCKS "loopBlocks"
-#define LATCHPIXEL "latchPixel"
-#define SETPIXEL "setPixel"
-#define LATCH "latch"
 #define ENDRUN "endrun"
 #define SNOW "snow"
-#define WEBSOCKET "websocket" //<- finish this
 #define SETBRIGHTNESS "setBrightness"
 #define USA "usa"
 #define LIGHTNING "lightning"
@@ -96,21 +93,24 @@ String *strArr = new String[NUM_ARGS];
 
 void setup() 
 {
+    //retrieve persisted state
     EEPROM.get(EEPROM_ADDR_STRIP_0, stripObj0);
     EEPROM.get(EEPROM_ADDR_STRIP_1, stripObj1);
     EEPROM.get(EEPROM_ADDR_STRIP_2, stripObj2);
     EEPROM.get(EEPROM_ADDR_PINS, pinObj);
     EEPROM.get(EEPROM_BRIGHTNESS, brightness);
+    _brightness = (int)brightness;
 
     Serial.begin(9600);  
+
     strip2.begin();
-    strip2.show(); // Initialize all pixels to 'off'
-    //register the run command as an API endpoint
+    strip2.show();
+
+    //regiser cloud variables and the run function
     Particle.function("run", run);
-    //register the action variable as a GET parameter
     Particle.variable("action", action, STRING);
-    //register the parameters variable as a GET parameter
     Particle.variable("parameters", parameters, STRING);
+    Particle.variable("brightness", &_brightness, INT);
 
     pinMode(PIN_0, OUTPUT);
     pinMode(PIN_1, OUTPUT);
@@ -123,6 +123,7 @@ void setup()
     {
         Serial.println("Reseting state");
         brightness = 255;
+        _brightness = 255;
         EEPROM.put(EEPROM_BRIGHTNESS, 255);
     }
     else
@@ -380,6 +381,7 @@ int run(String params)
     else if(command.equals(SETBRIGHTNESS))
     {
         brightness = stringToInt(args[1]);
+        _brightness = (int)brightness;
         EEPROM.put(EEPROM_BRIGHTNESS, brightness);
         strip2.setBrightness(brightness);
         strip2.show();
