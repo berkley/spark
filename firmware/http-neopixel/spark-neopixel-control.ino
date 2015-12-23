@@ -2,7 +2,8 @@
 #include "neopixel.h"
 #include "led-strip-particles.h"
 
-#define EEPROM_ADDR_PINS 0
+#define EEPROM_BRIGHTNESS 0
+#define EEPROM_ADDR_PINS 100
 #define EEPROM_ADDR_STRIP_0 500
 #define EEPROM_ADDR_STRIP_1 1000
 #define EEPROM_ADDR_STRIP_2 1500
@@ -43,6 +44,8 @@ struct PINObject
 {
     int pins[NUM_PINS];
 };
+
+uint8_t brightness = 255;
 
 Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(PIXEL_COUNT_0, PIXEL_PIN_0, PIXEL_TYPE);
 LEDObject stripObj0 = {{'I', 'N', 'I', 'T'}};
@@ -97,6 +100,7 @@ void setup()
     EEPROM.get(EEPROM_ADDR_STRIP_1, stripObj1);
     EEPROM.get(EEPROM_ADDR_STRIP_2, stripObj2);
     EEPROM.get(EEPROM_ADDR_PINS, pinObj);
+    EEPROM.get(EEPROM_BRIGHTNESS, brightness);
 
     Serial.begin(9600);  
     strip2.begin();
@@ -118,10 +122,16 @@ void setup()
     if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
     {
         Serial.println("Reseting state");
+        brightness = 255;
+        EEPROM.put(EEPROM_BRIGHTNESS, 255);
     }
     else
     {
         Serial.println("Resuming state: " + String(stripObj2.params));
+        if(brightness > 0 && brightness < 256)
+        {
+            strip2.setBrightness(brightness);
+        }
         run(String(stripObj2.params));
     }
 
@@ -282,7 +292,7 @@ int run(String params)
     args = stringSplit(params, ',');
     String command = args[0];
 
-    if(!command.equals(ON) && !command.equals(OFF))
+    if(!command.equals(ON) && !command.equals(OFF) && !command.equals(SETBRIGHTNESS))
     { //save the pin commands
         params.toCharArray(stripObj2.params, 64);
         EEPROM.put(EEPROM_ADDR_STRIP_2, stripObj2);
@@ -369,7 +379,8 @@ int run(String params)
     }
     else if(command.equals(SETBRIGHTNESS))
     {
-        int brightness = stringToInt(args[1]);
+        brightness = stringToInt(args[1]);
+        EEPROM.put(EEPROM_BRIGHTNESS, brightness);
         strip2.setBrightness(brightness);
         strip2.show();
     }
