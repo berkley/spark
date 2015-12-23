@@ -2,6 +2,11 @@
 #include "neopixel.h"
 #include "led-strip-particles.h"
 
+#define EEPROM_ADDR_PINS 0
+#define EEPROM_ADDR_STRIP_0 100
+#define EEPROM_ADDR_STRIP_1 500
+#define EEPROM_ADDR_STRIP_2 1000
+
 //pins that control on/off functions
 #define PIN_0 A0
 #define PIN_1 A1
@@ -9,6 +14,7 @@
 #define PIN_3 A3
 #define PIN_4 A4
 #define PIN_5 A5
+#define NUM_PINS 6
 
 //pins for neopixel strips = D0, D1, D2
 #define PIXEL_PIN_0 D0
@@ -25,10 +31,27 @@
 #define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
 
+struct LEDObject
+{
+    char params[64];
+};
+
+struct PINObject
+{
+    int pins[NUM_PINS];
+};
+
 Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(PIXEL_COUNT_0, PIXEL_PIN_0, PIXEL_TYPE);
+LEDObject stripObj0 = {{'I', 'N', 'I', 'T'}};
 Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(PIXEL_COUNT_1, PIXEL_PIN_1, PIXEL_TYPE);
+LEDObject stripObj1 = {{'I', 'N', 'I', 'T'}};
 Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(PIXEL_COUNT_2, PIXEL_PIN_2, PIXEL_TYPE);
+LEDObject stripObj2 = {{'I', 'N', 'I', 'T'}};
+
+PINObject pinObj = {{0,0,0,0,0,0}};
+
 ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT_2, MAX_COLOR);
+
 char action[64];
 char parameters[64];
 
@@ -66,14 +89,19 @@ String *strArr = new String[20];
 
 void setup() 
 {
-//   Serial.begin(9600);
+  EEPROM.get(EEPROM_ADDR_STRIP_0, stripObj0);
+  EEPROM.get(EEPROM_ADDR_STRIP_1, stripObj1);
+  EEPROM.get(EEPROM_ADDR_STRIP_2, stripObj2);
+  EEPROM.get(EEPROM_ADDR_PINS, pinObj);
+
+  Serial.begin(9600);  
   strip2.begin();
   strip2.show(); // Initialize all pixels to 'off'
   //register the run command as an API endpoint
   Particle.function("run", run);
   //register the action variable as a GET parameter
   Particle.variable("action", action, STRING);
-  //retister the parameters variable as a GET parameter
+  //register the parameters variable as a GET parameter
   Particle.variable("parameters", parameters, STRING);
 
   pinMode(PIN_0, OUTPUT);
@@ -82,6 +110,24 @@ void setup()
   pinMode(PIN_3, OUTPUT);
   pinMode(PIN_4, OUTPUT);
   pinMode(PIN_5, OUTPUT);
+
+  if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
+  {
+    Serial.println("Reseting state");
+  }
+  else
+  {
+    Serial.println("Resuming state: " + String(stripObj2.params));
+    run(String(stripObj2.params));
+  }
+
+  for(int i=0; i<NUM_PINS; i++)
+  {
+    int pin = pinForId(i);
+    digitalWrite(pin, pinObj.pins[i]);
+  }
+
+  Serial.println("Setup done.");
 }
 
 void loop() 
@@ -104,7 +150,26 @@ void loop()
     {
         rainbow(20);        
     }
+    else if(loopRun.equals(SETALL))
+    {
+        int r = stringToInt(loopArgs[1]);
+        int g = stringToInt(loopArgs[2]);
+        int b = stringToInt(loopArgs[3]);
+        setAll(r, g, b);
+        delay(1000);
+    }
     else if(loopRun.equals(ALTERNATE))
+    {
+        int r1 = stringToInt(loopArgs[1]);
+        int g1 = stringToInt(loopArgs[2]);
+        int b1 = stringToInt(loopArgs[3]);
+        int r2 = stringToInt(loopArgs[4]);
+        int g2 = stringToInt(loopArgs[5]);
+        int b2 = stringToInt(loopArgs[6]);
+        staticAlternate(r1, g1, b1, r2, g2, b2);
+        delay(1000);
+    }
+    else if(loopRun.equals(LOOPALTERNATE))
     {
         int r1 = stringToInt(loopArgs[0]);
         int g1 = stringToInt(loopArgs[1]);
@@ -120,6 +185,18 @@ void loop()
         delay(d);
     }
     else if(loopRun.equals(BLOCKS))
+    {
+        int r1 = stringToInt(loopArgs[1]);
+        int g1 = stringToInt(loopArgs[2]);
+        int b1 = stringToInt(loopArgs[3]);
+        int r2 = stringToInt(loopArgs[4]);
+        int g2 = stringToInt(loopArgs[5]);
+        int b2 = stringToInt(loopArgs[6]);
+        int blockSize = stringToInt(loopArgs[7]);
+        buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
+        delay(1000);
+    }
+    else if(loopRun.equals(LOOPBLOCKS))
     {
         int r1 = stringToInt(loopArgs[0]);
         int g1 = stringToInt(loopArgs[1]);
@@ -200,6 +277,13 @@ int run(String params)
 {
     String* args = stringSplit(params, ',');
     String command = args[0];
+
+    if(!command.equals(ON) && !command.equals(OFF))
+    { //save the pin commands
+        params.toCharArray(stripObj2.params, 64);
+        EEPROM.put(EEPROM_ADDR_STRIP_2, stripObj2);
+    }
+
     strcpy(parameters, params.c_str());
     strcpy(action, command.c_str());
     
@@ -209,26 +293,27 @@ int run(String params)
     }
     else if(command.equals(SETALL))
     {
-        loopRun = STOP;
-        int r = stringToInt(args[1]);
-        int g = stringToInt(args[2]);
-        int b = stringToInt(args[3]);
-        return setAll(r, g, b);
+        loopRun = SETALL;
+        loopArgs[1] = stringToInt(args[1]);
+        loopArgs[2] = stringToInt(args[2]);
+        loopArgs[3] = stringToInt(args[3]);
+
+        // return setAll(r, g, b);
     }
     else if(command.equals(ALTERNATE))
     {
-        loopRun = STOP;
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        int r2 = stringToInt(args[4]);
-        int g2 = stringToInt(args[5]);
-        int b2 = stringToInt(args[6]);
-        return staticAlternate(r1, g1, b1, r2, g2, b2);
+        loopRun = ALTERNATE;
+        loopArgs[1] = stringToInt(args[1]);
+        loopArgs[2] = stringToInt(args[2]);
+        loopArgs[3] = stringToInt(args[3]);
+        loopArgs[4] = stringToInt(args[4]);
+        loopArgs[5] = stringToInt(args[5]);
+        loopArgs[6] = stringToInt(args[6]);
+        // return staticAlternate(r1, g1, b1, r2, g2, b2);
     }
     else if(command.equals(LOOPALTERNATE))
     {
-        loopRun = ALTERNATE;
+        loopRun = LOOPALTERNATE;
         loopArgs[0] = args[1]; //r1
         loopArgs[1] = args[2]; //g1
         loopArgs[2] = args[3]; //b1
@@ -240,7 +325,7 @@ int run(String params)
     }
     else if(command.equals(LOOPBLOCKS))
     {
-        loopRun = BLOCKS;
+        loopRun = LOOPBLOCKS;
         loopArgs[0] = args[1]; //r1
         loopArgs[1] = args[2]; //g1
         loopArgs[2] = args[3]; //b1
@@ -253,15 +338,15 @@ int run(String params)
     }
     else if(command.equals(BLOCKS))
     {
-        loopRun = STOP;
-        int r1 = stringToInt(args[1]);
-        int g1 = stringToInt(args[2]);
-        int b1 = stringToInt(args[3]);
-        int r2 = stringToInt(args[4]);
-        int g2 = stringToInt(args[5]);
-        int b2 = stringToInt(args[6]);
-        int blockSize = stringToInt(args[7]);
-        buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
+        loopRun = BLOCKS;
+        loopArgs[1] = stringToInt(args[1]);
+        loopArgs[2] = stringToInt(args[2]);
+        loopArgs[3] = stringToInt(args[3]);
+        loopArgs[4] = stringToInt(args[4]);
+        loopArgs[5] = stringToInt(args[5]);
+        loopArgs[6] = stringToInt(args[6]);
+        loopArgs[7] = stringToInt(args[7]);
+        // buildBlocks(r1, g1, b1, r2, g2, b2, blockSize);
         return 1;
     }
     else if(command.equals(FADECOLOR))
@@ -295,6 +380,7 @@ int run(String params)
     }
     else if(command.equals(SETPIXEL))
     {
+        loopRun = STOP;
         int pixel = stringToInt(args[0]);
         int r1 = stringToInt(args[1]);
         int g1 = stringToInt(args[2]);
@@ -336,6 +422,7 @@ int run(String params)
     }
     else if(command.equals(PARTICLES))
     {
+        loopRun = PARTICLES;
         int np = stringToInt(args[1]);
         int mv = stringToInt(args[2]);
         bool respawn = stringToBool(args[3]);
@@ -348,7 +435,7 @@ int run(String params)
         emitter.numParticles = np;
         float mvf = mv / 10.0;
         emitter.maxVelocity = mvf / FPS;
-        loopRun = PARTICLES;
+        
         return 1;
     }
     else if(command.equals(SETBRIGHTNESS))
@@ -370,7 +457,7 @@ int run(String params)
     }
     else if(command.equals(ON))
     {
-        setPinState(ON, args);
+        setPinState(ON, args);        
     }
     else if(command.equals(OFF))
     {
@@ -380,33 +467,22 @@ int run(String params)
     { //command not found
         return 0;
     }
+    return 1;
 }
 
 void setPinState(String command, String* args)
 {
-    Serial.println("setPinState: " + String(command) + String(" ") + String(args[1]));
     int pinState = LOW;
     if(command.equals(ON))
     {
         pinState = HIGH;
     }
 
-    if(args[1].equals("all"))
-    {
-        for(int i=0; i<6; i++)
-        {
-            int pin = pinForId(i);
-            digitalWrite(pin, pinState);         
-        }
-    }
-    else
-    {
-        
-        int pinNum = stringToInt(args[1]);
-        int pin = pinForId(pinNum);
-        Serial.println("setPinState: " + String(command) + String(" ") + String(args[1]));
-        digitalWrite(pin, pinState);    
-    }
+    int pinNum = stringToInt(args[1]);
+    pinObj.pins[pinNum] = pinState;
+    int pin = pinForId(pinNum);
+    digitalWrite(pin, pinState);    
+    EEPROM.put(EEPROM_ADDR_PINS, pinObj);
 }
 
 int pinForId(int id)
