@@ -47,6 +47,7 @@ Adafruit_NeoPixel strip1 = Adafruit_NeoPixel(PIXEL_COUNT_1, PIXEL_PIN_1, PIXEL_T
 LEDObject stripObj1 = {{'I', 'N', 'I', 'T'}};
 Adafruit_NeoPixel strip2 = Adafruit_NeoPixel(PIXEL_COUNT_2, PIXEL_PIN_2, PIXEL_TYPE);
 LEDObject stripObj2 = {{'I', 'N', 'I', 'T'}};
+//TODO: enable strip0 and strip1.  Right now only strip2 works.
 
 PINObject pinObj = {{0,0,0,0,0,0}};
 
