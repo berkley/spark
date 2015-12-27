@@ -21,7 +21,6 @@
 		body 
 		{
 			background-color: grey;
-			max-width: 220px;
 			margin: 0 auto;
 			float: none;
 		}
@@ -31,15 +30,59 @@
 		    margin-left: auto;
 		    margin-right: auto
 		}
+		.neopixel
+		{
+			display: inline-block;
+			border: 1px solid;
+			width: 200px;
+			height: 300px;
+
+		}
+		.horizontal-wrapper
+		{
+			width: 100%;
+			border: 1px solid;
+		}
+		.box-desc
+		{
+			text-align: center;
+			padding: 5px;
+		}
+		.vert-range
+		{
+			border: 1px solid;
+			display: inline;
+		}
+		input.vertical
+		{
+			/*display: inline-block;*/
+		    vertical-align: -600%;
+		    /*margin: auto;*/
+		    /*width: 20%;*/
+		    border: 1px solid;
+		    -webkit-transform: rotate(90deg);
+		}
     </style>
 </head>
 <body>
-	<br/>
+	
 	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
-	<a href="/"><img class="centered" src="freddy.png"/></a>
 	<h3 style="text-align:center">El Casa Poder 2000</h3>
-	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
 	</div>
+	<div class="horizontal-wrapper">
+	<% for(var i=0; i<cores.length; i++) {
+		if(cores[i].lightDisplay == true) {%>
+		<div class="neopixel">
+			<input type="hidden" name="coreId" value="<%= cores[i].id %>"/>
+			<div class="box-desc"><%= cores[i].description %></div>
+			<div class="vert-range">
+				<input class="vertical" type="range" min="0" max="255" value="0"/>
+			</div>
+		</div>
+	<% }} %>
+	</div>
+
+	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
 	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
 
 		Core:
