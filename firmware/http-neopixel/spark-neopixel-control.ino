@@ -23,7 +23,7 @@
 #define PIXEL_PIN_2 D2
 #define PIXEL_COUNT_0 5 
 #define PIXEL_COUNT_1 5
-#define PIXEL_COUNT_2 467 
+#define PIXEL_COUNT_2 8 
 #define PIXEL_TYPE WS2812B
 
 //particle params

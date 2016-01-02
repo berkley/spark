@@ -4,19 +4,13 @@
 	<title>El Casa Poder 2000</title>
 	<link rel="shortcut icon" href="favicon.ico" type="image/x-icon">
 	<link rel="apple-touch-icon" href="./freddy.png" />
+	<link rel="stylesheet" href="//code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
 	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="//code.jquery.com/ui/1.11.4/jquery-ui.js"></script>
 	<script src="spectrum.js" type="text/javascript"></script>
 	<link rel="stylesheet" href="spectrum.css" type="text/css"/>
 	<meta name="viewport" content="width=250" />
-	<script>
-    $( document ).ready(function() {
-        hideAll();
-        setCurrentState();
-    });
- 
-    $( window ).load(function() {
-    });
-    </script>
+	
 	<style>
 		body 
 		{
@@ -53,19 +47,36 @@
 			border: 1px solid;
 			display: inline;
 		}
-		input.vertical
+		.center 
 		{
-			/*display: inline-block;*/
-		    vertical-align: -600%;
-		    /*margin: auto;*/
-		    /*width: 20%;*/
-		    border: 1px solid;
-		    -webkit-transform: rotate(90deg);
+		    margin: auto;
 		}
     </style>
+    <script>
+    $( document ).ready(function() {
+        hideAll();
+        setCurrentState();
+    });
+ 
+    $( window ).load(function() {
+    });
+
+    $(function() {
+	    $( ".slider-vertical" ).slider({
+	      orientation: "vertical",
+	      range: "min",
+	      min: 0,
+	      max: 255,
+	      value: 0,
+	      change: function( event, ui ) {
+	      	console.log("val of ", this.id + ": ", $("#" + this.id).slider("value"));
+	        // $( "#amount" ).val( $("#" + this.id).slider("value") );
+	      }
+	    });
+	  });
+    </script>
 </head>
 <body>
-	
 	<div id="header" style="border:0px solid black; padding:5px; margin:5px">
 	<h3 style="text-align:center">El Casa Poder 2000</h3>
 	</div>
@@ -75,28 +86,13 @@
 		<div class="neopixel">
 			<input type="hidden" name="coreId" value="<%= cores[i].id %>"/>
 			<div class="box-desc"><%= cores[i].description %></div>
-			<div class="vert-range">
-				<input class="vertical" type="range" min="0" max="255" value="0"/>
+			<div class="center">
+				<div class="slider-vertical center" style="padding-top:10px; padding-bottom:10px" id="slider-vertical-<%= i %>" style="height:200px;"></div>
 			</div>
-		</div>
-	<% }} %>
-	</div>
 
-	<input type="hidden" id="defaultCoreId" value="<%= cores[0].id %>"/>
-	<div id="rootDiv" style="border:1px solid black; padding:5px; margin:5px">
-
-		Core:
-		<select id="coreIdSelect" name="core">
-			<% for(var i=0; i<cores.length; i++) {
-				if(cores[i].lightDisplay == true) {%>
-			   <option value="<%= cores[i].id %>"><%= cores[i].name %> - <%= cores[i].description %></option>
-			<% }} %>
-			<option value="all">All</option>
-		</select>
-
-		<div id="programDiv" style="border:1px solid black; padding:5px; margin:5px">
+			<div id="programDiv" style="padding:5px; margin:15px">
 			Program:
-			<select id="actionSelect" name="action">
+			<select id="actionSelect-<%= i %>" name="action">
 				<option value="allOff">All Pixels Off</option>
 				<option value="stop">Stop Program</option>
 				<option value="setAll">Single Color</option>
@@ -115,7 +111,7 @@
 				<option value="skullnolightning">Skull - No lightning</option>
 			</select><br/>
 
-			<span id="colorSelector1">
+			<span id="colorSelector1-<%= i %>">
 				Red1: <br/>
 				<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
 				<br/>
@@ -130,7 +126,7 @@
 			</span>
 
 
-			<span id="colorSelector2">
+			<span id="colorSelector2-<%= i %>">
 				Red2: <br/>
 				<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
 				<br/>
@@ -140,33 +136,29 @@
 				Blue2: <br/>
 				<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
 				<br/>
-				<input id='colorpicker2' />
+				<input id='colorpicker2-<%= i %>' />
 			</span>
 
-			<div id="delayDiv">delay:<input id="delay" name="delay" value="50"/></div>
-			<div id="durationDiv">duration:<input id="duration" name="duration" value="5000"/></div>
-			<div id="blockSizeDiv">block size:<input id="blockSize" name="blockSize" value="5"/></div>
-			<div id="numParticlesDiv">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
-			<div id="maxVelocityDiv">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
-			<div id="threedDiv">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
-			<div id="respawnDiv">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
-			<div id="flickerDiv">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
+			<div id="delayDiv-<%= i %>">delay:<input id="delay" name="delay" value="50"/></div>
+			<div id="durationDiv-<%= i %>">duration:<input id="duration" name="duration" value="5000"/></div>
+			<div id="blockSizeDiv-<%= i %>">block size:<input id="blockSize" name="blockSize" value="5"/></div>
+			<div id="numParticlesDiv-<%= i %>">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
+			<div id="maxVelocityDiv-<%= i %>">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
+			<div id="threedDiv-<%= i %>">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
+			<div id="respawnDiv-<%= i %>">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
+			<div id="flickerDiv-<%= i %>">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
 			<br/>
-			<button id="goButton">Light It Up</button>
-			<button id="stopButton">Shut it down</button>
+			<button id="goButton-<%= i %>">Light It Up</button>
+			<button id="stopButton-<%= i %>">Shut it down</button>
 			<br/>
 			<br/>
 
-			<div id="status"></div>
-			<div id="result"></div>
-			<img style="width:30px;" id="spinner" width="100" src="spinner.gif">
+			<div id="status-<%= i %>"></div>
+			<div id="result-<%= i %>"></div>
+			<img style="width:30px;" id="spinner-<%= i %>" width="100" src="spinner.gif">
 		</div>
-		
-		<div id="brightnessDiv" style="border:1px solid black; padding:5px; margin:5px">
-			Brightness:
-			<input type="range"  min="0" max="255" name="brightness" id="brightness" value="255"/> 
-			<!-- <button id="setBrightnessButton">Set Brightness</button> -->
 		</div>
+	<% }} %>
 	</div>
 
 	<script>
@@ -270,17 +262,21 @@
 		});
 
 		var hideAll = function() {
-			$('#colorSelector1').hide();
-			$('#colorSelector2').hide();
-			$('#delayDiv').hide();
-			$('#durationDiv').hide();
-			$('#blockSizeDiv').hide();
-			$('#numParticlesDiv').hide();
-			$('#maxVelocityDiv').hide();
-			$('#threedDiv').hide();
-			$('#respawnDiv').hide();
-			$('#flickerDiv').hide();
-			$('#spinner').hide();
+			<% for(var i=0; i<cores.length; i++) {
+				if(cores[i].lightDisplay == true) {%>
+					$('#colorSelector1-<%=i%>').hide();
+					$('#colorSelector2-<%=i%>').hide();
+					$('#delayDiv-<%=i%>').hide();
+					$('#durationDiv-<%=i%>').hide();
+					$('#blockSizeDiv-<%=i%>').hide();
+					$('#numParticlesDiv-<%=i%>').hide();
+					$('#maxVelocityDiv-<%=i%>').hide();
+					$('#threedDiv-<%=i%>').hide();
+					$('#respawnDiv-<%=i%>').hide();
+					$('#flickerDiv-<%=i%>').hide();
+					$('#spinner-<%=i%>').hide();
+				<%}%>
+			<%}%>
 		};
 
 		$("#coreIdSelect").change(function(ev) {
