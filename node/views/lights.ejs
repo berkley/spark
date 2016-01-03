@@ -55,7 +55,7 @@
     <script>
     $( document ).ready(function() {
         hideAll();
-        setCurrentState();
+        // setCurrentState();
     });
  
     $( window ).load(function() {
@@ -113,13 +113,13 @@
 
 			<span id="colorSelector1-<%= i %>">
 				Red1: <br/>
-				<input type="range"  min="0" max="255" name="r1" id="r1" value="255"/>
+				<input type="range"  min="0" max="255" name="r1" id="r1-<%= i %>" value="0"/>
 				<br/>
 				Green1: <br/>
-				<input type="range"  min="0" max="255" name="g1" id="g1" value="0"/>
+				<input type="range"  min="0" max="255" name="g1" id="g1-<%= i %>" value="0"/>
 				<br/>
 				Blue1: <br/>
-				<input type="range"  min="0" max="255" name="b1" id="b1" value="0"/>
+				<input type="range"  min="0" max="255" name="b1" id="b1-<%= i %>" value="0"/>
 				<br/>
 				<input id='colorpicker1' />
 				<br/>
@@ -128,25 +128,25 @@
 
 			<span id="colorSelector2-<%= i %>">
 				Red2: <br/>
-				<input type="range"  min="0" max="255" name="r2" id="r2" value="255"/>
+				<input type="range"  min="0" max="255" name="r2" id="r2-<%= i %>" value="0"/>
 				<br/>
 				Green2: <br/>
-				<input type="range"  min="0" max="255" name="g2" id="g2" value="0"/>
+				<input type="range"  min="0" max="255" name="g2" id="g2-<%= i %>" value="0"/>
 				<br/>
 				Blue2: <br/>
-				<input type="range"  min="0" max="255" name="b2" id="b2" value="0"/>
+				<input type="range"  min="0" max="255" name="b2" id="b2-<%= i %>" value="0"/>
 				<br/>
 				<input id='colorpicker2-<%= i %>' />
 			</span>
 
-			<div id="delayDiv-<%= i %>">delay:<input id="delay" name="delay" value="50"/></div>
-			<div id="durationDiv-<%= i %>">duration:<input id="duration" name="duration" value="5000"/></div>
-			<div id="blockSizeDiv-<%= i %>">block size:<input id="blockSize" name="blockSize" value="5"/></div>
-			<div id="numParticlesDiv-<%= i %>">number of particles:<input id="numParticles" name="numParticles" value="10"/></div>
-			<div id="maxVelocityDiv-<%= i %>">max particle velocity:<input id="maxVelocity" name="maxVelocity" value="1"/></div>
-			<div id="threedDiv-<%= i %>">3D:<input id="threed" name="threed"	 type="checkbox"/></div>
-			<div id="respawnDiv-<%= i %>">respawn:<input id="respawn" name="respawn" type="checkbox"/></div>
-			<div id="flickerDiv-<%= i %>">flicker:<input id="flicker" name="flicker" type="checkbox"/></div>
+			<div id="delayDiv-<%= i %>">delay:<input id="delay-<%= i %>" name="delay" value="50"/></div>
+			<div id="durationDiv-<%= i %>">duration:<input id="duration-<%= i %>" name="duration" value="5000"/></div>
+			<div id="blockSizeDiv-<%= i %>">block size:<input id="blockSize-<%= i %>" name="blockSize" value="5"/></div>
+			<div id="numParticlesDiv-<%= i %>">number of particles:<input id="numParticles-<%= i %>" name="numParticles" value="10"/></div>
+			<div id="maxVelocityDiv-<%= i %>">max particle velocity:<input id="maxVelocity-<%= i %>" name="maxVelocity" value="1"/></div>
+			<div id="threedDiv-<%= i %>">3D:<input id="threed-<%= i %>" name="threed" type="checkbox"/></div>
+			<div id="respawnDiv-<%= i %>">respawn:<input id="respawn-<%= i %>" name="respawn" type="checkbox"/></div>
+			<div id="flickerDiv-<%= i %>">flicker:<input id="flicker-<%= i %>" name="flicker" type="checkbox"/></div>
 			<br/>
 			<button id="goButton-<%= i %>">Light It Up</button>
 			<button id="stopButton-<%= i %>">Shut it down</button>
@@ -328,19 +328,33 @@
 			});
 	    };
 
-		$('#actionSelect').change(function(ev) {
+	    <% for(var i=0; i<cores.length; i++) {
+			if(cores[i].lightDisplay == true) {%>
+				$('#actionSelect-<%=i%>').change(function(ev) {
+					actionSelectChange(ev, <%=i%>);
+				});
+
+				$('stopButton-<%=i%>').click(function(){
+					runQuery("stop", <%=i%>);
+				});
+
+				$('stopButton-<%=i%>').click(function(){
+					runQuery($('#actionSelect-<%=i%>').val());
+				});
+			<%}%>
+		<%}%>
+
+		var actionSelectChange = function(ev, i) {
 			hideAll();
+			console.log("action change for ", i);
 			console.log("event: " + ev.target.value);
 			if(ev.target.value == 'stop')
-			{
-
-			}
+			{}
 			else if(ev.target.value == 'allOff')
-			{
-			}
+			{}
 			else if(ev.target.value == 'setAll')
 			{
-				$('#colorSelector1').show();
+				$('#colorSelector1-' + i).show();
 				if(paramState[0] == 'setAll')
 				{
 					$('#r1').val(paramState[1]);
@@ -505,16 +519,7 @@
 				$('#colorSelector2').hide();
 				$('#delayDiv').hide();
 			}
-		});
-
-		stopButton.addEventListener("click", function(ev) {
-			runQuery("stop");
-		}, false);
-
-	    button.addEventListener("click", function(ev) {
-	    	runQuery($('#actionSelect').val());
-	    }, false);
-
+		};
 	    
 	</script>
 
