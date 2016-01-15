@@ -261,20 +261,38 @@
 			});
 		});
 
+		var hideOne = function(i)
+		{
+			$('#colorSelector1-' + i).hide();
+			$('#colorSelector2-' + i).hide();
+			$('#delayDiv-' + i).hide();
+			$('#durationDiv-' + i).hide();
+			$('#blockSizeDiv-' + i).hide();
+			$('#numParticlesDiv-' + i).hide();
+			$('#maxVelocityDiv-' + i).hide();
+			$('#threedDiv-' + i).hide();
+			$('#respawnDiv-' + i).hide();
+			$('#flickerDiv-' + i).hide();
+			$('#spinner-' + i).hide();
+		};
+
+		var hideAllButOne = function(theOne)
+		{
+			<% var num = %> theOne;
+			<% for(var i=0; i<cores.length; i++) {
+				if(i != num)
+				{
+					if(cores[i].lightDisplay == true) {%>
+						hideOne(<%=i%>);
+					<%}%>
+				<%}%>
+			<%}%>
+		};
+
 		var hideAll = function() {
 			<% for(var i=0; i<cores.length; i++) {
 				if(cores[i].lightDisplay == true) {%>
-					$('#colorSelector1-<%=i%>').hide();
-					$('#colorSelector2-<%=i%>').hide();
-					$('#delayDiv-<%=i%>').hide();
-					$('#durationDiv-<%=i%>').hide();
-					$('#blockSizeDiv-<%=i%>').hide();
-					$('#numParticlesDiv-<%=i%>').hide();
-					$('#maxVelocityDiv-<%=i%>').hide();
-					$('#threedDiv-<%=i%>').hide();
-					$('#respawnDiv-<%=i%>').hide();
-					$('#flickerDiv-<%=i%>').hide();
-					$('#spinner-<%=i%>').hide();
+					hideOne(<%=i%>);
 				<%}%>
 			<%}%>
 		};
@@ -345,7 +363,7 @@
 		<%}%>
 
 		var actionSelectChange = function(ev, i) {
-			hideAll();
+			hideAllButOne(i);
 			console.log("action change for ", i);
 			console.log("event: " + ev.target.value);
 			if(ev.target.value == 'stop')
