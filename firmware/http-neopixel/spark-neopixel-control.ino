@@ -6,7 +6,7 @@
 #define EEPROM_ADDR_PINS 100
 #define EEPROM_ADDR_STRIP_0 500
 #define EEPROM_ADDR_STRIP_1 1000
-#define EEPROM_ADDR_STRIP_2 1500
+#define EEPROM_ADDR_STRIP_2 500
 
 //pins that control on/off functions
 #define PIN_0 A0
@@ -23,7 +23,7 @@
 #define PIXEL_PIN_2 D2
 #define PIXEL_COUNT_0 5 
 #define PIXEL_COUNT_1 5
-#define PIXEL_COUNT_2 467 
+#define PIXEL_COUNT_2 150 
 #define PIXEL_TYPE WS2812B
 
 //particle params
@@ -86,7 +86,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define ON "on" 
 #define OFF "off"
 
-String loopRun = STOP;
+String loopRun = RAINBOW;
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];

@@ -150,9 +150,8 @@ void loop()
   pinValT1();
   pinValT2();
   calculatePercentFull();
-  publishFlowingEvents();
+  //publishFlowingEvents();
   handleAnimation();
-  writeToEEPROM();
 }
 
 void writeToEEPROM()
@@ -186,6 +185,7 @@ void handleAnimation()
   {
     Serial.println("flowingT0: " + String(T0.flowing));
     animateTap(0);
+    writeToEEPROM();
   }
   else
   {
@@ -198,6 +198,7 @@ void handleAnimation()
   {
     animateTap(1);
     Serial.println("flowingT1: " + String(T1.flowing));
+    writeToEEPROM();
   }
   else
   {
@@ -210,6 +211,7 @@ void handleAnimation()
   {
     animateTap(2);
     Serial.println("flowingT2: " + String(T2.flowing));
+    writeToEEPROM();
   }
   else
   {

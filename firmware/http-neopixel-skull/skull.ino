@@ -1,11 +1,11 @@
 #include "application.h"
-#include "neopixel/neopixel.h"
+#include "neopixel.h"
 #include "led-strip-particles.h"
 
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2
 //the number of pixels you are controlling
-#define PIXEL_COUNT 168
+#define PIXEL_COUNT 150
 
 //0-149 - strip
 //pixels 150-154 = small skull 1
@@ -54,7 +54,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define SKULL "skull"
 #define SKULLNOLIGHTNING "skullnolightning"
 
-String loopRun = SKULL;
+String loopRun = STOP;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
