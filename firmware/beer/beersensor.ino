@@ -150,7 +150,7 @@ void loop()
   pinValT1();
   pinValT2();
   calculatePercentFull();
-  //publishFlowingEvents();
+  publishFlowingEvents();
   handleAnimation();
 }
 
