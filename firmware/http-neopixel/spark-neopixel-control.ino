@@ -1,3 +1,25 @@
+/*
+
+LED Map for the Yuba
+--------------------
+
+front tube and bottom bracket ground effects - PIXEL_PIN_0
+bottom bracket - pixel 0
+front tube near spring - pixel 16
+
+Bike - lower rails - PIXEL_PIN_1
+back left = 0
+center left = 28
+center right = 29
+back right (last pixel) = 58
+Tail - Left: 0-8  Right: 49-58
+Sides - Left: 9-28 (19 pixels)  Right: 29-48 (19 pixels)
+
+Headlight - PIXEL_PIN_2
+neopixel ring - pixels 0-11
+
+*/
+
 #include "application.h"
 #include "neopixel.h"
 #include "led-strip-particles.h"
@@ -21,9 +43,9 @@
 #define PIXEL_PIN_0 D0
 #define PIXEL_PIN_1 D1
 #define PIXEL_PIN_2 D2
-#define PIXEL_COUNT_0 100
-#define PIXEL_COUNT_1 100
-#define PIXEL_COUNT_2 100 
+#define PIXEL_COUNT_0 17
+#define PIXEL_COUNT_1 59
+#define PIXEL_COUNT_2 12
 #define PIXEL_TYPE WS2812B
 
 //particle params
@@ -85,8 +107,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LIGHTNING "lightning"
 #define ON "on" 
 #define OFF "off"
+#define BIKE1 "BIKE1"
 
-String loopRun = RAINBOW;
+String loopRun = BIKE1;
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];
@@ -123,24 +146,24 @@ void setup()
     pinMode(PIN_4, OUTPUT);
     pinMode(PIN_5, OUTPUT);
 
-    if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
-    {
-        Serial.println("Reseting state");
-        brightness = 255;
-        _brightness = 255;
-        EEPROM.put(EEPROM_BRIGHTNESS, 255);
-    }
-    else
-    {
-        Serial.println("Resuming state: " + String(stripObj2.params));
-        if(brightness > 0 && brightness < 256)
-        {
-            strip2.setBrightness(brightness);
-            strip1.setBrightness(brightness);
-            strip0.setBrightness(brightness);
-        }
-        run(String(stripObj2.params));
-    }
+    // if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
+    // {
+    //     Serial.println("Reseting state");
+    //     brightness = 255;
+    //     _brightness = 255;
+    //     EEPROM.put(EEPROM_BRIGHTNESS, 255);
+    // }
+    // else
+    // {
+    //     Serial.println("Resuming state: " + String(stripObj2.params));
+    //     if(brightness > 0 && brightness < 256)
+    //     {
+    //         strip2.setBrightness(brightness);
+    //         strip1.setBrightness(brightness);
+    //         strip0.setBrightness(brightness);
+    //     }
+    //     run(String(stripObj2.params));
+    // }
 
     for(int i=0; i<NUM_PINS; i++)
     {
@@ -274,6 +297,74 @@ void loop()
     {
         runLightning();
     }
+    else if(loopRun.equals(BIKE1))
+    {
+        strip1.setBrightness(128);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        bikeLeftSide(strip1.Color(0,0,0));
+        bikeRightSide(strip1.Color(0,0,0));
+        // delay(1000);
+        // bikeRightTail(strip1.Color(0,0,0));
+        // bikeLeftTail(strip1.Color(0,0,0));
+        // bikeLeftSide(strip1.Color(0,0,0));
+        // bikeRightSide(strip1.Color(0,0,0));
+        // delay(1000);
+    }
+}
+
+/**
+ Bike - lower rails - PIXEL_PIN_1
+back left = 0
+center left = 28
+center right = 29
+back right (last pixel) = 58
+Tail - Left: 0-8  Right: 49-58
+Sides - Left: 9-28 (19 pixels)  Right: 29-48 (19 pixels)
+*/
+#define BIKE_LEFT_TAIL_START 0
+#define BIKE_LEFT_TAIL_END 8
+#define BIKE_RIGHT_TAIL_START 29
+#define BIKE_RIGHT_TAIL_END 58
+#define BIKE_LEFT_SIDE_START 9
+#define BIKE_LEFT_SIDE_END 28
+#define BIKE_RIGHT_SIDE_START 29
+#define BIKE_RIGHT_SIDE_END 48
+
+void bikeLeftTail(uint32_t color)
+{
+    for(int i=BIKE_LEFT_TAIL_START; i<=BIKE_LEFT_TAIL_END; i++)
+    {
+        strip1.setPixelColor(i, color);
+    }
+    strip1.show();
+}
+
+void bikeRightTail(uint32_t color)
+{
+    for(int i=BIKE_RIGHT_TAIL_START; i<=BIKE_RIGHT_TAIL_END; i++)
+    {
+        strip1.setPixelColor(i, color);
+    }
+    strip1.show();
+}
+
+void bikeLeftSide(uint32_t color)
+{
+    for(int i=BIKE_LEFT_SIDE_START; i<=BIKE_LEFT_SIDE_END; i++)
+    {
+        strip1.setPixelColor(i, color);
+    }
+    strip1.show();
+}
+
+void bikeRightSide(uint32_t color)
+{
+    for(int i=BIKE_RIGHT_SIDE_START; i<=BIKE_RIGHT_SIDE_END; i++)
+    {
+        strip1.setPixelColor(i, color);
+    }
+    strip1.show();
 }
 
 int allOff()
