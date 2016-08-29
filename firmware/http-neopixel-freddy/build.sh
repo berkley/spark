@@ -1,3 +1,4 @@
-particle compile photon freddy.ino neopixel.*
-particle flash --usb photon_*.bin
-rm photon_firmware*
+rm *firmware*
+particle compile core freddy.ino neopixel.*
+particle flash 54ff6b066678574927170667 *.bin
+

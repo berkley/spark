@@ -14,7 +14,7 @@
 #include "application.h"
 #include "neopixel.h"
 
- SYSTEM_MODE(MANUAL);
+ // SYSTEM_MODE(MANUAL);
 
 #define ARRAYLEN(x)  (sizeof(x) / sizeof((x)[0]))
 
@@ -58,7 +58,7 @@ char parameters[64];
 char ip[64];
 char tcpstate[64];
 
-String loopRun = RAINBOWEYES;
+String loopRun = RANDOM;
 String *loopArgs = new String[20];
 String *strArr = new String[20];
 
@@ -76,6 +76,7 @@ void setup()
   server.begin();
   strip.begin();
   strip.show(); // Initialize all pixels to 'off'
+  strip.setBrightness(128);
   
   Serial.println("Serial begin");
   

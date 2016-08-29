@@ -21,9 +21,9 @@
 #define PIXEL_PIN_0 D0
 #define PIXEL_PIN_1 D1
 #define PIXEL_PIN_2 D2
-#define PIXEL_COUNT_0 5 
-#define PIXEL_COUNT_1 5
-#define PIXEL_COUNT_2 150 
+#define PIXEL_COUNT_0 100
+#define PIXEL_COUNT_1 100
+#define PIXEL_COUNT_2 100 
 #define PIXEL_TYPE WS2812B
 
 //particle params
@@ -105,6 +105,10 @@ void setup()
 
     strip2.begin();
     strip2.show();
+    strip1.begin();
+    strip1.show();
+    strip0.begin();
+    strip0.show();
 
     //regiser cloud variables and the run function
     Particle.function("run", run);
@@ -132,6 +136,8 @@ void setup()
         if(brightness > 0 && brightness < 256)
         {
             strip2.setBrightness(brightness);
+            strip1.setBrightness(brightness);
+            strip0.setBrightness(brightness);
         }
         run(String(stripObj2.params));
     }
@@ -638,8 +644,12 @@ int rainbow(int d) {
     for(i=0; i<strip2.numPixels(); i++) 
     {
           strip2.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
+          strip1.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
+          strip0.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
     }
     strip2.show();
+    strip1.show();
+    strip0.show();
     delay(d);
     }
     return 1;
@@ -777,6 +787,14 @@ void particles()
                                 strip2.Color(prt.redColor * colorScale, 
                                             prt.greenColor * colorScale, 
                                             prt.blueColor * colorScale));
+            strip1.setPixelColor(currentSlot, 
+                                strip2.Color(prt.redColor * colorScale, 
+                                            prt.greenColor * colorScale, 
+                                            prt.blueColor * colorScale));
+            strip0.setPixelColor(currentSlot, 
+                                strip2.Color(prt.redColor * colorScale, 
+                                            prt.greenColor * colorScale, 
+                                            prt.blueColor * colorScale));
 
             oldSlot = currentSlot;
             currentSlot = startSlot + ((ii+1) * (prt.velocity.x > 0 ? -1 : 1));
@@ -784,6 +802,8 @@ void particles()
 
         //Terminate the tail
         strip2.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
+        strip1.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
+        strip0.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
     }
 
     uint16_t frameElapsedMillis = millis() - frameStartMillis;
@@ -794,11 +814,15 @@ void particles()
         Serial.println(frameDelayMillis);
         delay(frameDelayMillis);
         strip2.show();
+        strip1.show();
+        strip0.show();
     }
 }
 
 void setCoordColor(Coord3D coord, uint32_t color) 
 {
     strip2.setPixelColor(coord.x * emitter.numPixels, color); 
+    strip1.setPixelColor(coord.x * emitter.numPixels, color); 
+    strip0.setPixelColor(coord.x * emitter.numPixels, color); 
 }
 
