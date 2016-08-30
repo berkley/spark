@@ -57,6 +57,19 @@ neopixel ring - pixels 0-11
 #define NUM_PARAMS 64
 #define NUM_ARGS 20
 
+#define BIKE_LEFT_TAIL_START 0
+#define BIKE_LEFT_TAIL_END 5
+#define BIKE_RIGHT_TAIL_START 53
+#define BIKE_RIGHT_TAIL_END 58
+#define BIKE_LEFT_SIDE_START 6
+#define BIKE_LEFT_SIDE_END 28
+#define BIKE_RIGHT_SIDE_START 29
+#define BIKE_RIGHT_SIDE_END 52
+#define BIKE_MIDDLE_START 0
+#define BIKE_MIDDLE_END 16
+#define BIKE_HOOD_START 0
+#define BIKE_HOOD_END 12
+
 struct LEDObject
 {
     char params[NUM_PARAMS];
@@ -108,6 +121,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define ON "on" 
 #define OFF "off"
 #define BIKE1 "BIKE1"
+#define BIKE2 "BIKE2"
 
 String loopRun = BIKE1;
 String *args = new String[NUM_ARGS];
@@ -299,19 +313,67 @@ void loop()
     }
     else if(loopRun.equals(BIKE1))
     {
+        strip0.setBrightness(255);
         strip1.setBrightness(128);
+        strip2.setBrightness(255);
+        // allOff();
         bikeRightTail(strip1.Color(255,0,0));
-        bikeLeftTail(strip1.Color(0,0,0));
-        bikeLeftSide(strip1.Color(0,0,0));
-        bikeRightSide(strip1.Color(0,0,0));
-        // delay(1000);
+        bikeRightSide(strip1.Color(255,165,0));
+
+        bikeLeftTail(strip1.Color(255,0,0));
+        bikeLeftSide(strip1.Color(255,165,0));
+
+        bikeMiddle(strip1.Color(76,0,153));
+
+        bikeHood(strip1.Color(0,255,0));
+        
+        // delay(10000);
         // bikeRightTail(strip1.Color(0,0,0));
         // bikeLeftTail(strip1.Color(0,0,0));
         // bikeLeftSide(strip1.Color(0,0,0));
         // bikeRightSide(strip1.Color(0,0,0));
         // delay(1000);
     }
+    else if(loopRun.equals(BIKE2))
+    {
+        strip0.setBrightness(255);
+        strip1.setBrightness(128);
+        strip2.setBrightness(255);
+
+        uint32_t color = strip1.Color(random(255), 56, random(255));
+
+        bikeMiddle(strip0.Color(255,0,255));
+        bikeHood(strip0.Color(0,255,0));
+
+        for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
+        {
+            setStrip1(0,0,0);
+            // strip1.show();
+            int j = BIKE_RIGHT_TAIL_END - i;
+            strip1.setPixelColor(i, color);
+            strip1.setPixelColor(i+1, color);
+            strip1.setPixelColor(i+2, color);
+            strip1.setPixelColor(j, color);
+            strip1.setPixelColor(j-1, color);
+            strip1.setPixelColor(j-2, color);
+            strip1.show();
+            delay(40);
+        }
+    }
 }
+
+/*
+#define BIKE_LEFT_TAIL_START 0
+#define BIKE_LEFT_TAIL_END 5
+#define BIKE_RIGHT_TAIL_START 53
+#define BIKE_RIGHT_TAIL_END 58
+#define BIKE_LEFT_SIDE_START 6
+#define BIKE_LEFT_SIDE_END 28
+#define BIKE_RIGHT_SIDE_START 29
+#define BIKE_RIGHT_SIDE_END 52
+#define BIKE_MIDDLE_START 0
+#define BIKE_MIDDLE_END 16
+*/
 
 /**
  Bike - lower rails - PIXEL_PIN_1
@@ -322,14 +384,24 @@ back right (last pixel) = 58
 Tail - Left: 0-8  Right: 49-58
 Sides - Left: 9-28 (19 pixels)  Right: 29-48 (19 pixels)
 */
-#define BIKE_LEFT_TAIL_START 0
-#define BIKE_LEFT_TAIL_END 8
-#define BIKE_RIGHT_TAIL_START 29
-#define BIKE_RIGHT_TAIL_END 58
-#define BIKE_LEFT_SIDE_START 9
-#define BIKE_LEFT_SIDE_END 28
-#define BIKE_RIGHT_SIDE_START 29
-#define BIKE_RIGHT_SIDE_END 48
+
+void bikeHood(uint32_t color)
+{
+    for(int i=BIKE_HOOD_START; i<=BIKE_MIDDLE_END; i++)
+    {
+        strip2.setPixelColor(i, color);
+    }
+    strip2.show();
+}
+
+void bikeMiddle(uint32_t color)
+{
+    for(int i=BIKE_MIDDLE_START; i<=BIKE_MIDDLE_END; i++)
+    {
+        strip0.setPixelColor(i, color);
+    }
+    strip0.show();
+}
 
 void bikeLeftTail(uint32_t color)
 {
@@ -720,12 +792,37 @@ int setRGB(String rgb)
 
 int setAll(uint8_t r, uint8_t g, uint8_t b)
 {
-    for(int i=0; i<strip2.numPixels(); i++) 
+    setStrip0(r, g, b);
+    setStrip1(r, g, b);
+    setStrip2(r, g, b);
+    return 1;
+}
+
+void setStrip0(uint8_t r, uint8_t g, uint8_t b)
+{
+    for(int i=0; i<strip0.numPixels(); i++) 
+    {
+      strip0.setPixelColor(i, strip0.Color(r, g, b));
+    }
+    strip0.show();
+}
+
+void setStrip1(uint8_t r, uint8_t g, uint8_t b)
+{
+    for(int i=1; i<strip1.numPixels(); i++) 
+    {
+      strip1.setPixelColor(i, strip1.Color(r, g, b));
+    }
+    strip1.show();
+}
+
+void setStrip2(uint8_t r, uint8_t g, uint8_t b)
+{
+    for(int i=2; i<strip2.numPixels(); i++) 
     {
       strip2.setPixelColor(i, strip2.Color(r, g, b));
     }
     strip2.show();
-    return 1;
 }
 
 int rainbow(int d) {
