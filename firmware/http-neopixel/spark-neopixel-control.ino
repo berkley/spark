@@ -93,7 +93,7 @@ LEDObject stripObj2 = {{'I', 'N', 'I', 'T'}};
 
 PINObject pinObj = {{0,0,0,0,0,0}};
 
-ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT_2, MAX_COLOR);
+ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT_1, MAX_COLOR);
 
 char action[64];
 char parameters[NUM_PARAMS];
@@ -123,7 +123,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define BIKE1 "BIKE1"
 #define BIKE2 "BIKE2"
 
-String loopRun = BIKE1;
+String loopRun = BIKE2;
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];
@@ -184,6 +184,14 @@ void setup()
         int pin = pinForId(i);
         digitalWrite(pin, pinObj.pins[i]);
     }
+
+    //particle emitter default properties
+    emitter.respawnOnOtherSide = false;
+    emitter.threed = false;
+    emitter.flicker = false;
+    emitter.numParticles = 3;
+    float mvf = 5 / 10.0;
+    emitter.maxVelocity = mvf / FPS;
 
     Serial.println("Setup done.");
 }
@@ -340,50 +348,40 @@ void loop()
         strip1.setBrightness(128);
         strip2.setBrightness(255);
 
-        uint32_t color = strip1.Color(random(255), 56, random(255));
-
         bikeMiddle(strip0.Color(255,0,255));
         bikeHood(strip0.Color(0,255,0));
 
-        for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
+        for(int x=0; x<500; x++)
         {
-            setStrip1(0,0,0);
-            // strip1.show();
-            int j = BIKE_RIGHT_TAIL_END - i;
-            strip1.setPixelColor(i, color);
-            strip1.setPixelColor(i+1, color);
-            strip1.setPixelColor(i+2, color);
-            strip1.setPixelColor(j, color);
-            strip1.setPixelColor(j-1, color);
-            strip1.setPixelColor(j-2, color);
-            strip1.show();
-            delay(40);
+            uint32_t color = strip1.Color(random(255), 56, random(255));
+
+            for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
+            {
+                setStrip1(0,0,0);
+                // strip1.show();
+                int j = BIKE_RIGHT_TAIL_END - i;
+                strip1.setPixelColor(i, color);
+                strip1.setPixelColor(i+1, color);
+                strip1.setPixelColor(i+2, color);
+                strip1.setPixelColor(j, color);
+                strip1.setPixelColor(j-1, color);
+                strip1.setPixelColor(j-2, color);
+                strip1.show();
+                delay(40);
+            }    
+        }
+
+        for(int i=0; i<1000; i++)
+        {
+            particles();
+        }
+
+        for(int i=0; i<10; i++)
+        {
+            rainbow(20);
         }
     }
 }
-
-/*
-#define BIKE_LEFT_TAIL_START 0
-#define BIKE_LEFT_TAIL_END 5
-#define BIKE_RIGHT_TAIL_START 53
-#define BIKE_RIGHT_TAIL_END 58
-#define BIKE_LEFT_SIDE_START 6
-#define BIKE_LEFT_SIDE_END 28
-#define BIKE_RIGHT_SIDE_START 29
-#define BIKE_RIGHT_SIDE_END 52
-#define BIKE_MIDDLE_START 0
-#define BIKE_MIDDLE_END 16
-*/
-
-/**
- Bike - lower rails - PIXEL_PIN_1
-back left = 0
-center left = 28
-center right = 29
-back right (last pixel) = 58
-Tail - Left: 0-8  Right: 49-58
-Sides - Left: 9-28 (19 pixels)  Right: 29-48 (19 pixels)
-*/
 
 void bikeHood(uint32_t color)
 {
@@ -598,7 +596,6 @@ int pinForId(int id)
         default : return -1;
     }
 }
-
 
 int runLightning()
 {
@@ -829,11 +826,17 @@ int rainbow(int d) {
     uint16_t i, j;
 
     for(j=0; j<256; j++) {
+    for(i=0; i<strip0.numPixels(); i++) 
+    {
+          strip0.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
+    }
+    for(i=0; i<strip1.numPixels(); i++) 
+    {
+          strip1.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
+    }
     for(i=0; i<strip2.numPixels(); i++) 
     {
           strip2.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-          strip1.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-          strip0.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
     }
     strip2.show();
     strip1.show();
@@ -971,27 +974,27 @@ void particles()
             }
 
             // Draw particle
-            strip2.setPixelColor(currentSlot, 
-                                strip2.Color(prt.redColor * colorScale, 
-                                            prt.greenColor * colorScale, 
-                                            prt.blueColor * colorScale));
+            // strip2.setPixelColor(currentSlot, 
+            //                     strip2.Color(prt.redColor * colorScale, 
+            //                                 prt.greenColor * colorScale, 
+            //                                 prt.blueColor * colorScale));
             strip1.setPixelColor(currentSlot, 
                                 strip2.Color(prt.redColor * colorScale, 
                                             prt.greenColor * colorScale, 
                                             prt.blueColor * colorScale));
-            strip0.setPixelColor(currentSlot, 
-                                strip2.Color(prt.redColor * colorScale, 
-                                            prt.greenColor * colorScale, 
-                                            prt.blueColor * colorScale));
+            // strip0.setPixelColor(currentSlot, 
+            //                     strip2.Color(prt.redColor * colorScale, 
+            //                                 prt.greenColor * colorScale, 
+            //                                 prt.blueColor * colorScale));
 
             oldSlot = currentSlot;
             currentSlot = startSlot + ((ii+1) * (prt.velocity.x > 0 ? -1 : 1));
         }
 
         //Terminate the tail
-        strip2.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
-        strip1.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
-        strip0.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
+        // strip2.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
+        strip1.setPixelColor(oldSlot, strip1.Color(0, 0, 0));
+        // strip0.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
     }
 
     uint16_t frameElapsedMillis = millis() - frameStartMillis;
@@ -1001,16 +1004,16 @@ void particles()
     {
         Serial.println(frameDelayMillis);
         delay(frameDelayMillis);
-        strip2.show();
+        // strip2.show();
         strip1.show();
-        strip0.show();
+        // strip0.show();
     }
 }
 
 void setCoordColor(Coord3D coord, uint32_t color) 
 {
-    strip2.setPixelColor(coord.x * emitter.numPixels, color); 
+    // strip2.setPixelColor(coord.x * emitter.numPixels, color); 
     strip1.setPixelColor(coord.x * emitter.numPixels, color); 
-    strip0.setPixelColor(coord.x * emitter.numPixels, color); 
+    // strip0.setPixelColor(coord.x * emitter.numPixels, color); 
 }
 
