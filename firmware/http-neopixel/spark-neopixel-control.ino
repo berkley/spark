@@ -24,6 +24,8 @@ neopixel ring - pixels 0-11
 #include "neopixel.h"
 #include "led-strip-particles.h"
 
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
 #define EEPROM_BRIGHTNESS 0
 #define EEPROM_ADDR_PINS 100
 #define EEPROM_ADDR_STRIP_0 500
@@ -47,6 +49,11 @@ neopixel ring - pixels 0-11
 #define PIXEL_COUNT_1 59
 #define PIXEL_COUNT_2 12
 #define PIXEL_TYPE WS2812B
+
+#define BUTTON_MODE_PIN D6
+#define BUTTON_WIFI_PIN D5
+
+#define LED_PIN D7
 
 //particle params
 #define MAX_COLOR 255
@@ -130,6 +137,11 @@ String *strArr = new String[NUM_ARGS];
 
 void setup() 
 {
+    pinMode(BUTTON_WIFI_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_MODE_PIN, INPUT_PULLUP);
+    attachInterrupt(BUTTON_WIFI_PIN, connect, CHANGE, 1);
+    attachInterrupt(BUTTON_MODE_PIN, mode, CHANGE, 1);
+
     //retrieve persisted state
     EEPROM.get(EEPROM_ADDR_STRIP_0, stripObj0);
     EEPROM.get(EEPROM_ADDR_STRIP_1, stripObj1);
@@ -159,6 +171,7 @@ void setup()
     pinMode(PIN_3, OUTPUT);
     pinMode(PIN_4, OUTPUT);
     pinMode(PIN_5, OUTPUT);
+    pinMode(LED_PIN, OUTPUT);
 
     // if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
     // {
@@ -188,8 +201,34 @@ void setup()
     Serial.println("Setup done.");
 }
 
+//wifi connect button was pushed
+void connect() 
+{
+  Serial.println("Connecting to Wifi");
+  if (Particle.connected() == false) 
+  {
+    Particle.connect();
+  }
+}
+
+//mode button was pushed
+void mode()
+{
+    Serial.println("Changing mode");
+    // if(loopRun == BIKE1)
+    //     loopRun = BIKE2;
+    // else if(loopRun == BIKE2)
+    //     loopRun = BIKE1;
+}
+
 void loop() 
 {
+    Serial.println("loop");
+    if (Particle.connected() == false) 
+    {
+        Particle.connect();
+    }
+
     if(loopRun.equals(STOP))
     {
         delay(1000);
@@ -313,6 +352,7 @@ void loop()
     }
     else if(loopRun.equals(BIKE1))
     {
+        Serial.println("BIKE1");
         strip0.setBrightness(255);
         strip1.setBrightness(128);
         strip2.setBrightness(255);
@@ -326,8 +366,9 @@ void loop()
         bikeMiddle(strip1.Color(76,0,153));
 
         bikeHood(strip1.Color(0,255,0));
+
         
-        // delay(10000);
+        delay(2000);
         // bikeRightTail(strip1.Color(0,0,0));
         // bikeLeftTail(strip1.Color(0,0,0));
         // bikeLeftSide(strip1.Color(0,0,0));
@@ -336,29 +377,29 @@ void loop()
     }
     else if(loopRun.equals(BIKE2))
     {
-        strip0.setBrightness(255);
-        strip1.setBrightness(128);
-        strip2.setBrightness(255);
+        // strip0.setBrightness(255);
+        // strip1.setBrightness(128);
+        // strip2.setBrightness(255);
 
-        uint32_t color = strip1.Color(random(255), 56, random(255));
+        // uint32_t color = strip1.Color(random(255), 56, random(255));
 
-        bikeMiddle(strip0.Color(255,0,255));
-        bikeHood(strip0.Color(0,255,0));
+        // bikeMiddle(strip0.Color(255,0,255));
+        // bikeHood(strip0.Color(0,255,0));
 
-        for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
-        {
-            setStrip1(0,0,0);
-            // strip1.show();
-            int j = BIKE_RIGHT_TAIL_END - i;
-            strip1.setPixelColor(i, color);
-            strip1.setPixelColor(i+1, color);
-            strip1.setPixelColor(i+2, color);
-            strip1.setPixelColor(j, color);
-            strip1.setPixelColor(j-1, color);
-            strip1.setPixelColor(j-2, color);
-            strip1.show();
-            delay(40);
-        }
+        // for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
+        // {
+        //     setStrip1(0,0,0);
+        //     // strip1.show();
+        //     int j = BIKE_RIGHT_TAIL_END - i;
+        //     strip1.setPixelColor(i, color);
+        //     strip1.setPixelColor(i+1, color);
+        //     strip1.setPixelColor(i+2, color);
+        //     strip1.setPixelColor(j, color);
+        //     strip1.setPixelColor(j-1, color);
+        //     strip1.setPixelColor(j-2, color);
+        //     strip1.show();
+        //     delay(40);
+        // }
     }
 }
 
