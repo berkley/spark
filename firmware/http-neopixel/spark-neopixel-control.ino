@@ -24,6 +24,8 @@ neopixel ring - pixels 0-11
 #include "neopixel.h"
 #include "led-strip-particles.h"
 
+SYSTEM_MODE(MANUAL);
+
 #define EEPROM_BRIGHTNESS 0
 #define EEPROM_ADDR_PINS 100
 #define EEPROM_ADDR_STRIP_0 500
@@ -351,15 +353,15 @@ void loop()
         bikeMiddle(strip0.Color(255,0,255));
         bikeHood(strip0.Color(0,255,0));
 
-        for(int x=0; x<500; x++)
+        for(int x=0; x<100; x++)
         {
-            uint32_t color = strip1.Color(random(255), 56, random(255));
-
-            for(int i=0; i<BIKE_LEFT_SIDE_END; i+=3)
+            for(int i=BIKE_LEFT_SIDE_END; i>=0; i-=3)
             {
+                // uint32_t color = strip1.Color(255 - i, 56, random(255 - 1));
+                uint32_t color = strip1.Color(255,0,random(100+i));
                 setStrip1(0,0,0);
                 // strip1.show();
-                int j = BIKE_RIGHT_TAIL_END - i;
+                int j = BIKE_RIGHT_TAIL_START - i;
                 strip1.setPixelColor(i, color);
                 strip1.setPixelColor(i+1, color);
                 strip1.setPixelColor(i+2, color);
@@ -371,7 +373,7 @@ void loop()
             }    
         }
 
-        for(int i=0; i<1000; i++)
+        for(int i=0; i<2000; i++)
         {
             particles();
         }
