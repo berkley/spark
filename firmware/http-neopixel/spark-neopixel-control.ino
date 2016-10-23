@@ -50,10 +50,15 @@ SYSTEM_MODE(SEMI_AUTOMATIC);
 #define PIXEL_COUNT_2 12
 #define PIXEL_TYPE WS2812B
 
-#define BUTTON_MODE_PIN D6
-#define BUTTON_WIFI_PIN D5
-
-#define LED_PIN D7
+//Right: green/red
+//Left: yellow/red
+//horn: white/white
+//lights: blue/blue
+#define BUTTON_RIGHT_TURN_PIN D3
+#define BUTTON_LEFT_TURN_PIN D4
+#define BUTTON_HORN_PIN D5
+#define BUTTON_LIGHTS_PIN D6
+#define BUTTON_BRAKE_PIN D7
 
 //particle params
 #define MAX_COLOR 255
@@ -129,18 +134,31 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define OFF "off"
 #define BIKE1 "BIKE1"
 #define BIKE2 "BIKE2"
+#define LEFT_BLINKER "LEFT_BLINKER"
+#define RIGHT_BLINKER "RIGHT_BLINKER"
 
-String loopRun = BIKE2;
+String loopRun = BIKE1;
+String blinkerMode = STOP;
+String brakeMode = STOP;
+bool interrupt = false;
+
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];
 
 void setup() 
 {
-    pinMode(BUTTON_WIFI_PIN, INPUT_PULLUP);
-    pinMode(BUTTON_MODE_PIN, INPUT_PULLUP);
-    attachInterrupt(BUTTON_WIFI_PIN, connect, CHANGE, 1);
-    attachInterrupt(BUTTON_MODE_PIN, mode, CHANGE, 1);
+    pinMode(BUTTON_RIGHT_TURN_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_LEFT_TURN_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_HORN_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_LIGHTS_PIN, INPUT_PULLUP);
+    pinMode(BUTTON_BRAKE_PIN, INPUT_PULLUP);
+
+    attachInterrupt(BUTTON_RIGHT_TURN_PIN, rightBlinker, CHANGE, 1);
+    attachInterrupt(BUTTON_LEFT_TURN_PIN, leftBlinker, CHANGE, 1);
+    attachInterrupt(BUTTON_HORN_PIN, horn, CHANGE, 1);
+    attachInterrupt(BUTTON_LIGHTS_PIN, lights, CHANGE, 1);
+    attachInterrupt(BUTTON_BRAKE_PIN, brake, CHANGE, 1);
 
     //retrieve persisted state
     EEPROM.get(EEPROM_ADDR_STRIP_0, stripObj0);
@@ -171,7 +189,7 @@ void setup()
     pinMode(PIN_3, OUTPUT);
     pinMode(PIN_4, OUTPUT);
     pinMode(PIN_5, OUTPUT);
-    pinMode(LED_PIN, OUTPUT);
+    // pinMode(LED_PIN, OUTPUT);
 
     // if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
     // {
@@ -209,29 +227,86 @@ void setup()
     Serial.println("Setup done.");
 }
 
-//wifi connect button was pushed
-void connect() 
+void leftBlinker()
 {
-  Serial.println("Connecting to Wifi");
-  if (Particle.connected() == false) 
-  {
-    Particle.connect();
-  }
+    Serial.println("left Blinker");
 }
 
-//mode button was pushed
-void mode()
+void rightBlinker()
 {
-    Serial.println("Changing mode");
+    Serial.println("right Blinker");
+}
+
+void horn()
+{
+    Serial.println("horn");
     // if(loopRun == BIKE1)
     //     loopRun = BIKE2;
     // else if(loopRun == BIKE2)
     //     loopRun = BIKE1;
 }
 
+void lights()
+{
+    Serial.println("lights");
+}
+
+void brake()
+{
+    Serial.println("brake");
+}
+
 void loop() 
 {
-    Serial.println("loop");
+    // Serial.println("loop");
+    if(digitalRead(BUTTON_LEFT_TURN_PIN) == LOW)
+    {
+        Serial.println("left ON");
+        blinkerMode = LEFT_BLINKER;
+    }
+    else if(digitalRead(BUTTON_RIGHT_TURN_PIN) == LOW)
+    {
+        Serial.println("right ON");
+        blinkerMode = RIGHT_BLINKER;
+    }
+    else
+    {
+        Serial.println("blinkers OFF");
+        blinkerMode = STOP;
+    }
+
+    if(digitalRead(BUTTON_LIGHTS_PIN) == LOW)
+    {
+        Serial.println("lights ON");
+        loopRun = BIKE1;
+    }
+    else
+    {
+        Serial.println("lights OFF");
+        loopRun = STOP;
+        allOff();
+    }
+
+    if(digitalRead(BUTTON_HORN_PIN) == LOW)
+    {
+        Serial.println("horn ON");
+    }
+    else
+    {
+        Serial.println("horn OFF");
+    }
+
+    if(digitalRead(BUTTON_BRAKE_PIN) == LOW)
+    {
+        Serial.println("brake ON");
+        brakeMode = ON;
+    }
+    else
+    {
+        Serial.println("brake OFF");
+        brakeMode = STOP;
+    }
+
     if (Particle.connected() == false) 
     {
         Particle.connect();
@@ -240,16 +315,6 @@ void loop()
     if(loopRun.equals(STOP))
     {
         delay(1000);
-    }
-    else if(loopRun.equals(SHUTDOWN))
-    { //stop all programs and set all pixels to off
-        loopRun = PRESTOP;
-        delay(1000); //give a program time to stop
-    }
-    else if(loopRun.equals(PRESTOP))
-    {
-        loopRun = STOP;
-        allOff();
     }
     else if(loopRun.equals(RAINBOW))
     {
@@ -335,25 +400,6 @@ void loop()
     {
         particles(); 
     }
-    else if(loopRun.equals(ENDRUN))
-    {
-        int r1 = stringToInt(loopArgs[1]);
-        int g1 = stringToInt(loopArgs[2]);
-        int b1 = stringToInt(loopArgs[3]);
-        int r2 = stringToInt(loopArgs[4]);
-        int g2 = stringToInt(loopArgs[5]);
-        int b2 = stringToInt(loopArgs[6]);
-        int d = stringToInt(loopArgs[7]);
-        endRun(r1, g1, b1, r2, g2, b2, d);
-    }
-    else if(loopRun.equals(SNOW))
-    {
-        snow();
-    }
-    else if(loopRun.equals(USA))
-    {
-        runUSA();
-    }
     else if(loopRun.equals(LIGHTNING))
     {
         runLightning();
@@ -374,17 +420,9 @@ void loop()
         bikeMiddle(strip1.Color(76,0,153));
 
         bikeHood(strip1.Color(0,255,0));
-
-        
-        delay(2000);
-        // bikeRightTail(strip1.Color(0,0,0));
-        // bikeLeftTail(strip1.Color(0,0,0));
-        // bikeLeftSide(strip1.Color(0,0,0));
-        // bikeRightSide(strip1.Color(0,0,0));
-        // delay(1000);
     }
     else if(loopRun.equals(BIKE2))
-    }
+    {
         strip0.setBrightness(255);
         strip1.setBrightness(128);
         strip2.setBrightness(255);
@@ -421,6 +459,53 @@ void loop()
         {
             rainbow(20);
         }
+    }
+
+    if(blinkerMode == LEFT_BLINKER)
+    {
+        Serial.println("LEFT_BLINKER");
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(300);
+        bikeLeftTail(strip1.Color(0,0,0));      
+        delay(300);
+    }
+    else if(blinkerMode == RIGHT_BLINKER)
+    {
+        Serial.println("RIGHT_BLINKER");
+        bikeRightTail(strip1.Color(255,0,0));
+        delay(300);
+        bikeRightTail(strip1.Color(0,0,0));      
+        delay(300);   
+    }
+
+    if(brakeMode == ON)
+    {
+        strip1.setBrightness(255);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(100);
+    }
+    else
+    {
+        strip1.setBrightness(128);
     }
 }
 
@@ -847,7 +932,7 @@ void setStrip0(uint8_t r, uint8_t g, uint8_t b)
 
 void setStrip1(uint8_t r, uint8_t g, uint8_t b)
 {
-    for(int i=1; i<strip1.numPixels(); i++) 
+    for(int i=0; i<strip1.numPixels(); i++) 
     {
       strip1.setPixelColor(i, strip1.Color(r, g, b));
     }
@@ -856,7 +941,7 @@ void setStrip1(uint8_t r, uint8_t g, uint8_t b)
 
 void setStrip2(uint8_t r, uint8_t g, uint8_t b)
 {
-    for(int i=2; i<strip2.numPixels(); i++) 
+    for(int i=0; i<strip2.numPixels(); i++) 
     {
       strip2.setPixelColor(i, strip2.Color(r, g, b));
     }
