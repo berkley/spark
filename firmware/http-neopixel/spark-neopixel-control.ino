@@ -244,6 +244,12 @@ void horn()
     //     loopRun = BIKE2;
     // else if(loopRun == BIKE2)
     //     loopRun = BIKE1;
+    if (Particle.connected() == false) 
+    {
+        Serial.println("Particle Connecting...");
+        Particle.connect();
+        Serial.println("Particle Post Connect");
+    }
 }
 
 void lights()
@@ -305,11 +311,6 @@ void loop()
     {
         Serial.println("brake OFF");
         brakeMode = STOP;
-    }
-
-    if (Particle.connected() == false) 
-    {
-        Particle.connect();
     }
 
     if(loopRun.equals(STOP))
