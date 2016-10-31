@@ -5,7 +5,7 @@
 //the pin your spark is using to control neopixels
 #define PIXEL_PIN D2 
 //the number of pixels you are controlling
-#define PIXEL_COUNT 150
+#define PIXEL_COUNT 168
 
 //0-149 - strip
 //pixels 150-154 = small skull 1
