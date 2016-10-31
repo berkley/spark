@@ -1,5 +1,5 @@
 #include "application.h"
-#include "neopixel/neopixel.h"
+#include "neopixel.h"
 #include "led-strip-particles.h"
 
 //the pin your spark is using to control neopixels
