@@ -3,7 +3,7 @@
 #include "led-strip-particles.h"
 
 //the pin your spark is using to control neopixels
-#define PIXEL_PIN D2
+#define PIXEL_PIN D2 
 //the number of pixels you are controlling
 #define PIXEL_COUNT 150
 
@@ -12,7 +12,7 @@
 //pixels 155-158 = small skull 2
 //pixels 159-162 = big skull bottom
 //pixels 163-165 = left eye
-//pixels 166-168 = right eye
+//pixels 166-168 = right eye pix
 
 //the neopixel chip type
 #define PIXEL_TYPE WS2812B
