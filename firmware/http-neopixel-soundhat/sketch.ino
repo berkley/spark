@@ -6,7 +6,7 @@ Suspender side 1: 24-47
 #include "application.h"
 #include "neopixel.h"
 
-// SYSTEM_MODE(MANUAL);
+SYSTEM_MODE(MANUAL);
 
 #define ARRAYLEN(x)  (sizeof(x) / sizeof((x)[0]))
 
