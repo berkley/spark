@@ -1,6 +1,8 @@
 #include "application.h"
 #include "neopixel.h"
 
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
 Adafruit_NeoPixel ring = Adafruit_NeoPixel(12, D0, WS2812B);
 Adafruit_NeoPixel strip = Adafruit_NeoPixel(10, D1, WS2812B);
 
@@ -12,9 +14,9 @@ int encoderA = D5;
 int encoderB = D6;
 int encoderButtonPin = D2;
 
-int potPin0 = A0;
-int potPin1 = A1;
-int potPin2 = A2;
+int potPin0 = A0; //red
+int potPin1 = A1; //green
+int potPin2 = A2; //blue
 
 volatile bool A_set = false;
 volatile bool B_set = false;
