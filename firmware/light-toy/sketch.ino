@@ -52,11 +52,40 @@ void setup() {
   attachInterrupt(encoderA, doEncoderA, CHANGE);
   attachInterrupt(encoderB, doEncoderB, CHANGE);
   attachInterrupt(encoderButtonPin, doEncoderButton, RISING);
+
+  delay(1000);
+
+  if(digitalRead(encoderButtonPin) == LOW)
+  {
+    Serial.println("Button pressed during startup");
+    if (Particle.connected() == false) {
+      Particle.connect();
+    }
+  }
 }
 
 void loop() {
     
     if(ringMode == 0)
+    { //animate the ring and change color based on POT
+      for(int i=0; i<12; i++)
+        {
+            ringAllOff();
+            int potColor = getRGBPotVal();
+            int R = analogRead(potPin0) / 16;
+            int G = analogRead(potPin1) / 16;
+            int B = analogRead(potPin2) / 16;
+            ring.setPixelColor(i, potColor);
+            ring.setPixelColor(i+1, ring.Color(R/4, G/4, B/4));
+            ring.setPixelColor(i+2, ring.Color(R/8, G/8, B/8));
+            ring.setPixelColor(i+3, ring.Color(R/12, G/12, B/12));
+            ring.setPixelColor(i+4, ring.Color(R/16, G/16, B/16));
+            ring.show();
+            stripSetAll(potColor);
+            delay(30);
+        }
+    }
+    else if (ringMode == 1)
     { //change the color of a single pixel
         if (prevPos != encoderPos) {
             if(prevPos > encoderPos)
@@ -82,25 +111,6 @@ void loop() {
         ring.setPixelColor(pixelIndex, potColor);
         ring.show();
         stripSetAll(potColor);
-    }
-    else if (ringMode == 1)
-    { //animate the ring and change color based on POT
-        for(int i=0; i<12; i++)
-        {
-            ringAllOff();
-            int potColor = getRGBPotVal();
-            int R = analogRead(potPin0) / 16;
-            int G = analogRead(potPin1) / 16;
-            int B = analogRead(potPin2) / 16;
-            ring.setPixelColor(i, potColor);
-            ring.setPixelColor(i+1, ring.Color(R/4, G/4, B/4));
-            ring.setPixelColor(i+2, ring.Color(R/8, G/8, B/8));
-            ring.setPixelColor(i+3, ring.Color(R/12, G/12, B/12));
-            ring.setPixelColor(i+4, ring.Color(R/16, G/16, B/16));
-            ring.show();
-            stripSetAll(potColor);
-            delay(30);
-        }
     }
     else if (ringMode == 2)
     { //set all pixels accoring to POT
@@ -259,13 +269,10 @@ void stripSetAll(int color)
 
 void encoderButtonPushed()
 {
-    Serial.println("1mode: " + String(ringMode) + " numModes: " + String(numRingModes));
     ringMode++;
-    Serial.println("2mode: " + String(ringMode) + " numModes: " + String(numRingModes));
     if(ringMode >= numRingModes)
     {
       ringMode = 0;
-      Serial.println("reset mode: " + String(ringMode));
     }
       
     Serial.println("Mode: " + String(ringMode));
