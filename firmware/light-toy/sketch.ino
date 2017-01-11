@@ -1,10 +1,9 @@
 #include "application.h"
 #include "neopixel.h"
 
-SYSTEM_MODE(SEMI_AUTOMATIC);
+// SYSTEM_MODE(SEMI_AUTOMATIC);
 
-Adafruit_NeoPixel ring = Adafruit_NeoPixel(12, D0, WS2812B);
-Adafruit_NeoPixel strip = Adafruit_NeoPixel(10, D1, WS2812B);
+Adafruit_NeoPixel ring = Adafruit_NeoPixel(64, D0, WS2812B);
 
 void doEncoderA();
 void doEncoderB();
@@ -30,7 +29,7 @@ int pixelIndex = 0;
 
 int MAX_COLOR = 255;
 
-int ringMode = 0;
+int ringMode = 6;
 int numRingModes = 8;
 
 void setup() {
@@ -40,9 +39,6 @@ void setup() {
   ring.begin();
   ring.show();
   ring.setBrightness(64);
-  strip.begin();
-  strip.show();
-  strip.setBrightness(255);
   
   Serial.println("encoderPos init: " + String(encoderPos));
   
@@ -81,7 +77,6 @@ void loop() {
             ring.setPixelColor(i+3, ring.Color(R/12, G/12, B/12));
             ring.setPixelColor(i+4, ring.Color(R/16, G/16, B/16));
             ring.show();
-            stripSetAll(potColor);
             delay(30);
         }
     }
@@ -110,19 +105,16 @@ void loop() {
         int potColor = getRGBPotVal();
         ring.setPixelColor(pixelIndex, potColor);
         ring.show();
-        stripSetAll(potColor);
     }
     else if (ringMode == 2)
     { //set all pixels accoring to POT
         int potColor = getRGBPotVal();
         ringSetAll(potColor);
-        stripSetAll(potColor);
     }
     else if (ringMode == 3)
     {  //fade entire ring in and out on POT color
         int potColor = getRGBPotVal();
         ringSetAll(potColor);
-        stripSetAll(potColor);
         for(int i=1; i<=16; i++)
         {
             int R = analogRead(potPin0) / 16;
@@ -162,7 +154,6 @@ void loop() {
         int potColor = getRGBPotVal();
         ring.setPixelColor(pixelIndex, potColor);
         ring.show();
-        stripSetAll(potColor);
     }
     else if(ringMode == 5)
     { //fade accoring to encoder position
@@ -189,7 +180,6 @@ void loop() {
         ringSetAll(ring.Color(R / pixelIndex, G / pixelIndex, B / pixelIndex));
         
         int potColor = getRGBPotVal();
-        stripSetAll(potColor);
         delay(10);
     }
     else if(ringMode == 6)
@@ -201,7 +191,6 @@ void loop() {
             for(i=0; i<ring.numPixels(); i++) 
             {
                   ring.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-                  stripSetAll(Wheel((i+j) & MAX_COLOR));
             }
             ring.show();
             delay(10);
@@ -256,16 +245,6 @@ void ringSetAll(int color)
     }
     ring.show();
 }
-
-void stripSetAll(int color)
-{
-    for(int i=0; i<10; i++)
-    {
-        strip.setPixelColor(i, color);
-    }
-    strip.show();
-}
-
 
 void encoderButtonPushed()
 {
