@@ -1,322 +1,337 @@
 #include "application.h"
 #include "neopixel.h"
 
-// SYSTEM_MODE(SEMI_AUTOMATIC);
+SYSTEM_MODE(SEMI_AUTOMATIC);
 
-Adafruit_NeoPixel ring = Adafruit_NeoPixel(64, D0, WS2812B);
+Adafruit_NeoPixel panel = Adafruit_NeoPixel(64, D0, WS2812B);
 
-void doEncoderA();
-void doEncoderB();
+void doXEncoderA();
+void doXxEncoderB();
+void doYEncoderA();
+void doyEncoderB();
 void allOff();
 
-int encoderA = D5;
-int encoderB = D6;
-int encoderButtonPin = D2;
+//X-axis encoder - left side
+int xEncoderA = D5;
+int xEncoderB = D6;
+int xEncoderButtonPin = D1;
+
+//Y-axis encoder - right side
+int yEncoderA = D3;
+int yEncoderB = D4;
+int yEncoderButtonPin = D2;
 
 int potPin0 = A0; //red
 int potPin1 = A1; //green
 int potPin2 = A2; //blue
 
-volatile bool A_set = false;
-volatile bool B_set = false;
-volatile bool button_set = false;
-volatile int encoderPos = 0;
+volatile bool xA_set = false;
+volatile bool xB_set = false;
+volatile bool xButton_set = false;
+volatile int xEncoderPos = 0;
 
-int prevPos = 0;
-int value = 0;
+volatile bool yA_set = false;
+volatile bool yB_set = false;
+volatile bool yButton_set = false;
+volatile int yEncoderPos = 0;
 
 int pixelIndex = 0;
+int xprevPos = 0;
+int yprevPos = 0;
+
+int blinkState = true;
 
 int MAX_COLOR = 255;
 
-int ringMode = 6;
-int numRingModes = 8;
-
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(9600); 
   delay(1000);
-  
-  ring.begin();
-  ring.show();
-  ring.setBrightness(64);
-  
-  Serial.println("encoderPos init: " + String(encoderPos));
-  
-  pinMode(encoderA, INPUT_PULLUP);
-  pinMode(encoderB, INPUT_PULLUP);
-  pinMode(encoderButtonPin, INPUT_PULLUP);
-  attachInterrupt(encoderA, doEncoderA, CHANGE);
-  attachInterrupt(encoderB, doEncoderB, CHANGE);
-  attachInterrupt(encoderButtonPin, doEncoderButton, RISING);
+
+  panel.begin();
+  panel.show();
+  panel.setBrightness(64);
+
+  pinMode(xEncoderA, INPUT_PULLUP);
+  pinMode(xEncoderB, INPUT_PULLUP);
+  pinMode(xEncoderButtonPin, INPUT_PULLUP);
+  attachInterrupt(xEncoderA, doxEncoderA, CHANGE);
+  attachInterrupt(xEncoderB, doxEncoderB, CHANGE);
+  attachInterrupt(xEncoderButtonPin, doxEncoderButton, RISING);
+
+  pinMode(yEncoderA, INPUT_PULLUP);
+  pinMode(yEncoderB, INPUT_PULLUP);
+  pinMode(yEncoderButtonPin, INPUT_PULLUP);
+  attachInterrupt(yEncoderA, doyEncoderA, CHANGE);
+  attachInterrupt(yEncoderB, doyEncoderB, CHANGE);
+  attachInterrupt(yEncoderButtonPin, doyEncoderButton, RISING);
 
   delay(1000);
 
-  if(digitalRead(encoderButtonPin) == LOW)
+  if(digitalRead(xEncoderButtonPin) == LOW)
   {
-    Serial.println("Button pressed during startup");
+    Serial.println("Button pressed dupanel startup");
     if (Particle.connected() == false) {
       Particle.connect();
     }
   }
+
+  for(int i=0; i<panel.numPixels(); i++)
+  {
+    panel.setPixelColor(i, panel.Color(random(255), random(255), random(255)));
+    panel.show();
+    delay(20);
+  }
+
+  makeE(panel.Color(0,0,0));
+  delay(100);
+  makeE(panel.Color(255,0,0));
+  delay(100);
+  makeE(panel.Color(0,255,0));
+  delay(100);
+  makeE(panel.Color(0,0,255));
+  delay(100);
+  makeE(panel.Color(0,0,0));
 }
 
 void loop() {
-    
-    if(ringMode == 0)
-    { //animate the ring and change color based on POT
-      for(int i=0; i<12; i++)
-        {
-            ringAllOff();
-            int potColor = getRGBPotVal();
-            int R = analogRead(potPin0) / 16;
-            int G = analogRead(potPin1) / 16;
-            int B = analogRead(potPin2) / 16;
-            ring.setPixelColor(i, potColor);
-            ring.setPixelColor(i+1, ring.Color(R/4, G/4, B/4));
-            ring.setPixelColor(i+2, ring.Color(R/8, G/8, B/8));
-            ring.setPixelColor(i+3, ring.Color(R/12, G/12, B/12));
-            ring.setPixelColor(i+4, ring.Color(R/16, G/16, B/16));
-            ring.show();
-            delay(30);
-        }
-    }
-    else if (ringMode == 1)
-    { //change the color of a single pixel
-        if (prevPos != encoderPos) {
-            if(prevPos > encoderPos)
-              pixelIndex++;
-            else 
-              pixelIndex--;
-              
-            prevPos = encoderPos;
-            
-            if(pixelIndex >=12)
-              pixelIndex = 0;
-            else if(pixelIndex < 0)
-              pixelIndex = 11;
-              
-            Serial.println("pixelIndex: " + String(pixelIndex));  
-            Serial.println("encoderPos: " + String(encoderPos));
-            
-            ringAllOff();
-            ring.show();
-        }
-    
-        int potColor = getRGBPotVal();
-        ring.setPixelColor(pixelIndex, potColor);
-        ring.show();
-    }
-    else if (ringMode == 2)
-    { //set all pixels accoring to POT
-        int potColor = getRGBPotVal();
-        ringSetAll(potColor);
-    }
-    else if (ringMode == 3)
-    {  //fade entire ring in and out on POT color
-        int potColor = getRGBPotVal();
-        ringSetAll(potColor);
-        for(int i=1; i<=16; i++)
-        {
-            int R = analogRead(potPin0) / 16;
-            int G = analogRead(potPin1) / 16;
-            int B = analogRead(potPin2) / 16;
-            ringSetAll(ring.Color(R / i, G / i, B / i));
-            delay(30);
-        }
-        for(int i=16; i>0; i--)
-        {
-            int R = analogRead(potPin0) / 16;
-            int G = analogRead(potPin1) / 16;
-            int B = analogRead(potPin2) / 16;
-            ringSetAll(ring.Color(R / i, G / i, B / i));
-            delay(30);
-        }
-    }
-    else if(ringMode == 4)
-    { //change single pixels but don't reset the whole ring
-        if (prevPos != encoderPos) {
-            if(prevPos > encoderPos)
-              pixelIndex++;
-            else 
-              pixelIndex--;
-              
-            prevPos = encoderPos;
-            
-            if(pixelIndex >=12)
-              pixelIndex = 0;
-            else if(pixelIndex < 0)
-              pixelIndex = 11;
-              
-            ring.show();
-            delay(50);
-        }
-    
-        int potColor = getRGBPotVal();
-        ring.setPixelColor(pixelIndex, potColor);
-        ring.show();
-    }
-    else if(ringMode == 5)
-    { //fade accoring to encoder position
-        if (prevPos != encoderPos) {
-            if(prevPos > encoderPos)
-              pixelIndex++;
-            else 
-              pixelIndex--;
-              
-            prevPos = encoderPos;
-            
-            if(pixelIndex >=12)
-              pixelIndex = 0;
-            else if(pixelIndex < 0)
-              pixelIndex = 11;
-        }
-        
-        int R = analogRead(potPin0) / 16;
-        int G = analogRead(potPin1) / 16;
-        int B = analogRead(potPin2) / 16;
-        if(pixelIndex == 0)
-          pixelIndex++;
-        Serial.println("pixelIndex (brightness): " + String(pixelIndex));
-        ringSetAll(ring.Color(R / pixelIndex, G / pixelIndex, B / pixelIndex));
-        
-        int potColor = getRGBPotVal();
-        delay(10);
-    }
-    else if(ringMode == 6)
-    {
-        uint16_t i, j;
-    
-        for(j=0; j<256; j++) 
-        {
-            for(i=0; i<ring.numPixels(); i++) 
-            {
-                  ring.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-            }
-            ring.show();
-            delay(10);
-        }
-    }
-    else if(ringMode == 7)
-    {
-        // for(int j=0; j<256; j++)
-        // {
-        // for(int i=0; i<12; i++)
-        // {
-        //     ringAllOff();
-        //     int potColor = getRGBPotVal();
-        //     int R = analogRead(potPin0) / 16;
-        //     int G = analogRead(potPin1) / 16;
-        //     int B = analogRead(potPin2) / 16;
-        //     ring.setPixelColor(i, Wheel((i+j) & MAX_COLOR));
-        //     ring.setPixelColor(i+1, Wheel((i+j) & MAX_COLOR));
-        //     ring.setPixelColor(i+2, Wheel((i+j) & MAX_COLOR));
-        //     ring.show();
-        //     stripSetAll(Wheel((i+j) & MAX_COLOR));
-        //     delay(30);
-        // }
-        // }
-    }
+  if (xprevPos != xEncoderPos) {
+    if(xprevPos > xEncoderPos)
+      pixelIndex++;
+    else
+      pixelIndex--;
+
+    xprevPos = xEncoderPos;
+
+    if(pixelIndex >= panel.numPixels())
+      pixelIndex = pixelIndex - panel.numPixels();
+    else if(pixelIndex < 0)
+      pixelIndex = pixelIndex + (panel.numPixels() - 1);
+
+    Serial.println("xxxpixelIndex: " + String(pixelIndex));
+    Serial.println("xxxxEncoderPos: " + String(xEncoderPos));
+    Serial.println("xxxyEncoderPos: " + String(yEncoderPos));
+    panel.setPixelColor(pixelIndex, getRGBPotVal());
+    panel.show();
+  } else if (yprevPos != yEncoderPos) {
+    if(yprevPos > yEncoderPos)
+      pixelIndex += 8;
+    else 
+      pixelIndex -= 8;
+
+    yprevPos = yEncoderPos;
+
+    if(pixelIndex >= panel.numPixels())
+      pixelIndex = pixelIndex - panel.numPixels();
+    else if(pixelIndex < 0)
+      pixelIndex = pixelIndex + (panel.numPixels() - 1);
+
+    Serial.println("yyypixelIndex: " + String(pixelIndex));
+    Serial.println("yyyxEncoderPos: " + String(xEncoderPos));
+    Serial.println("yyyyEncoderPos: " + String(yEncoderPos));
+    panel.setPixelColor(pixelIndex, getRGBPotVal());
+    panel.show();
+  } else {
+    // if(blinkState)
+    // {
+      panel.setPixelColor(pixelIndex, getRGBPotVal());
+    // }
+    // else
+    // {
+    //   panel.setPixelColor(pixelIndex, panel.Color(0,0,0));
+    // }
+    // blinkState = !blinkState;
+    panel.show();
+    // delay(20);
+  }
+
+
 }
 
-
-int getRGBPotVal() {
-    int pot0Val = analogRead(potPin0) / 16;
-    int pot1Val = analogRead(potPin1) / 16;
-    int pot2Val = analogRead(potPin2) / 16;
-    // Serial.println("pot0Val: " + String(pot0Val));
-    // Serial.println("pot1Val: " + String(pot1Val));
-    // Serial.println("pot2Val: " + String(pot2Val));
-    return ring.Color(pot0Val, pot1Val, pot2Val);
-}
-
-void ringAllOff()
+void xEncoderButtonPushed()
 {
-    for(int i=0; i<12; i++)
-    {
-      ring.setPixelColor(i, ring.Color(0,0,0));
-    }
+    Serial.println("X Button Pushed");
 }
 
-void ringSetAll(int color)
+void yEncoderButtonPushed()
 {
-    for(int i=0; i<12; i++)
-    {
-        ring.setPixelColor(i, color);
-    }
-    ring.show();
+    Serial.println("Y Button Pushed");
 }
 
-void encoderButtonPushed()
+unsigned long xlastDebounceTime = 0;
+unsigned long xdebounceDelay = 50;
+int xbuttonState;
+
+void doxEncoderButton()
 {
-    ringMode++;
-    if(ringMode >= numRingModes)
+    xbuttonState = digitalRead(xEncoderButtonPin);
+    if(xbuttonState == HIGH &&
+      (millis() - xlastDebounceTime) > xdebounceDelay)
     {
-      ringMode = 0;
-    }
-      
-    Serial.println("Mode: " + String(ringMode));
-}
-
-unsigned long lastDebounceTime = 0;
-unsigned long debounceDelay = 50;
-int buttonState;
-int lastButtonState = LOW;
-void doEncoderButton() 
-{
-    buttonState = digitalRead(encoderButtonPin);
-    if(buttonState == HIGH &&
-      (millis() - lastDebounceTime) > debounceDelay) 
-    {
-        lastDebounceTime = millis();
-        encoderButtonPushed();
+        xlastDebounceTime = millis();
+        xEncoderButtonPushed();
     }
 }
 
-void doEncoderA(){
-  
-  if(digitalRead(encoderA) != A_set)
+void doxEncoderA(){
+
+  if(digitalRead(xEncoderA) != xA_set)
   {
-    A_set = !A_set; // adjust counter + if A leads B
-    Serial.println("encoderA: " + String(A_set) + "  encoderB: " + String(B_set));
-    if (A_set && !B_set) 
+    xA_set = !xA_set; // adjust counter + if A leads B
+    Serial.println("xEncoderA: " + String(xA_set) + "  xEncoderB: " + String(xB_set));
+    if (xA_set && !xB_set)
     {
-      Serial.println("encoderA-FIRE");  
-      encoderPos += 1;
+      Serial.println("xEncoderA-FIRE");
+      xEncoderPos += 1;
     }
   }
 }
 
 // Interrupt on B changing state, same as A above
-void doEncoderB(){
-  
-  if(digitalRead(encoderB) != B_set) {
-    B_set = !B_set; //  adjust counter - 1 if B leads A
-    Serial.println("encoderB: " + String(B_set) + "  encoderA: " + String(A_set));   
-    if(B_set && !A_set) 
+void doxEncoderB(){
+
+  if(digitalRead(xEncoderB) != xB_set) {
+    xB_set = !xB_set; //  adjust counter - 1 if B leads A
+    Serial.println("xEncoderB: " + String(xB_set) + "  xEncoderA: " + String(xA_set));
+    if(xB_set && !xA_set)
     {
-      Serial.println("encoderB-FIRE");
-      encoderPos -= 1;
+      Serial.println("xEncoderB-FIRE");
+      xEncoderPos += 1;
     }
   }
 }
 
-// Input a value 0 to MAX_COLOR to get a color value.
-// The colours are a transition r - g - b - back to r.
-uint32_t Wheel(byte WheelPos) 
+unsigned long ylastDebounceTime = 0;
+unsigned long ydebounceDelay = 50;
+int ybuttonState;
+
+void doyEncoderButton()
 {
-    int maxVal = MAX_COLOR;
-    if(WheelPos < 85) 
+    ybuttonState = digitalRead(yEncoderButtonPin);
+    if(ybuttonState == HIGH &&
+      (millis() - ylastDebounceTime) > ydebounceDelay)
     {
-     return ring.Color(WheelPos * 3, maxVal - WheelPos * 3, 0);
-    } 
-    else if(WheelPos < 170) 
-    {
-     WheelPos -= 85;
-     return ring.Color(maxVal - WheelPos * 3, 0, WheelPos * 3);
-    } 
-    else 
-    {
-     WheelPos -= 170;
-     return ring.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
+        ylastDebounceTime = millis();
+        yEncoderButtonPushed();
     }
 }
+
+void doyEncoderA(){
+
+  if(digitalRead(yEncoderA) != yA_set)
+  {
+    yA_set = !yA_set; // adjust counter + if A leads B
+    Serial.println("yEncoderA: " + String(yA_set) + "  xEncoderB: " + String(yB_set));
+    if (yA_set && !yB_set)
+    {
+      Serial.println("yEncoderA-FIRE");
+      yEncoderPos += 1;
+    }
+  }
+}
+
+// Interrupt on B changing state, same as A above
+void doyEncoderB(){
+
+  if(digitalRead(yEncoderB) != yB_set) {
+    yB_set = !yB_set; //  adjust counter - 1 if B leads A
+    Serial.println("yEncoderB: " + String(yB_set) + "  yEncoderA: " + String(yA_set));
+    if(yB_set && !yA_set)
+    {
+      Serial.println("yEncoderB-FIRE");
+      yEncoderPos += 1;
+    }
+  }
+}
+
+int getRGBPotVal() {
+    int pot0Val = analogRead(potPin0) / 16;
+    int pot1Val = analogRead(potPin1) / 16;
+    int pot2Val = analogRead(potPin2) / 16;
+    /*Serial.println("pot0Val: " + String(pot0Val));
+    Serial.println("pot1Val: " + String(pot1Val));
+    Serial.println("pot2Val: " + String(pot2Val));*/
+    return panel.Color(pot0Val, pot1Val, pot2Val);
+}
+
+void panelAllOff()
+{
+    for(int i=0; i<12; i++)
+    {
+      panel.setPixelColor(i, panel.Color(0,0,0));
+    }
+}
+
+void panelSetAll(int color)
+{
+    for(int i=0; i<12; i++)
+    {
+        panel.setPixelColor(i, color);
+    }
+    panel.show();
+}
+
+// Input a value 0 to MAX_COLOR to get a color value.
+// The colours are a transition r - g - b - back to r.
+uint32_t Wheel(byte WheelPos)
+{
+    int maxVal = MAX_COLOR;
+    if(WheelPos < 85)
+    {
+     return panel.Color(WheelPos * 3, maxVal - WheelPos * 3, 0);
+    }
+    else if(WheelPos < 170)
+    {
+     WheelPos -= 85;
+     return panel.Color(maxVal - WheelPos * 3, 0, WheelPos * 3);
+    }
+    else
+    {
+     WheelPos -= 170;
+     return panel.Color(0, WheelPos * 3, maxVal - WheelPos * 3);
+    }
+}
+
+void makeE(int color)
+{
+  panel.setPixelColor(2, color);
+  panel.setPixelColor(3, color);
+  panel.setPixelColor(4, color);
+  panel.setPixelColor(5, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(10, color);
+  panel.setPixelColor(11, color);
+  panel.setPixelColor(12, color);
+  panel.setPixelColor(13, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(18, color);
+  panel.setPixelColor(19, color);
+  panel.show();
+  panel.setPixelColor(26, color);
+  panel.setPixelColor(27, color);
+  panel.setPixelColor(28, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(34, color);
+  panel.setPixelColor(35, color);
+  panel.setPixelColor(36, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(42, color);
+  panel.setPixelColor(43, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(50, color);
+  panel.setPixelColor(51, color);
+  panel.setPixelColor(52, color);
+  panel.setPixelColor(53, color);
+  panel.show();
+  delay(100);
+  panel.setPixelColor(58, color);
+  panel.setPixelColor(59, color);
+  panel.setPixelColor(60, color);
+  panel.setPixelColor(61, color);
+  panel.show();
+}
+
