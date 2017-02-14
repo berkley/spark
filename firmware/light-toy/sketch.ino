@@ -114,7 +114,7 @@ void loop() {
     {
       if(blinkState)
       {
-        panel.setPixelColor(i, displayArr[i]);
+        panel.setPixelColor(i, getRGBPotVal());
       }
       else
       {
@@ -162,7 +162,7 @@ void handleInput() {
     if(currentColor != potColor)
     {
       Serial.println("x color changed");
-      displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
+      // displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
     }
   } else if (yprevPos != yEncoderPos) {
     if(yprevPos > yEncoderPos)
@@ -184,7 +184,7 @@ void handleInput() {
     if(currentColor != potColor)
     {
       Serial.println("y color changed");
-      displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
+      // displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
     }
   } 
 }
@@ -197,11 +197,13 @@ int getPixelIndex(int xIndex, int yIndex)
 void xEncoderButtonPushed()
 {
     Serial.println("X Button Pushed");
+    displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
 }
 
 void yEncoderButtonPushed()
 {
     Serial.println("Y Button Pushed");
+    displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
 }
 
 unsigned long xlastDebounceTime = 0;
