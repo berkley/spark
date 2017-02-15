@@ -6,6 +6,12 @@
 #define NUM_PIXELS 64
 #define NUM_ROWS 8
 #define NUM_COLS 8
+#define DISPLAY_ARR_LOC 0
+
+struct DisplayObj
+{
+  int displayArr[NUM_PIXELS];
+};
 
 Adafruit_NeoPixel panel = Adafruit_NeoPixel(NUM_PIXELS, D0, WS2812B);
 
@@ -29,7 +35,14 @@ int potPin0 = A0; //red
 int potPin1 = A1; //green
 int potPin2 = A2; //blue
 
-int displayArr[NUM_PIXELS];
+DisplayObj displayObj = {{0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0,
+                          0,0,0,0,0,0,0,0}};
 
 volatile bool xA_set = false;
 volatile bool xB_set = false;
@@ -55,6 +68,8 @@ int MAX_COLOR = 255;
 
 void setup() {
   Serial.begin(9600); 
+
+  EEPROM.get(DISPLAY_ARR_LOC, displayObj);
 
   panel.begin();
   panel.show();
@@ -84,10 +99,6 @@ void setup() {
     }
   }
 
-  for(int i=0; i<panel.numPixels(); i++)
-  {
-    displayArr[i] = 0;
-  }
   // for(int i=0; i<panel.numPixels(); i++)
   // {
   //   panel.setPixelColor(i, panel.Color(random(255), random(255), random(255)));
@@ -119,7 +130,7 @@ void loop() {
       else
       {
         int blinkColor = panel.Color(0,0,0);
-        if(displayArr[i] == 0)
+        if(displayObj.displayArr[i] == 0)
         {
           blinkColor = panel.Color(255,255,255);
         }
@@ -128,7 +139,7 @@ void loop() {
     }
     else
     {
-      panel.setPixelColor(i, displayArr[i]);
+      panel.setPixelColor(i, displayObj.displayArr[i]);
     }
     
     currentBlinkCount++;
@@ -157,12 +168,12 @@ void handleInput() {
       xIndex = NUM_COLS - 1;
 
     Serial.println("x x: " + String(xIndex) + " y: " + String(yIndex) + " pixelIndex: " + String(getPixelIndex(xIndex, yIndex)));
-    int currentColor = displayArr[getPixelIndex(xIndex, yIndex)];
+    int currentColor = displayObj.displayArr[getPixelIndex(xIndex, yIndex)];
     int potColor = getRGBPotVal();
     if(currentColor != potColor)
     {
       Serial.println("x color changed");
-      // displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
+      // displayObj.displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
     }
   } else if (yprevPos != yEncoderPos) {
     if(yprevPos > yEncoderPos)
@@ -179,12 +190,12 @@ void handleInput() {
 
     Serial.println("y x: " + String(xIndex) + " y: " + String(yIndex) + " pixelIndex: " + String(getPixelIndex(xIndex, yIndex)));
 
-    int currentColor = displayArr[getPixelIndex(xIndex, yIndex)];
+    int currentColor = displayObj.displayArr[getPixelIndex(xIndex, yIndex)];
     int potColor = getRGBPotVal();
     if(currentColor != potColor)
     {
       Serial.println("y color changed");
-      // displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
+      // displayObj.displayArr[getPixelIndex(xIndex, yIndex)] = potColor;
     }
   } 
 }
@@ -197,13 +208,15 @@ int getPixelIndex(int xIndex, int yIndex)
 void xEncoderButtonPushed()
 {
     Serial.println("X Button Pushed");
-    displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
+    displayObj.displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
+    EEPROM.put(DISPLAY_ARR_LOC, displayObj);
 }
 
 void yEncoderButtonPushed()
 {
     Serial.println("Y Button Pushed");
-    displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
+    displayObj.displayArr[getPixelIndex(xIndex, yIndex)] = getRGBPotVal();
+    EEPROM.put(DISPLAY_ARR_LOC, displayObj);
 }
 
 unsigned long xlastDebounceTime = 0;
