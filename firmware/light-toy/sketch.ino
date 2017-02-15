@@ -1,7 +1,7 @@
 #include "application.h"
 #include "neopixel.h"
 
-// SYSTEM_MODE(SEMI_AUTOMATIC);
+SYSTEM_MODE(SEMI_AUTOMATIC);
 
 #define NUM_PIXELS 64
 #define NUM_ROWS 8
@@ -64,12 +64,13 @@ int blinkState = true;
 int blinkCount = 4000;
 int currentBlinkCount = 0;
 
+int xDoubleClickTimer = 0;
+int yDoubleClickTimer = 0;
+
 int MAX_COLOR = 255;
 
 void setup() {
   Serial.begin(9600); 
-
-  EEPROM.get(DISPLAY_ARR_LOC, displayObj);
 
   panel.begin();
   panel.show();
@@ -93,10 +94,20 @@ void setup() {
 
   if(digitalRead(xEncoderButtonPin) == LOW)
   {
-    Serial.println("Button pressed dupanel startup");
+    Serial.println("X Button pressed at panel startup");
     if (Particle.connected() == false) {
       Particle.connect();
     }
+  }
+
+  if(digitalRead(yEncoderButtonPin) == LOW)
+  {
+    Serial.println("Y Button pressed at panel startup");
+    EEPROM.put(DISPLAY_ARR_LOC, displayObj);
+  }
+  else
+  {
+    EEPROM.get(DISPLAY_ARR_LOC, displayObj);
   }
 
   // for(int i=0; i<panel.numPixels(); i++)
