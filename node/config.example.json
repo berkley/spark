@@ -3,7 +3,7 @@
     "port": 3000,
     "sendDelay":300,
     "defaultBrightness":32,
-    "spark_url":"https://api.spark.io/v1/devices",
+    "spark_url":"https://api.particle.io/v1/devices",
     "cores": [
         {
             "name": "Core1",
