@@ -189,27 +189,7 @@ void setup()
     pinMode(PIN_3, OUTPUT);
     pinMode(PIN_4, OUTPUT);
     pinMode(PIN_5, OUTPUT);
-    // pinMode(LED_PIN, OUTPUT);
-
-    // if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
-    // {
-    //     Serial.println("Reseting state");
-    //     brightness = 255;
-    //     _brightness = 255;
-    //     EEPROM.put(EEPROM_BRIGHTNESS, 255);
-    // }
-    // else
-    // {
-    //     Serial.println("Resuming state: " + String(stripObj2.params));
-    //     if(brightness > 0 && brightness < 256)
-    //     {
-    //         strip2.setBrightness(brightness);
-    //         strip1.setBrightness(brightness);
-    //         strip0.setBrightness(brightness);
-    //     }
-    //     run(String(stripObj2.params));
-    // }
-
+    
     for(int i=0; i<NUM_PINS; i++)
     {
         int pin = pinForId(i);
@@ -262,7 +242,7 @@ void brake()
     Serial.println("brake");
 }
 
-void loop() 
+void loop()
 {
     // Serial.println("loop");
     if(digitalRead(BUTTON_LEFT_TURN_PIN) == LOW)
@@ -312,6 +292,75 @@ void loop()
         Serial.println("brake OFF");
         brakeMode = STOP;
     }
+
+    strip0Loop();
+    strip1Loop();
+    strip2Loop();
+}
+
+strip0Loop()
+{
+    
+}
+
+strip1Loop()
+{
+    if(blinkerMode == LEFT_BLINKER)
+    {
+        Serial.println("LEFT_BLINKER");
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(300);
+        bikeLeftTail(strip1.Color(0,0,0));      
+        delay(300);
+    }
+    else if(blinkerMode == RIGHT_BLINKER)
+    {
+        Serial.println("RIGHT_BLINKER");
+        bikeRightTail(strip1.Color(255,0,0));
+        delay(300);
+        bikeRightTail(strip1.Color(0,0,0));      
+        delay(300);   
+    }
+
+    if(brakeMode == ON)
+    {
+        strip1.setBrightness(255);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(0,0,0));
+        bikeLeftTail(strip1.Color(0,0,0));
+        delay(50);
+        bikeRightTail(strip1.Color(255,0,0));
+        bikeLeftTail(strip1.Color(255,0,0));
+        delay(100);
+    }
+    else
+    {
+        strip1.setBrightness(128);
+    }
+}
+
+strip2Loop()
+{
+
+}
+
+void loop() 
+{
+    
 
     if(loopRun.equals(STOP))
     {
@@ -460,53 +509,6 @@ void loop()
         {
             rainbow(20);
         }
-    }
-
-    if(blinkerMode == LEFT_BLINKER)
-    {
-        Serial.println("LEFT_BLINKER");
-        bikeLeftTail(strip1.Color(255,0,0));
-        delay(300);
-        bikeLeftTail(strip1.Color(0,0,0));      
-        delay(300);
-    }
-    else if(blinkerMode == RIGHT_BLINKER)
-    {
-        Serial.println("RIGHT_BLINKER");
-        bikeRightTail(strip1.Color(255,0,0));
-        delay(300);
-        bikeRightTail(strip1.Color(0,0,0));      
-        delay(300);   
-    }
-
-    if(brakeMode == ON)
-    {
-        strip1.setBrightness(255);
-        bikeRightTail(strip1.Color(255,0,0));
-        bikeLeftTail(strip1.Color(255,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(0,0,0));
-        bikeLeftTail(strip1.Color(0,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(255,0,0));
-        bikeLeftTail(strip1.Color(255,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(0,0,0));
-        bikeLeftTail(strip1.Color(0,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(255,0,0));
-        bikeLeftTail(strip1.Color(255,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(0,0,0));
-        bikeLeftTail(strip1.Color(0,0,0));
-        delay(50);
-        bikeRightTail(strip1.Color(255,0,0));
-        bikeLeftTail(strip1.Color(255,0,0));
-        delay(100);
-    }
-    else
-    {
-        strip1.setBrightness(128);
     }
 }
 
