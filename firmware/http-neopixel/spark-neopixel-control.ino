@@ -35,6 +35,7 @@
 #define NUM_PARAMS 64
 #define NUM_ARGS 20
 
+
 struct LEDObject
 {
     char params[NUM_PARAMS];
@@ -62,6 +63,19 @@ ParticleEmitter emitter = ParticleEmitter(PIXEL_COUNT_2, MAX_COLOR);
 
 char action[64];
 char parameters[NUM_PARAMS];
+
+
+///////////////////////////////
+struct SignLetter
+{
+    int startPixel;
+    int endPixel;
+    int length;
+};
+
+#define CG_SIGN_LENGTH 12
+SignLetter cgSign[CG_SIGN_LENGTH];
+
 
 void setCoordColor(Coord3D coord, uint32_t color);
 
@@ -248,6 +262,68 @@ void loop()
     }
     else if(loopRun.equals(LETTERS))
     {
+        // C
+        cgSign[0].startPixel = 0;
+        cgSign[0].length = 25;
+        cgSign[0].endPixel = cgSign[0].startPixel + cgSign[0].length;
+
+        // O
+        cgSign[1].startPixel = cgSign[0].endPixel + 0;
+        cgSign[1].length = 29;
+        cgSign[1].endPixel = cgSign[1].startPixel + cgSign[1].length;
+
+        // S
+        cgSign[2].startPixel = cgSign[1].endPixel + 0;
+        cgSign[2].length = 25;
+        cgSign[2].endPixel = cgSign[2].startPixel + cgSign[2].length;
+
+        // M
+        cgSign[3].startPixel = cgSign[2].endPixel + 0;
+        cgSign[3].length = 44;
+        cgSign[3].endPixel = cgSign[3].startPixel + cgSign[3].length;
+
+        // I
+        cgSign[4].startPixel = cgSign[3].endPixel + 0;
+        cgSign[4].length = 13;
+        cgSign[4].endPixel = cgSign[4].startPixel + cgSign[4].length;
+
+        // C
+        cgSign[5].startPixel = cgSign[4].endPixel + 0;
+        cgSign[5].length = 24;
+        cgSign[5].endPixel = cgSign[5].startPixel + cgSign[5].length;
+
+        ///////////////////////////////////////////////////
+
+        // E
+        cgSign[6].startPixel = cgSign[5].endPixel + 0;
+        cgSign[6].length = 13;
+        cgSign[6].endPixel = cgSign[6].startPixel + cgSign[6].length;
+
+        // L
+        cgSign[7].startPixel = cgSign[6].endPixel + 0;
+        cgSign[7].length = 17;
+        cgSign[7].endPixel = cgSign[7].startPixel + cgSign[7].length;
+
+        // G
+        cgSign[8].startPixel = cgSign[7].endPixel + 0;
+        cgSign[8].length = 29;
+        cgSign[8].endPixel = cgSign[8].startPixel + cgSign[8].length;
+
+        // G
+        cgSign[9].startPixel = cgSign[8].endPixel + 0;
+        cgSign[9].length = 29;
+        cgSign[9].endPixel = cgSign[9].startPixel + cgSign[9].length;
+
+        // I
+        cgSign[10].startPixel = cgSign[9].endPixel + 0;
+        cgSign[10].length = 13;
+        cgSign[10].endPixel = cgSign[10].startPixel + cgSign[10].length;
+
+        // G
+        cgSign[11].startPixel = cgSign[10].endPixel + 0;
+        cgSign[11].length = 29;
+        cgSign[11].endPixel = cgSign[11].startPixel + cgSign[11].length;
+
         letters(); 
     }
     else if(loopRun.equals(ENDRUN))
@@ -675,6 +751,20 @@ uint32_t Wheel(byte WheelPos)
     }
 }
 
+int randomChance() {
+    return random(2) == 0;
+}
+
+uint32_t randomColor()
+{
+    int max = MAX_COLOR;
+    // int min = max;
+    return strip2.Color(
+        randomChance() ? random(max) : 0,
+        randomChance() ? random(max) : 0,
+        randomChance() ? random(max) : 0);
+}
+
 bool stringToBool(String s)
 {
     if(s.equals("true") || s.equals("TRUE"))
@@ -745,9 +835,20 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
 
 void letters() 
 {
-    strip2.setPixelColor(24, strip2.Color(255, 0, 0));
+    for (int i=0; i < CG_SIGN_LENGTH; i++) {
+    
+        SignLetter l = cgSign[i];
+        uint32_t color = randomColor();
+
+        for (int j=0; j < l.length; j++) {
+            int p = l.startPixel + j;
+            strip2.setPixelColor(p, color);
+            // strip2.setPixelColor(p, strip2.Color(Wheel(i & MAX_COLOR)));
+        }
+    }
+
     strip2.show();
-    delay(1000);
+    delay(2000);
 }
 
 void particles() 
