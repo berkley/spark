@@ -77,6 +77,19 @@ struct SignLetter
 SignLetter cgSign[CG_SIGN_LENGTH];
 
 
+// Sequences
+#define WORD_SEQUENCE_MAX_LENGTH 20
+#define WORD_COUNT 10
+
+int WordSpellingSmile[WORD_SEQUENCE_MAX_LENGTH] = {2, 3, 4, 7, 6};
+
+int SignWord[][WORD_SEQUENCE_MAX_LENGTH] = {
+    {2, 3, 4, 7, 6}, // SMILE
+    {2,1,3,6,  2, 3, 4, 7, 6,  4,  11,10,9,8,7,6} // SOME SMILE I GIGGLE
+};
+
+// int[] word = SignWord[0];
+
 void setCoordColor(Coord3D coord, uint32_t color);
 
 //program and action names
@@ -324,7 +337,8 @@ void loop()
         cgSign[11].length = 29;
         cgSign[11].endPixel = cgSign[11].startPixel + cgSign[11].length;
 
-        letters(); 
+        cgSign_lettersRainbowSwitch();
+        // cgSign_smile();
     }
     else if(loopRun.equals(ENDRUN))
     {
@@ -350,6 +364,8 @@ void loop()
         runLightning();
     }
 }
+
+#define WORD_SPELLING_SMILE 
 
 int allOff()
 {
@@ -760,7 +776,7 @@ uint32_t randomColor()
     int min = MAX_COLOR * 0.5;
     int max = MAX_COLOR - min;
     return strip2.Color(
-        randomChance() ? random(max) + min : 0,
+        randomChance() ? random(max) + min : min,
         randomChance() ? random(max) + min : 0,
         randomChance() ? random(max) + min : 0);
 }
@@ -833,24 +849,6 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
     return 1;
 }
 
-void letters() 
-{
-    for (int i=0; i < CG_SIGN_LENGTH; i++) {
-    
-        SignLetter l = cgSign[i];
-        uint32_t color = randomColor();
-
-        for (int j=0; j < l.length; j++) {
-            int p = l.startPixel + j;
-            strip2.setPixelColor(p, color);
-            // strip2.setPixelColor(p, strip2.Color(Wheel(i & MAX_COLOR)));
-        }
-    }
-
-    strip2.show();
-    delay(2000);
-}
-
 void particles() 
 {
     unsigned long frameStartMillis = millis();
@@ -919,3 +917,55 @@ void setCoordColor(Coord3D coord, uint32_t color)
     strip2.setPixelColor(coord.x * emitter.numPixels, color); 
 }
 
+/////////////////////////////////////
+
+void cgSign_letterOnWithColor(SignLetter letter, uint32_t color)
+{
+    for (int j=0; j < letter.length; j++)
+    {
+        int p = letter.startPixel + j;
+        strip2.setPixelColor(p, color);
+    }
+}
+
+void cgSign_letterOnWithRandomColor(SignLetter letter)
+{
+    cgSign_letterOnWithColor(letter, randomColor());
+}
+
+void cgSign_lettersRainbowSwitch() 
+{
+    for (int i=0; i < CG_SIGN_LENGTH; i++)
+    {
+        SignLetter l = cgSign[i];
+        cgSign_letterOnWithRandomColor(l);
+    }
+
+    strip2.show();
+    delay(2000);
+}
+
+void cgSign_smile()
+{
+    int *word = SignWord[0];
+    for (int i=0; i < WORD_SEQUENCE_MAX_LENGTH; i++) {
+
+        int letterNum = word[i];
+        SignLetter letter = cgSign[letterNum];
+
+        // if (*letter != NULL) {
+            cgSign_letterOnWithRandomColor(letter);
+            strip2.show();
+            delay(500);
+            allOff();
+        // }
+
+    }
+
+    strip2.show();
+    allOff();
+    delay(1000);
+}
+
+
+/////////////////////////////////////
