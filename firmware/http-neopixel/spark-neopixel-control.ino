@@ -85,8 +85,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LIGHTNING "lightning"
 #define ON "on" 
 #define OFF "off"
+#define LETTERS "letters"
 
-String loopRun = RAINBOW;
+String loopRun = LETTERS;
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];
@@ -245,6 +246,10 @@ void loop()
     {
         particles(); 
     }
+    else if(loopRun.equals(LETTERS))
+    {
+        letters(); 
+    }
     else if(loopRun.equals(ENDRUN))
     {
         int r1 = stringToInt(loopArgs[1]);
@@ -353,6 +358,10 @@ int run(String params)
     else if(command.equals(SNOW))
     {
         loopRun = SNOW;
+    }
+    else if(command.equals(LETTERS))
+    {
+        loopRun = LETTERS;
     }
     else if(command.equals(PARTICLES))
     {
@@ -732,6 +741,13 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
     }
 
     return 1;
+}
+
+void letters() 
+{
+    strip2.setPixelColor(24, strip2.Color(255, 0, 0));
+    strip2.show();
+    delay(1000);
 }
 
 void particles() 
