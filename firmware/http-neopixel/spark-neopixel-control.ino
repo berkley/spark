@@ -757,12 +757,12 @@ int randomChance() {
 
 uint32_t randomColor()
 {
-    int max = MAX_COLOR;
-    // int min = max;
+    int min = MAX_COLOR * 0.5;
+    int max = MAX_COLOR - min;
     return strip2.Color(
-        randomChance() ? random(max) : 0,
-        randomChance() ? random(max) : 0,
-        randomChance() ? random(max) : 0);
+        randomChance() ? random(max) + min : 0,
+        randomChance() ? random(max) + min : 0,
+        randomChance() ? random(max) + min : 0);
 }
 
 bool stringToBool(String s)
