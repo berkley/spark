@@ -116,7 +116,10 @@ int SignLetterSequence[][CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH] = {
     {4,-2, 0,1,3,6,-2, 4,-2, 11,1, -1} // I COME I GO
 };
 
-#define CGSIGN_WORD_SMILE 0
+#define CGSIGN_WORD_COSMIC_GIGGLE 0
+#define CGSIGN_WORD_COSMIC 1
+#define CGSIGN_WORD_GIGGLE 2
+#define CGSIGN_WORD_SMILE 3
 
 void setCoordColor(Coord3D coord, uint32_t color);
 
@@ -982,20 +985,29 @@ void cgSign_party()
 
     int i;
 
-    // all on, then a word, then all on, then letter sequence
-    cgSign_letterSequence(cgSign_nextLetterSequence(), 750);
+    for (i=0; i < 5; i++) {
+        allOff();
+        cgSign_word(CGSIGN_WORD_COSMIC);
+        delay(1000);
+        
+        allOff();
+        cgSign_word(CGSIGN_WORD_GIGGLE);
+        delay(1000);
+    }
+
+    cgSign_letterSequence(cgSign_nextLetterSequence(), 1000);
     delay(2000);
 
-    // for (i=0; i < 5; i++) {
-    //     cgSign_lettersRainbowSwitch();        
-    // }
+    for (i=0; i < 5; i++) {
+        cgSign_lettersRainbowSwitch();        
+    }
 
-    // cgSign_word(cgSign_nextWord());
-    // delay(2000);
+    cgSign_word(cgSign_nextWord());
+    delay(2000);
 
-    // for (i=0; i < 5; i++) {
-    //     cgSign_lettersRainbowSwitch();        
-    // }
+    for (i=0; i < 5; i++) {
+        cgSign_lettersRainbowSwitch();        
+    }
 }
 
 void initCGSign()
