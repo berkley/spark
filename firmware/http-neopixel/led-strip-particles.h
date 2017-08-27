@@ -8,7 +8,7 @@ MIT license
 #include <stddef.h>
 #include <stdlib.h>
 
-#define MAX_PARTICLES 33
+#define MAX_PARTICLES 20
 #define GOLDEN_RATIO 1.618
 
 typedef struct {

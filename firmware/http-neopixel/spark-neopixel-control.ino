@@ -78,12 +78,11 @@ struct SignLetter
 #define CG_SIGN_WORD_MAX_LENGTH 13
 #define CG_SIGN_WORD_COUNT 4
 #define CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH 25
-#define CG_SIGN_LETTER_SEQUENCE_COUNT 6
+#define CG_SIGN_LETTER_SEQUENCE_COUNT 7
 #define WORD_LENGTH(word)  (sizeof(word) / sizeof((word)[0]))
 
 SignLetter CGSign[CG_SIGN_LENGTH];
 unsigned long partyTime = millis();
-int currentWord = -1;
 int currentLetterSequence = -1;
 
 // C 0
@@ -115,13 +114,16 @@ int SignLetterSequence[][CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH] = {
     {7,1,12,6, -1}, // LOVE
     {11,10,12,6, -2, 7,1,12,6, -1}, // GIVE LOVE
     {2,1,3,6, -2, 2,3,4,7,6, -2, 4, -2, 11,10,9,8,7,6, -1}, // SOME SMILE I GIGGLE
-    {4,-2, 0,1,3,6,-2, 4,-2, 11,1, -1} // I COME I GO
+    {4,-2, 0,1,3,6,-2, 4,-2, 11,1, -1}, // I COME I GO
+    {7,10,0,-2, 3,6, -1} // LIC ME
 };
 
 #define CGSIGN_WORD_COSMIC_GIGGLE 0
 #define CGSIGN_WORD_COSMIC 1
 #define CGSIGN_WORD_GIGGLE 2
 #define CGSIGN_WORD_SMILE 3
+
+int currentWord = CGSIGN_WORD_GIGGLE;
 
 void setCoordColor(Coord3D coord, uint32_t color);
 
@@ -1029,7 +1031,7 @@ void cgSign_party()
     }
 
     cgSign_word(cgSign_nextWord());
-    delay(2000);
+    delay(5000);
 
     for (i=0; i < 16; i++) {
         cgSign_lettersRainbowSwitch();        
