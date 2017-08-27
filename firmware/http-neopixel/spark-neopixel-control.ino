@@ -74,17 +74,46 @@ struct SignLetter
 };
 
 #define CG_SIGN_LENGTH 12
-SignLetter CGSign[CG_SIGN_LENGTH];
-
-
-// Sequences
+#define CG_SIGN_WORD_MAX_LENGTH 13
+#define CG_SIGN_WORD_COUNT 4
+#define CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH 25
+#define CG_SIGN_LETTER_SEQUENCE_COUNT 6
 #define WORD_LENGTH(word)  (sizeof(word) / sizeof((word)[0]))
-#define WORD_SEQUENCE_MAX_LENGTH 20
-// #define WORD_COUNT 10
 
-int SignWord[][WORD_SEQUENCE_MAX_LENGTH] = {
-    {2,3,4,7,6}, // SMILE
-    {2,1,3,6,  2, 3, 4, 7, 6,  4,  11,10,9,8,7,6} // SOME SMILE I GIGGLE
+SignLetter CGSign[CG_SIGN_LENGTH];
+int currentWord = -1;
+int currentLetterSequence = -1;
+
+// C 0
+// O 1
+// S 2
+// M 3
+// I 4
+// C 5
+// 
+// G 11
+// I 10
+// G 9
+// G 8
+// L 7
+// E 6
+
+// V 12
+
+int SignWord[][CG_SIGN_WORD_MAX_LENGTH] = {
+    {0,1,2,3,4,5, 11,10,9,8,7,6, -1}, // COSMIC GIGGLE
+    {0,1,2,3,4,5, -1}, // COSMIC
+    {11,10,9,8,7,6, -1}, // GIGGLE
+    {2,3,4,7,6, -1} // SMILE
+};
+
+int SignLetterSequence[][CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH] = {
+    {0,1,2,3,4,5, 11,10,9,8,7,6, -1}, // COSMIC GIGGLE
+    {1,3,9, -1}, // OMG
+    {7,1,12,6, -1}, // LOVE
+    {11,10,12,6, -2, 7,1,12,6, -1}, // GIVE LOVE
+    {2,1,3,6, -2, 2,3,4,7,6, -2, 4, -2, 11,10,9,8,7,6, -1}, // SOME SMILE I GIGGLE
+    {4,-2, 0,1,3,6,-2, 4,-2, 11,1, -1} // I COME I GO
 };
 
 #define CGSIGN_WORD_SMILE 0
@@ -112,8 +141,9 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define ON "on" 
 #define OFF "off"
 #define LETTERS "letters"
+#define CGSIGN "cgsign"
 
-String loopRun = LETTERS;
+String loopRun = CGSIGN;
 String *args = new String[NUM_ARGS];
 String *loopArgs = new String[NUM_ARGS];
 String *strArr = new String[NUM_ARGS];
@@ -276,7 +306,11 @@ void loop()
     {
         initCGSign();
         cgSign_lettersRainbowSwitch();
-        // cgSign_smile();
+    }
+    else if(loopRun.equals(CGSIGN))
+    {
+        initCGSign();
+        cgSign_party();
     }
     else if(loopRun.equals(ENDRUN))
     {
@@ -392,6 +426,10 @@ int run(String params)
     else if(command.equals(LETTERS))
     {
         loopRun = LETTERS;
+    }
+    else if(command.equals(CGSIGN))
+    {
+        loopRun = CGSIGN;
     }
     else if(command.equals(PARTICLES))
     {
@@ -880,47 +918,84 @@ void cgSign_lettersRainbowSwitch()
     }
 
     strip2.show();
-    delay(2000);
+    delay(1000);
 }
 
 void cgSign_word(int wordNumber)
 {
     allOff();
     int *word = SignWord[wordNumber];
-    int length = WORD_LENGTH(word);
 
-    for (int i=0; i < length; i++) {
+    for (int i=0; i < CG_SIGN_WORD_MAX_LENGTH; i++) {
         int letterNum = word[i];
+        if (letterNum == -1) break;
         SignLetter letter = CGSign[letterNum];
-
-        // if (*letter != NULL) {
-            cgSign_letterOnWithRandomColor(letter);
-        // }
-
+        cgSign_letterOnWithRandomColor(letter);
     }
 
     strip2.show();
 }
 
-void cgSign_letterSequence(int wordNumber, int letterDelay, int repeatDelay)
+void cgSign_letterSequence(int sequenceNumber, int letterDelay)
 {
     allOff();
-    int *word = SignWord[wordNumber];
-    int length = WORD_LENGTH(word);
+    int *word = SignLetterSequence[sequenceNumber];
 
-    for (int i=0; i < length; i++) {
+    for (int i=0; i < CG_SIGN_LETTER_SEQUENCE_MAX_LENGTH; i++) {
         int letterNum = word[i];
-        SignLetter letter = CGSign[letterNum];
+        if (letterNum == -1) break;
 
-        // if (*letter != NULL) {
+        if (letterNum != -2) {
+            SignLetter letter = CGSign[letterNum];
             cgSign_letterOnWithRandomColor(letter);
-            strip2.show();
-            delay(letterDelay);
-            allOff();
-        // }
-    }
+            strip2.show();            
+        }
 
-    delay(repeatDelay);
+        delay(letterDelay);
+        allOff();
+    }
+}
+
+int cgSign_nextWord()
+{
+    currentWord++;
+    if (currentWord >= CG_SIGN_WORD_COUNT) {
+        currentWord = 0;
+    }
+    return currentWord;
+}
+
+int cgSign_nextLetterSequence()
+{
+    currentLetterSequence++;
+    if (currentLetterSequence >= CG_SIGN_LETTER_SEQUENCE_COUNT) {
+        currentLetterSequence = 0;
+    }
+    return currentLetterSequence;
+}
+
+void cgSign_party()
+{
+    // setAll(255,255,255);
+    // delay(500);
+    // return;
+
+    int i;
+
+    // all on, then a word, then all on, then letter sequence
+    cgSign_letterSequence(cgSign_nextLetterSequence(), 750);
+    delay(2000);
+
+    // for (i=0; i < 5; i++) {
+    //     cgSign_lettersRainbowSwitch();        
+    // }
+
+    // cgSign_word(cgSign_nextWord());
+    // delay(2000);
+
+    // for (i=0; i < 5; i++) {
+    //     cgSign_lettersRainbowSwitch();        
+    // }
 }
 
 void initCGSign()
@@ -989,6 +1064,11 @@ void initCGSign()
     CGSign[11].startPixel = CGSign[10].endPixel;
     CGSign[11].length = 29;
     CGSign[11].endPixel = CGSign[11].startPixel + CGSign[11].length;
+
+    // V
+    CGSign[12].startPixel = CGSign[3].startPixel + 10;
+    CGSign[12].length = 24;
+    CGSign[12].endPixel = CGSign[12].startPixel + CGSign[12].length;
 
 
     ///////////////////////////////////////////////////
