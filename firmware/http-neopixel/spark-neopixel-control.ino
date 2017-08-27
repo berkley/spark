@@ -73,6 +73,7 @@ struct SignLetter
     int length;
 };
 
+#define PARTY_SWITCH_TIME 15000
 #define CG_SIGN_LENGTH 12
 #define CG_SIGN_WORD_MAX_LENGTH 13
 #define CG_SIGN_WORD_COUNT 4
@@ -81,6 +82,7 @@ struct SignLetter
 #define WORD_LENGTH(word)  (sizeof(word) / sizeof((word)[0]))
 
 SignLetter CGSign[CG_SIGN_LENGTH];
+unsigned long partyTime = millis();
 int currentWord = -1;
 int currentLetterSequence = -1;
 
@@ -830,6 +832,14 @@ int fadeColor(uint8_t r1, uint8_t g1, uint8_t b1,
 
 void particles() 
 {
+    unsigned long now = millis();
+
+    if ((now - partyTime) > (PARTY_SWITCH_TIME*2)) {
+        partyTime = now;
+        allOff();
+        loopRun = CGSIGN;
+    }
+
     unsigned long frameStartMillis = millis();
     emitter.stripPosition = 0.5; //random(100) / 100.0;
 
@@ -877,7 +887,7 @@ void particles()
         }
 
         //Terminate the tail
-        strip2.setPixelColor(oldSlot, strip2.Color(0, 0, 0));
+        strip2.setPixelColor(oldSlot, strip2.Color(64, 0, 0));
     }
 
     uint16_t frameElapsedMillis = millis() - frameStartMillis;
@@ -979,13 +989,37 @@ int cgSign_nextLetterSequence()
 
 void cgSign_party()
 {
+    // Use this for power testing
     // setAll(255,255,255);
     // delay(500);
     // return;
 
+
+    unsigned long now = millis();
+
+    if ((now - partyTime) > PARTY_SWITCH_TIME) {
+        partyTime = now;
+
+        emitter.respawnOnOtherSide = true;
+        emitter.threed = false;
+        emitter.flicker = true;
+        emitter.numParticles = 20; // np;
+
+        // float mvf = 10.0;
+        // emitter.maxVelocity = mvf / FPS;
+
+        allOff();
+        loopRun = PARTICLES;
+        return;
+    }
+
     int i;
 
-    for (i=0; i < 5; i++) {
+
+    cgSign_letterSequence(cgSign_nextLetterSequence(), 666);
+    delay(1000);
+
+    for (i=0; i < 3; i++) {
         allOff();
         cgSign_word(CGSIGN_WORD_COSMIC);
         delay(1000);
@@ -995,19 +1029,13 @@ void cgSign_party()
         delay(1000);
     }
 
-    cgSign_letterSequence(cgSign_nextLetterSequence(), 1000);
-    delay(2000);
-
-    for (i=0; i < 5; i++) {
-        cgSign_lettersRainbowSwitch();        
-    }
-
     cgSign_word(cgSign_nextWord());
     delay(2000);
 
-    for (i=0; i < 5; i++) {
+    for (i=0; i < 3; i++) {
         cgSign_lettersRainbowSwitch();        
     }
+
 }
 
 void initCGSign()
