@@ -74,21 +74,20 @@ struct SignLetter
 };
 
 #define CG_SIGN_LENGTH 12
-SignLetter cgSign[CG_SIGN_LENGTH];
+SignLetter CGSign[CG_SIGN_LENGTH];
 
 
 // Sequences
+#define WORD_LENGTH(word)  (sizeof(word) / sizeof((word)[0]))
 #define WORD_SEQUENCE_MAX_LENGTH 20
-#define WORD_COUNT 10
-
-int WordSpellingSmile[WORD_SEQUENCE_MAX_LENGTH] = {2, 3, 4, 7, 6};
+// #define WORD_COUNT 10
 
 int SignWord[][WORD_SEQUENCE_MAX_LENGTH] = {
-    {2, 3, 4, 7, 6}, // SMILE
+    {2,3,4,7,6}, // SMILE
     {2,1,3,6,  2, 3, 4, 7, 6,  4,  11,10,9,8,7,6} // SOME SMILE I GIGGLE
 };
 
-// int[] word = SignWord[0];
+#define CGSIGN_WORD_SMILE 0
 
 void setCoordColor(Coord3D coord, uint32_t color);
 
@@ -275,68 +274,7 @@ void loop()
     }
     else if(loopRun.equals(LETTERS))
     {
-        // C
-        cgSign[0].startPixel = 0;
-        cgSign[0].length = 25;
-        cgSign[0].endPixel = cgSign[0].startPixel + cgSign[0].length;
-
-        // O
-        cgSign[1].startPixel = cgSign[0].endPixel + 0;
-        cgSign[1].length = 29;
-        cgSign[1].endPixel = cgSign[1].startPixel + cgSign[1].length;
-
-        // S
-        cgSign[2].startPixel = cgSign[1].endPixel + 0;
-        cgSign[2].length = 25;
-        cgSign[2].endPixel = cgSign[2].startPixel + cgSign[2].length;
-
-        // M
-        cgSign[3].startPixel = cgSign[2].endPixel + 0;
-        cgSign[3].length = 44;
-        cgSign[3].endPixel = cgSign[3].startPixel + cgSign[3].length;
-
-        // I
-        cgSign[4].startPixel = cgSign[3].endPixel + 0;
-        cgSign[4].length = 13;
-        cgSign[4].endPixel = cgSign[4].startPixel + cgSign[4].length;
-
-        // C
-        cgSign[5].startPixel = cgSign[4].endPixel + 0;
-        cgSign[5].length = 24;
-        cgSign[5].endPixel = cgSign[5].startPixel + cgSign[5].length;
-
-        ///////////////////////////////////////////////////
-
-        // E
-        cgSign[6].startPixel = cgSign[5].endPixel + 0;
-        cgSign[6].length = 13;
-        cgSign[6].endPixel = cgSign[6].startPixel + cgSign[6].length;
-
-        // L
-        cgSign[7].startPixel = cgSign[6].endPixel + 0;
-        cgSign[7].length = 17;
-        cgSign[7].endPixel = cgSign[7].startPixel + cgSign[7].length;
-
-        // G
-        cgSign[8].startPixel = cgSign[7].endPixel + 0;
-        cgSign[8].length = 29;
-        cgSign[8].endPixel = cgSign[8].startPixel + cgSign[8].length;
-
-        // G
-        cgSign[9].startPixel = cgSign[8].endPixel + 0;
-        cgSign[9].length = 29;
-        cgSign[9].endPixel = cgSign[9].startPixel + cgSign[9].length;
-
-        // I
-        cgSign[10].startPixel = cgSign[9].endPixel + 0;
-        cgSign[10].length = 13;
-        cgSign[10].endPixel = cgSign[10].startPixel + cgSign[10].length;
-
-        // G
-        cgSign[11].startPixel = cgSign[10].endPixel + 0;
-        cgSign[11].length = 29;
-        cgSign[11].endPixel = cgSign[11].startPixel + cgSign[11].length;
-
+        initCGSign();
         cgSign_lettersRainbowSwitch();
         // cgSign_smile();
     }
@@ -937,7 +875,7 @@ void cgSign_lettersRainbowSwitch()
 {
     for (int i=0; i < CG_SIGN_LENGTH; i++)
     {
-        SignLetter l = cgSign[i];
+        SignLetter l = CGSign[i];
         cgSign_letterOnWithRandomColor(l);
     }
 
@@ -945,27 +883,118 @@ void cgSign_lettersRainbowSwitch()
     delay(2000);
 }
 
-void cgSign_smile()
+void cgSign_word(int wordNumber)
 {
-    int *word = SignWord[0];
-    for (int i=0; i < WORD_SEQUENCE_MAX_LENGTH; i++) {
+    allOff();
+    int *word = SignWord[wordNumber];
+    int length = WORD_LENGTH(word);
 
+    for (int i=0; i < length; i++) {
         int letterNum = word[i];
-        SignLetter letter = cgSign[letterNum];
+        SignLetter letter = CGSign[letterNum];
 
         // if (*letter != NULL) {
             cgSign_letterOnWithRandomColor(letter);
-            strip2.show();
-            delay(500);
-            allOff();
         // }
 
     }
 
     strip2.show();
-    allOff();
-    delay(1000);
 }
 
+void cgSign_letterSequence(int wordNumber, int letterDelay, int repeatDelay)
+{
+    allOff();
+    int *word = SignWord[wordNumber];
+    int length = WORD_LENGTH(word);
+
+    for (int i=0; i < length; i++) {
+        int letterNum = word[i];
+        SignLetter letter = CGSign[letterNum];
+
+        // if (*letter != NULL) {
+            cgSign_letterOnWithRandomColor(letter);
+            strip2.show();
+            delay(letterDelay);
+            allOff();
+        // }
+    }
+
+    delay(repeatDelay);
+}
+
+void initCGSign()
+{
+    ///////////////////////////////////////////////////
+    // CG sign letters
+    ///////////////////////////////////////////////////
+    // C
+    CGSign[0].startPixel = 0;
+    CGSign[0].length = 25;
+    CGSign[0].endPixel = CGSign[0].startPixel + CGSign[0].length;
+
+    // O
+    CGSign[1].startPixel = CGSign[0].endPixel;
+    CGSign[1].length = 29;
+    CGSign[1].endPixel = CGSign[1].startPixel + CGSign[1].length;
+
+    // S
+    CGSign[2].startPixel = CGSign[1].endPixel;
+    CGSign[2].length = 25;
+    CGSign[2].endPixel = CGSign[2].startPixel + CGSign[2].length;
+
+    // M
+    CGSign[3].startPixel = CGSign[2].endPixel;
+    CGSign[3].length = 44;
+    CGSign[3].endPixel = CGSign[3].startPixel + CGSign[3].length;
+
+    // I
+    CGSign[4].startPixel = CGSign[3].endPixel;
+    CGSign[4].length = 13;
+    CGSign[4].endPixel = CGSign[4].startPixel + CGSign[4].length;
+
+    // C
+    CGSign[5].startPixel = CGSign[4].endPixel;
+    CGSign[5].length = 24;
+    CGSign[5].endPixel = CGSign[5].startPixel + CGSign[5].length;
+
+    ///////////////////////////////////////////////////
+
+    // E
+    CGSign[6].startPixel = CGSign[5].endPixel;
+    CGSign[6].length = 13;
+    CGSign[6].endPixel = CGSign[6].startPixel + CGSign[6].length;
+
+    // L
+    CGSign[7].startPixel = CGSign[6].endPixel;
+    CGSign[7].length = 17;
+    CGSign[7].endPixel = CGSign[7].startPixel + CGSign[7].length;
+
+    // G
+    CGSign[8].startPixel = CGSign[7].endPixel;
+    CGSign[8].length = 29;
+    CGSign[8].endPixel = CGSign[8].startPixel + CGSign[8].length;
+
+    // G
+    CGSign[9].startPixel = CGSign[8].endPixel;
+    CGSign[9].length = 29;
+    CGSign[9].endPixel = CGSign[9].startPixel + CGSign[9].length;
+
+    // I
+    CGSign[10].startPixel = CGSign[9].endPixel;
+    CGSign[10].length = 13;
+    CGSign[10].endPixel = CGSign[10].startPixel + CGSign[10].length;
+
+    // G
+    CGSign[11].startPixel = CGSign[10].endPixel;
+    CGSign[11].length = 29;
+    CGSign[11].endPixel = CGSign[11].startPixel + CGSign[11].length;
+
+
+    ///////////////////////////////////////////////////
+    // 
+    ///////////////////////////////////////////////////
+
+}
 
 /////////////////////////////////////
