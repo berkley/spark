@@ -73,7 +73,7 @@ struct SignLetter
     int length;
 };
 
-#define PARTY_SWITCH_TIME 15000
+#define PARTY_SWITCH_TIME 5000  //15000
 #define CG_SIGN_LENGTH 12
 #define CG_SIGN_WORD_MAX_LENGTH 13
 #define CG_SIGN_WORD_COUNT 4
@@ -834,7 +834,7 @@ void particles()
 {
     unsigned long now = millis();
 
-    if ((now - partyTime) > (PARTY_SWITCH_TIME*2)) {
+    if ((now - partyTime) > (PARTY_SWITCH_TIME*4)) {
         partyTime = now;
         allOff();
         loopRun = CGSIGN;
@@ -931,7 +931,6 @@ void cgSign_lettersRainbowSwitch()
     }
 
     strip2.show();
-    delay(1000);
 }
 
 void cgSign_word(int wordNumber)
@@ -973,7 +972,7 @@ int cgSign_nextWord()
 {
     currentWord++;
     if (currentWord >= CG_SIGN_WORD_COUNT) {
-        currentWord = 0;
+        currentWord = -1;
     }
     return currentWord;
 }
@@ -982,7 +981,7 @@ int cgSign_nextLetterSequence()
 {
     currentLetterSequence++;
     if (currentLetterSequence >= CG_SIGN_LETTER_SEQUENCE_COUNT) {
-        currentLetterSequence = 0;
+        currentLetterSequence = -1;
     }
     return currentLetterSequence;
 }
@@ -1000,10 +999,10 @@ void cgSign_party()
     if ((now - partyTime) > PARTY_SWITCH_TIME) {
         partyTime = now;
 
-        emitter.respawnOnOtherSide = true;
-        emitter.threed = false;
-        emitter.flicker = true;
-        emitter.numParticles = 20; // np;
+        // emitter.respawnOnOtherSide = true;
+        // emitter.threed = false;
+        // emitter.flicker = true;
+        // emitter.numParticles = 15; // np;
 
         // float mvf = 10.0;
         // emitter.maxVelocity = mvf / FPS;
@@ -1032,8 +1031,9 @@ void cgSign_party()
     cgSign_word(cgSign_nextWord());
     delay(2000);
 
-    for (i=0; i < 3; i++) {
+    for (i=0; i < 16; i++) {
         cgSign_lettersRainbowSwitch();        
+        delay(250);
     }
 
 }
