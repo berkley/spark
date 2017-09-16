@@ -2,6 +2,8 @@
 #include "neopixel.h"
 #include "led-strip-particles.h"
 
+SYSTEM_MODE(SEMI_AUTOMATIC);
+
 #define EEPROM_BRIGHTNESS 0
 #define EEPROM_ADDR_PINS 100
 #define EEPROM_ADDR_STRIP_0 500
