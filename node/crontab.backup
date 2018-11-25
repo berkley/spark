@@ -1,0 +1,53 @@
+# chicken watering
+00 06 * * * curl http://localhost:3000/water/run/action?action=on\&coreName=Chickens-water\&valve=1
+02 06 * * * curl http://localhost:3000/water/run/action?action=off\&coreName=Chickens-water\&valve=1
+00 12 * * * curl http://localhost:3000/water/run/action?action=on\&coreName=Chickens-water\&valve=1
+01 12 * * * curl http://localhost:3000/water/run/action?action=off\&coreName=Chickens-water\&valve=1
+00 16 * * * curl http://localhost:3000/water/run/action?action=on\&coreName=Chickens-water\&valve=1
+01 16 * * * curl http://localhost:3000/water/run/action?action=off\&coreName=Chickens-water\&valve=1
+
+# chicken heat lamp check - turn on at 40F
+*/20 * * * * /usr/local/bin/node /Users/cberkley/project/spark/node/heat-light/heat.js
+
+#chicken day lamp
+01 16 * * * curl http://localhost:3000/chickens/run/action?action=on\&coreName=Chickens\&valve=1
+01 21 * * * curl http://localhost:3000/chickens/run/action?action=off\&coreName=Chickens\&valve=1
+
+# chicken windows
+00 16 * * * curl http://localhost:3000/house/run/action?action=rainbow\&coreId=2b002e000347343337373737
+00 23 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=2b002e000347343337373737
+
+# front porch
+#00 16 * * * curl http://localhost:3000/house/run/action?action=setAll\&coreId=3f003a000547343337373737\&r1=255\&g1=153\&b1=0
+#halloween setting
+00 16 * * * curl http://localhost:3000/house/run/action?action=fadeColor\&coreId=3f003a000547343337373737\&r1=255\&g1=153\&b1=0\&r2=140\&g2=0\&b2=255\&delay=50\&blockSize=5\&duration=10000
+#front porch for christmas
+#00 16 * * * curl http://localhost:3000/house/run/action?action=blocks\&coreId=3f003a000547343337373737\&r1=255\&g1=0\&b1=0\&r2=255\&g2=255\&b2=255\&delay=100\&blockSize=5\&duration=5000
+#front porch off at 7:00
+00 07 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=3f003a000547343337373737
+
+#house eves for halloween
+#00 18 * * * curl http://localhost:3000/house/run/action?action=fadeColor\&coreId=3d0020000647343232363230\&r1=255\&g1=153\&b1=0\&r2=140\&g2=0\&b2=255\&delay=50\&blockSize=5\&duration=10000
+
+#house eves for christmas
+#00 16 * * * curl http://localhost:3000/house/run/action?action=loopBlocks\&coreId=3d0020000647343232363230\&r1=255\&g1=0\&b1=0\&r2=0\&g2=255\&b2=0\&delay=100\&blockSize=5\&duration=5000
+#00 18 * * * curl http://localhost:3000/house/run/action?action=blocks\&coreId=3d0020000647343232363230\&r1=255\&g1=0\&b1=0\&r2=255\&g2=255\&b2=255\&delay=100\&blockSize=5\&duration=5000
+#00 20 * * * curl http://localhost:3000/house/run/action?action=snow\&coreId=3d0020000647343232363230
+
+#house eves off at 06:00
+00 06 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=3d0020000647343232363230
+
+#mantel
+00 17 * * * curl http://localhost:3000/house/run/action?action=alternate\&coreId=1c002a000b47343432313031\&r1=1\&g1=1\&b1=243\&r2=255\&g2=130\&b2=0
+00 07 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=1c002a000b47343432313031
+
+#TV Room Shelves
+00 17 * * * curl http://localhost:3000/house/run/action?action=setAll\&coreId=170033000747343337373738\&r1=255\&g1=164\&b1=0
+30 23 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=170033000747343337373738
+
+#TV
+00 17 * * * curl http://localhost:3000/house/run/action?action=setAll\&coreId=29002c000347343337373737\&r1=255\&g1=164\&b1=0
+30 23 * * * curl http://localhost:3000/house/run/action?action=stop\&coreId=29002c000347343337373737
+
+#Google DNS
+01 * * * * gddns --username=cKqHDinmWtWY48Kx --password=liOwDRoLWYmZsGHg --hostname=home.blinkyhouse.com

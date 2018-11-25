@@ -1,3 +1,3 @@
 rm *firmware*
 particle compile particle *.ino
-particle flash 1c002a000b47343432313031 *firmware*.bin
+particle flash 380042000447343337373738 *firmware*.bin
