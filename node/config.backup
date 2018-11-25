@@ -1,0 +1,63 @@
+{
+    "access_token": "xxx",
+    "port": 3000,
+    "sendDelay":300,
+    "defaultBrightness":32,
+    "spark_url":"https://api.particle.io/v1/devices",
+    "cores": [
+        {
+            "name": "Outside",
+            "id": "3d0020000647343232363230",
+            "description": "Front-Eves",
+            "lightDisplay":true
+        },
+        {
+            "name": "Outside",
+            "id": "3f003a000547343337373737",
+            "description": "Porch",
+            "lightDisplay":true
+        },
+        {
+            "name": "Outside",
+            "id": "1f003c001747343338333633",
+            "description": "Skulls",
+            "lightDisplay":true
+        },
+        {
+            "name": "Chickens",
+            "id": "2b002e000347343337373737",
+            "description": "Lights",
+            "lightDisplay":true
+        },
+        {
+            "name": "Chickens-water",
+            "id": "380042000447343337373738",
+            "description": "Water",
+            "lightDisplay":false
+        },
+        {
+            "name": "TV",
+            "id": "170033000747343337373738",
+            "description": "Bookshelves",
+            "lightDisplay":true
+        },
+        {
+            "name": "TV",
+            "id": "29002c000347343337373737",
+            "description": "TV",
+            "lightDisplay":true
+        },
+        {
+            "name": "Living Room",
+            "id": "1c002a000b47343432313031",
+            "description": "Mantel",
+            "lightDisplay":true
+        }
+        
+    ],
+    "water":{"valves":[{"valveId":"0", "name":"Garden", "core":"Chickens-water"},
+                       {"valveId":"1", "name":"Chickens", "core":"Chickens-water"}]},
+    "chickens":{"switches":[{"lightId":"2", "name":"Heat Lamp", "core":"Chickens"},
+                          {"lightId":"1", "name":"Daylight Lamp","core":"Chickens"}]}
+}
+
