@@ -1,6 +1,9 @@
+
 #include "application.h"
 #include "neopixel.h"
 #include "led-strip-particles.h"
+
+SYSTEM_MODE(MANUAL);
 
 #define EEPROM_BRIGHTNESS 0
 #define EEPROM_ADDR_PINS 100
@@ -28,7 +31,7 @@
 
 //particle params
 #define MAX_COLOR 255
-#define NUM_PARTICLES 12
+#define NUM_PARTICLES 30
 #define FPS 30
 #define MILLIS_PER_FRAME (1000 / FPS)
 
@@ -45,8 +48,8 @@ struct PINObject
     int pins[NUM_PINS];
 };
 
-uint8_t brightness = 255;
-int _brightness = 255;
+uint8_t brightness = 10;
+int _brightness = 10;
 
 Adafruit_NeoPixel strip0 = Adafruit_NeoPixel(PIXEL_COUNT_0, PIXEL_PIN_0, PIXEL_TYPE);
 LEDObject stripObj0 = {{'I', 'N', 'I', 'T'}};
@@ -100,11 +103,15 @@ void setup()
     EEPROM.get(EEPROM_ADDR_PINS, pinObj);
     EEPROM.get(EEPROM_BRIGHTNESS, brightness);
     _brightness = (int)brightness;
+    _brightness = 100;
 
     Serial.begin(9600);  
 
     strip2.begin();
+    strip2.setBrightness(_brightness);
+
     strip2.show();
+
 
     //regiser cloud variables and the run function
     Particle.function("run", run);
@@ -122,16 +129,16 @@ void setup()
     if(String(stripObj2.params).equals("") || String(stripObj2.params).equals("INIT"))
     {
         Serial.println("Reseting state");
-        brightness = 255;
-        _brightness = 255;
-        EEPROM.put(EEPROM_BRIGHTNESS, 255);
+        // brightness = 255;
+        // _brightness = 255;
+        // EEPROM.put(EEPROM_BRIGHTNESS, 255);
     }
     else
     {
         Serial.println("Resuming state: " + String(stripObj2.params));
         if(brightness > 0 && brightness < 256)
         {
-            strip2.setBrightness(brightness);
+            // strip2.setBrightness(brightness);
         }
         run(String(stripObj2.params));
     }
