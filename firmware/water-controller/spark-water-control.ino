@@ -41,9 +41,15 @@ void setup()
     //register the run command as an API endpoint
     Particle.function("run", run);
     //register the action variable as a GET parameter
+<<<<<<< HEAD
     Particle.variable("action", &action, STRING);
     //retister the parameters variable as a GET parameter
     Particle.variable("parameters", &parameters, STRING);
+=======
+    Particle.variable("action", action, STRING);
+    //retister the parameters variable as a GET parameter
+    Particle.variable("parameters", parameters, STRING);
+>>>>>>> 2ef96911901de57efdf576662a36cdb13efb90b3
 }
 
 void loop() 
