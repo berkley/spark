@@ -39,11 +39,11 @@ void setup()
     }
 
     //register the run command as an API endpoint
-    Spark.function("run", run);
+    Particle.function("run", run);
     //register the action variable as a GET parameter
-    Spark.variable("action", &action, STRING);
+    Particle.variable("action", &action, STRING);
     //retister the parameters variable as a GET parameter
-    Spark.variable("parameters", &parameters, STRING);
+    Particle.variable("parameters", &parameters, STRING);
 }
 
 void loop() 
