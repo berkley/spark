@@ -137,7 +137,7 @@ void setCoordColor(Coord3D coord, uint32_t color);
 #define LEFT_BLINKER "LEFT_BLINKER"
 #define RIGHT_BLINKER "RIGHT_BLINKER"
 
-String loopRun = BIKE1;
+String loopRun = PARTICLES;
 String blinkerMode = STOP;
 String brakeMode = STOP;
 bool interrupt = false;
@@ -186,7 +186,7 @@ void setup()
     pinMode(PIN_0, OUTPUT);
     pinMode(PIN_1, OUTPUT);
     pinMode(PIN_2, OUTPUT);
-    pinMode(PIN_3, OUTPUT);
+    pinMode(PIN_3, OUTPUT); 
     pinMode(PIN_4, OUTPUT);
     pinMode(PIN_5, OUTPUT);
     // pinMode(LED_PIN, OUTPUT);
@@ -240,10 +240,9 @@ void rightBlinker()
 void horn()
 {
     Serial.println("horn");
-    // if(loopRun == BIKE1)
-    //     loopRun = BIKE2;
-    // else if(loopRun == BIKE2)
-    //     loopRun = BIKE1;
+
+    loopRun = PARTICLES;
+
     if (Particle.connected() == false) 
     {
         Serial.println("Particle Connecting...");
@@ -284,13 +283,25 @@ void loop()
     if(digitalRead(BUTTON_LIGHTS_PIN) == LOW)
     {
         Serial.println("lights ON");
-        loopRun = BIKE1;
+        // Particle.publish("lights on", loopRun); 
+        // if(blinkerMode == RIGHT_BLINKER)
+        //     loopRun = BIKE1;
+        // else
+            loopRun = RAINBOW;
+    //     if(loopRun == BIKE1)
+    //         loopRun = BIKE2;
+    //     else if(loopRun == BIKE2)
+    //         loopRun = BIKE1;
+    //     else if(loopRun == BIKE2)
+    //         loopRun = PARTICLES;
+    //     else if(loopRun == PARTICLES)
+    //         loopRun = BIKE1;
     }
     else
     {
         Serial.println("lights OFF");
-        loopRun = STOP;
-        allOff();
+        loopRun = PARTICLES;
+        // allOff();
     }
 
     if(digitalRead(BUTTON_HORN_PIN) == LOW)
